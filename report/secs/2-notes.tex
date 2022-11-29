@@ -38,7 +38,7 @@ I was wondering if relative distances among UGVs could also be used to further i
     \item Improved estimation precision (see \textit{docs/FormationFly\_Journal\_v3.pdf}). Moreover, a point left open in such analysis is the possibility of exploiting EKF covariance matrix estimation to infer on the goodness of a relative distance measurement. Each measurement could be weighted according to the inferred estimation goodness in this case. 
 \end{itemize}
 
-\myrulefill{.5\linewidth}{\textit{November, 23}}{\noindent Adaptive observers}
+\myrulefill{.5\linewidth}{\textit{November, 29}}{\noindent Adaptive observers}
 \newline
 An issue that could be interesting to address is the estimation of model parameters along with the state vector. I'm thinking for instance of the possibility of estimating online the mass of the UGV. By doing so there could be a direct measure of how much weight the single agent is carrying during the site preparation task. Adaptive observers could be used to test if this approach is feasible. One could think of using an EKF-based approach again. However, if the mission's cycle time and the system's computational capabilities are sufficiently long/high, an optimization-based approach could be tried, following for instance \cite{Oliva01,Oliva02}. In this regard, I have a couple of questions: 
 
@@ -56,5 +56,34 @@ However, the benefits of this approach could be the followings:
 
 \myrulefill{.5\linewidth}{\textit{November, 23}}{\noindent Hybrid observer}
 \newline
-We are currently working on 
+We are currently working on a hybrid observer to exploit measurements with consistently different sampling times. Consider the following setup: 
 
+\begin{subequations}
+    \label{eqn:multirate_ss}
+    \begin{align}
+        x_t &= f(x_{t-1},u_t) + \omega_t \\
+        z_t &= h(x_t) + e_t \\
+        y_{t} &= g(x_{t-K-1},u_{t-K}) + v_t
+    \end{align}
+\end{subequations}
+
+where $x_t\in\mathbb{R^n}$ is the state vector, $z_t\in\mathbb{R}^p$ is a measurement vector available at a high sampling rate, namely the same rate used to integrate the system. Instead, $y_t\in\mathbb{R}^l$ is a measurement vector whose sampling rate is lower than the previous one, i.e., it is acquired every $K$ samples. Lastly, $\omega_t$ the process noise, and $(e_t,v_t)$ are the measurement noise. Let's consider $||e_t|| \geq ||v_t||$ as a general assumption. Thus, low-frequency measurements are considered more reliable than high-frequency ones. We consider these assumptions as we are developing this solution for a case study in which we have the following sensors available: 
+
+\begin{itemize}
+    \item IMU: providing acceleration at high frequency but with high noise and drifting issues.
+    \item UWB: providing relative distances with respect to anchors, but with a lower noise.
+\end{itemize}
+
+\medskip
+The idea is to design an observer in the following form: 
+
+\begin{subequations}
+    \label{eqn:observer_hyb}
+    \begin{align}
+        \xi_t &= o(\xi_{t-1},\theta,u_t,z_t) \\
+        \theta &= j^{+}(y_t) \\
+        \hat{x}_t &= \gamma(\xi_t,u_t) 
+    \end{align}
+\end{subequations}
+
+where $\xi_t\in\mathbb{R}^o$ is the observer state, $\hat{x}_t\in\mathbb{R}^n$ is the observer output (i.e. the state estimation), and $\theta\in\mathbb{R}^h$ is a set of parameters determined by a jump-map $j^{+}$. Such map is responsible for a discrete state-reset event on $\xi_t$. This reset aims to exploit the more reliable information from the low-frequency measurements to improve the estimation performance on $\hat{x}_t$.
