@@ -1,0 +1,60 @@
+
+\section{Notes}
+
+\subsection{\emoji{light-bulb}Project topics}
+\label{subscn:proj_topics}
+This section briefly recalls the project's main topics, highlighting potential issues that could be addressed in future research \cite{Oren2022}.
+
+\myrulefill{.5\linewidth}{\textit{November, 22}}{\noindent Material mapping}
+\newline
+Material mapping is defined in \cite{Oren2022} as a process allowing tracking of the gravel's location on-site. Indeed, it relies on the capability to distinguish the material from the surroundings. Computer vision is usually exploited to reach such a goal. In \cite{Oren2022} an initial hint from human operators is used to reach dynamic mapping during the task execution.
+
+\myrulefill{.5\linewidth}{\textit{November, 22}}{\noindent Localization }
+\newline
+Localization plays a key role in multi-agent robotic applications. In \cite{Oren2022} a standard EKF approach based on wheel odometry and IMU measurements is improved by exploiting visual localization gained from a master agent (UAV) to increase the estimated position precision on the others (UGVs).
+
+\subsection{\emoji{light-bulb}Points of interest}
+\label{subscn:points_interest}
+
+\myrulefill{.5\linewidth}{\textit{November, 23}}{\noindent Relative distances}
+\newline
+Considering the localization problem, a first question arises from \cite{Oren2022}. Does the visual-EKF use the images to detect only the UGV absolute position or does it also considers the relative distances between the agents? The framework I'm thinking of is the following. Consider the model notation used in \cite{Oren2022}:
+
+\begin{subequations}
+    \label{eqn:model_ss}
+    \begin{align}
+        x_t &= f(x_{t-1},u_t) + \omega_t, \\
+        z_t &= h(x_t) + e_t,
+    \end{align}
+\end{subequations}
+
+with $x\in\mathbb{R}^n$ the state vector, $u\in\mathbb{R}^m$ the control input, $z\in\mathbb{R}^m$ the measured output, and $(\omega,e)$ respectively the process and measurement noise. As I understand, \cite{Oren2022} considers the standard EKF as provided with $z_{s} = [p_{od}, v_{IMU}]$, where $p_{od}$ the position computed from the wheel odometry, and $v_{IMU}$ the velocity measured by the IMU. Instead, the visual-EKF considers an augmented measurements vector $z_v = [p_{od}, p_{img},v_{IMU}]$, where the absolute position of the UGV is also estimated from the UAV camera. 
+
+\medskip
+I was wondering if relative distances among UGVs could also be used to further improve the estimation precision, following the approach proposed in \textit{docs/FormationFly\_Journal\_v3.pdf}. The relative distances could be obtained either from the UAV camera or through additional sensors, such as UWB sensors (e.g. \cite{UWBmodules,UWBdecawave}). The following benefits could come from this approach: 
+
+\begin{itemize}
+    \item Errors on initial anchor position could be addressed 
+    \item Improved estimation precision (see \textit{docs/FormationFly\_Journal\_v3.pdf}). Moreover, a point left open in such analysis is the possibility of exploiting EKF covariance matrix estimation to infer on the goodness of a relative distance measurement. Each measurement could be weighted according to the inferred estimation goodness in this case. 
+\end{itemize}
+
+\myrulefill{.5\linewidth}{\textit{November, 23}}{\noindent Adaptive observers}
+\newline
+An issue that could be interesting to address is the estimation of model parameters along with the state vector. I'm thinking for instance of the possibility of estimating online the mass of the UGV. By doing so there could be a direct measure of how much weight the single agent is carrying during the site preparation task. Adaptive observers could be used to test if this approach is feasible. One could think of using an EKF-based approach again. However, if the mission's cycle time and the system's computational capabilities are sufficiently long/high, an optimization-based approach could be tried, following for instance \cite{Oliva01,Oliva02}. In this regard, I have a couple of questions: 
+
+\begin{itemize}
+    \item Is there a GCS in the experiment?
+    \item If so, which algorithms are centralized in the GCS and which are instead run by single agents?    
+\end{itemize}
+
+However, the benefits of this approach could be the followings:
+
+\begin{itemize}
+    \item More precise and robust estimation compared to EKF
+    \item Online system diagnosis through model parameters monitoring
+\end{itemize}
+
+\myrulefill{.5\linewidth}{\textit{November, 23}}{\noindent Hybrid observer}
+\newline
+We are currently working on 
+
