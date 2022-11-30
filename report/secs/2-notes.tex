@@ -54,18 +54,19 @@ However, the benefits of this approach could be the followings:
     \item Online system diagnosis through model parameters monitoring
 \end{itemize}
 
-\myrulefill{.5\linewidth}{\textit{November, 23}}{\noindent Hybrid observer}
+\myrulefill{.5\linewidth}{\textit{November, 29}}{\noindent Hybrid observer}
 \newline
-We are currently working on a hybrid observer to exploit measurements with consistently different sampling times. Consider the following setup: 
+We are currently working on a hybrid observer to exploit measurements with consistently different sampling times (it's still in an early stage). Consider the following setup: 
 
-\begin{subequations}
+\begin{equation}
     \label{eqn:multirate_ss}
-    \begin{align}
+    \mathcal{P} \text{ : }    
+    \begin{cases}
         x_t &= f(x_{t-1},u_t) + \omega_t \\
         z_t &= h(x_t) + e_t \\
         y_{t} &= g(x_{t-K-1},u_{t-K}) + v_t
-    \end{align}
-\end{subequations}
+    \end{cases}
+\end{equation}
 
 where $x_t\in\mathbb{R^n}$ is the state vector, $z_t\in\mathbb{R}^p$ is a measurement vector available at a high sampling rate, namely the same rate used to integrate the system. Instead, $y_t\in\mathbb{R}^l$ is a measurement vector whose sampling rate is lower than the previous one, i.e., it is acquired every $K$ samples. Lastly, $\omega_t$ the process noise, and $(e_t,v_t)$ are the measurement noise. Let's consider $||e_t|| \geq ||v_t||$ as a general assumption. Thus, low-frequency measurements are considered more reliable than high-frequency ones. We consider these assumptions as we are developing this solution for a case study in which we have the following sensors available: 
 
@@ -77,13 +78,59 @@ where $x_t\in\mathbb{R^n}$ is the state vector, $z_t\in\mathbb{R}^p$ is a measur
 \medskip
 The idea is to design an observer in the following form: 
 
-\begin{subequations}
+\begin{equation}
     \label{eqn:observer_hyb}
-    \begin{align}
-        \xi_t &= o(\xi_{t-1},\theta,u_t,z_t) \\
+    \mathcal{O} \text{ : }
+    \begin{cases}
+        \xi_t &= f_o(\xi_{t-1},\theta,u_t,z_t) \\
         \theta &= j^{+}(y_t) \\
         \hat{x}_t &= \gamma(\xi_t,u_t) 
-    \end{align}
-\end{subequations}
+    \end{cases}
+\end{equation}
 
-where $\xi_t\in\mathbb{R}^o$ is the observer state, $\hat{x}_t\in\mathbb{R}^n$ is the observer output (i.e. the state estimation), and $\theta\in\mathbb{R}^h$ is a set of parameters determined by a jump-map $j^{+}$. Such map is responsible for a discrete state-reset event on $\xi_t$. This reset aims to exploit the more reliable information from the low-frequency measurements to improve the estimation performance on $\hat{x}_t$.
+where $\xi_t\in\mathbb{R}^o$ is the observer state, $\hat{x}_t\in\mathbb{R}^n$ is the observer output (i.e. the state estimation), and $\theta\in\mathbb{R}^h$ is a set of parameters determined by a jump-map $j^{+}$. Such map is responsible for a discrete state-reset event on $\xi_t$. This reset aims to exploit the more reliable information from the low-frequency measurements to improve the estimation performance on $\hat{x}_t$. The main idea is depicted in \cref{fig:hyb}, where $(z_t^*,y_t^*)$ are $\mathcal{P}$ measurements without noise, and the control input $u$ is assumed zero to ease the notation. Note that an event trigger \textbf{E} is included in the scheme as the jump map $j^+$ acts on the observer state only when the low-frequency measurement $y_t$ is collected.
+
+\begin{figure}[h!]
+        \label{fig:hyb}
+	\centering
+	\begin{tikzpicture}[
+			squarednode_black/.style={rectangle, draw=black!60, fill=black!5, very thick},
+			circlenode/.style={circle, draw=black!60, fill=black!5, very thick},
+			node distance=2.5cm]
+			
+		%Nodes
+		\node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm] (P) {$\bm{\mathcal{P}}$};
+		\node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm] (O) [xshift=-0cm,below=of P] {$f_o$};
+            \node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm](J) [right=of O] {$j^+$};
+            \node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm] (UWB) [right=of J] {UWB};       
+            %\node[squarednode_black,minimum width = 1cm,minimum height = 1cm] (E) [xshift=-2.3cm,yshift=-1.5cm,above=of J] {E};       
+            % circles
+            \node[draw,circle,minimum size=0.5cm,inner sep=0pt] (S1) [yshift=1.5cm,below=of P] {$+$};
+            \node[draw,circle,minimum size=0.5cm,inner sep=0pt] (S2) [xshift=1.5cm,left=of UWB] {$+$};
+		
+		
+
+		%Lines
+            % Plant
+		\draw[black, ultra thick, ->] (P.east) -- ([xshift=8.8cm]P.east) node [xshift=-3cm,above] (TextNode) {$x_t$} -- (UWB.north);
+            % z meas            
+            \draw[black, ultra thick, ->] (P.south) -- (S1.north) node [yshift=0.5cm,right] (TextNode) {$z^*_t$};
+            \draw[black, ultra thick, ->] ([xshift=1cm]S1.east) -- (S1.east) node [xshift=0.5cm,above] (TextNode) {$e_t$};
+            \draw[black, ultra thick, ->] (S1.south) -- (O.north) node [yshift=0.5cm,right] (TextNode) {$z_t$};
+            % y meas
+            \draw[black, ultra thick, ->] (UWB.west) -- (S2.east) node [xshift=0.5cm,above] (TextNode) {$y^*_t$};
+            \draw[black, ultra thick, ->] ([yshift=1cm]S2.north) -- (S2.north) node [yshift=0.5cm,right] (TextNode) {$v_t$};
+            \draw[black, ultra thick, ->] (S2.west) -- (J.east) node [xshift=0.5cm,above] (TextNode) {$y_t$};
+            % theta and switch
+            \draw[black, ultra thick,] (J.west) -- ([xshift=1.5cm]O.east) node [xshift=0.5cm,above] (TextNode) {$\theta$};
+            \draw[black, ultra thick,] ([yshift=0.5cm,xshift=1.5cm]O.east) node [xshift=0cm,above] (TextNode) {\textbf{E}} -- ([xshift=1cm]O.east) -- (O.east);
+            %\draw[black, ultra thick,] (E.south) --([yshift=0.5cm,xshift=1.5cm]O.east);
+            
+            % xhat
+            \draw[black, ultra thick, ->] (O.west) -- ([xshift=-1cm]O.west) node [xshift=0.5cm,above] (TextNode) {$\hat{x}_t$};
+		
+		
+		
+	\end{tikzpicture}	
+	\caption{\centering Hybrid observer}
+\end{figure}
