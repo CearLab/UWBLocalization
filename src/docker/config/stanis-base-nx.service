@@ -1,0 +1,16 @@
+[Unit]
+Description=Stanis base service for NX boards
+Requires=docker.service
+After=docker.service
+
+[Service]
+User=
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=
+ExecStart=/usr/local/bin/docker-compose up -d stanis-base-nx
+ExecStop=/usr/local/bin/docker-compose stop stanis-base-nx
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

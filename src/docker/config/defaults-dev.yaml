@@ -1,0 +1,12 @@
+{
+  "build": {
+    "packages-ignore": [
+      "zed_mini_driver"
+    ]
+  },
+  "test": {
+    "packages-ignore": [
+      "zed_mini_driver"
+    ]
+  }
+}

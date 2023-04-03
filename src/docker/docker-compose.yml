@@ -1,0 +1,118 @@
+# Jackal deployment and development environment containers specification.
+#
+# Federico Oliva <lvofrc95@outlook.it>
+#
+# April 3, 2023
+
+version: "3.9"
+
+services:
+  # Jackal base setup
+  jackal-base:
+    build:
+      context: .
+      network: host
+      dockerfile: Dockerfile.x86.base
+    image: dockoly/jackal:base
+
+  # Default Development target
+  jackal-dev:
+    build:
+      context: .
+      network: host
+      dockerfile: Dockerfile.x86.dev
+      args:
+        TARGET: dev
+    image: dockoly/jackal:dev
+    network_mode: "host"
+    environment:
+      TERM: xterm-256color
+      DISPLAY:
+      SHELL: /usr/bin/zsh
+      BOARD: $USER
+    privileged: true
+    cap_add:
+      - SYS_PTRACE
+    user: ros
+    stdin_open: false
+    tty: true
+    working_dir: /home/ros/workspace
+    command:
+      [
+        "/bin/bash",
+        "-c",
+        "trap 'exit 0' TERM; sleep infinity & wait"
+      ]
+    volumes:
+      - /dev:/dev
+      - /sys:/sys
+      - ~/.Xauthority:/home/ros/.Xauthority:rw
+      - ~/.ssh:/home/ros/.ssh
+      - ~/.gitconfig:/home/ros/.gitconfig
+      - ./config/.aliases.sh:/home/ros/.aliases.sh:rw
+      - ./config/.p10k.zsh:/home/ros/.p10k.zsh:rw
+      - ./config/.ros2_cmds.sh:/home/ros/.ros2_cmds.sh:rw
+      - ./config/.zshrc:/home/ros/.zshrc:rw
+      - ./config/zsh_history:/home/ros/zsh_history
+      - ./config/.bashrc:/home/ros/.bashrc:rw
+      - ./config/.stanis_aliases.sh:/home/ros/.stanis_aliases.sh:rw
+      - ./config/defaults-dev.yaml:/home/ros/.colcon/defaults.yaml:rw
+      - /etc/localtime:/etc/localtime:ro
+      - ./config/gazebo:/home/ros/.gazebo
+      - type: bind
+        source: ../
+        target: /home/ros/workspace
+
+  # Defalt Development with Nvidia GPU target
+  jackal-nvidia:
+    build:
+      context: .
+      network: host
+      dockerfile: Dockerfile.x86.dev
+      args:
+        TARGET: nvidia
+    image: dockoly/jackal:dev-nvidia
+    network_mode: "host"
+    environment:
+      TERM: xterm-256color
+      DISPLAY:
+      SHELL: /usr/bin/zsh
+      BOARD: $USER
+    privileged: true
+    cap_add:
+      - SYS_PTRACE
+    user: ros
+    stdin_open: false
+    tty: true
+    working_dir: /home/ros/workspace
+    command:
+      [
+        "/bin/bash",
+        "-c",
+        "trap 'exit 0' TERM; sleep infinity & wait"
+      ]
+    volumes:
+      - /dev:/dev
+      - /sys:/sys
+      - ~/.Xauthority:/home/ros/.Xauthority:rw
+      - ~/.ssh:/home/ros/.ssh
+      - ~/.gitconfig:/home/ros/.gitconfig
+      - ./config/.aliases.sh:/home/ros/.aliases.sh:rw
+      - ./config/.p10k.zsh:/home/ros/.p10k.zsh:rw
+      - ./config/.ros2_cmds.sh:/home/ros/.ros2_cmds.sh:rw
+      - ./config/.zshrc:/home/ros/.zshrc:rw
+      - ./config/zsh_history:/home/ros/zsh_history
+      - ./config/.bashrc:/home/ros/.bashrc:rw
+      - ./config/.stanis_aliases.sh:/home/ros/.stanis_aliases.sh:rw
+      - ./config/gazebo:/home/ros/.gazebo
+      - /etc/localtime:/etc/localtime:ro
+      - type: bind
+        source: ./
+        target: /home/ros/workspace
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
