@@ -9,12 +9,12 @@
 # --network host
 
 # Start from a Bionic image for linux/amd64
-FROM --platform=linux/amd64 ros:melodic-ros-base-bionic
+FROM --platform=linux/amd64 ros:noetic-ros-base-focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Copy mirrored sources list
-COPY sources.list /etc/apt/sources.list
+COPY sources_focal.list /etc/apt/sources.list
 
 # Install basic utilities
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -48,7 +48,6 @@ RUN yes | pip3 install -U \
     argparse \
     cerberus \
     coverage \
-    empy \
     flake8 \
     flake8-blind-except \
     flake8-builtins \
@@ -75,7 +74,6 @@ RUN yes | pip3 install -U \
     pytest-runner \
     pytest-rerunfailures \
     pyulog \
-    pyyaml \
     requests \    
     six \
     testresources \

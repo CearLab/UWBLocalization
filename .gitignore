@@ -1,2 +1,3 @@
 # gitignore file
 *_old
+catkin_ws

@@ -44,7 +44,7 @@
 
 # Choose the container to build from (see README.md)
 ARG TARGET=base
-FROM dockoly/jackal:base
+FROM dockoly/jackal:noetic-base
 ARG TARGET
 
 ARG USER_UID=1000

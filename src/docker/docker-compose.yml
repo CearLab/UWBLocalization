@@ -7,23 +7,31 @@
 version: "3.9"
 
 services:
-  # Jackal base setup
-  jackal-base:
+  # Jackal base setup - melodic
+  jackal-melodic-base:
     build:
       context: .
       network: host
-      dockerfile: Dockerfile.x86.base
-    image: dockoly/jackal:base
+      dockerfile: Dockerfile.melodic.x86.base
+    image: dockoly/jackal:melodic-base
+
+  # Jackal base setup - noetic
+  jackal-noetic-base:
+    build:
+      context: .
+      network: host
+      dockerfile: Dockerfile.noetic.x86.base
+    image: dockoly/jackal:noetic-base
 
   # Default Development target
-  jackal-dev:
+  jackal-melodic-dev:
     build:
       context: .
       network: host
-      dockerfile: Dockerfile.x86.dev
+      dockerfile: Dockerfile.melodic.x86.dev
       args:
         TARGET: dev
-    image: dockoly/jackal:dev
+    image: dockoly/jackal:melodic-dev
     network_mode: "host"
     environment:
       TERM: xterm-256color
@@ -63,15 +71,15 @@ services:
         source: ../
         target: /home/ros/workspace
 
-  # Defalt Development with Nvidia GPU target
-  jackal-nvidia:
+  # Default Development target
+  jackal-noetic-dev:
     build:
       context: .
       network: host
-      dockerfile: Dockerfile.x86.dev
+      dockerfile: Dockerfile.noetic.x86.dev
       args:
-        TARGET: nvidia
-    image: dockoly/jackal:dev-nvidia
+        TARGET: dev
+    image: dockoly/jackal:nodeitc-dev
     network_mode: "host"
     environment:
       TERM: xterm-256color
@@ -104,15 +112,9 @@ services:
       - ./config/zsh_history:/home/ros/zsh_history
       - ./config/.bashrc:/home/ros/.bashrc:rw
       - ./config/.stanis_aliases.sh:/home/ros/.stanis_aliases.sh:rw
-      - ./config/gazebo:/home/ros/.gazebo
+      - ./config/defaults-dev.yaml:/home/ros/.colcon/defaults.yaml:rw
       - /etc/localtime:/etc/localtime:ro
+      - ./config/gazebo:/home/ros/.gazebo
       - type: bind
-        source: ./
+        source: ../
         target: /home/ros/workspace
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [ gpu ]
