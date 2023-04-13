@@ -47,7 +47,7 @@ int main(int argc, char **argv)
      */
     ros::Publisher teleop_pub = n.advertise<geometry_msgs::Twist>("Jackal1/cmd_vel", 1000);
 
-    ros::Rate loop_rate(5);
+    ros::Rate loop_rate(10);
 
     /**
      * A count of how many messages we have sent. This is used to create
@@ -59,13 +59,16 @@ int main(int argc, char **argv)
     std::vector<double> linvel(3, 0.0);
     std::vector<double> angvel(3, 0.0);
 
-    // set default params
-    ros::NodeHandle nh;
-    nh.setParam("/jack_linvel_res", linvel);
-    nh.setParam("/jack_angvel_res", angvel);
-
     // general stuff
     int cnt = 0;
+    ros::NodeHandle nh;
+
+    // test
+    //linvel[0] = -0.5;
+
+    // set default params
+    nh.setParam("/jack_linvel_res",linvel);
+    nh.setParam("/jack_angvel_res",angvel);
 
     while (ros::ok())
     {
@@ -74,12 +77,18 @@ int main(int argc, char **argv)
          */
         geometry_msgs::Twist msg;
 
-        nh.getParam("/jack_linvel_res", linvel);
-        nh.getParam("/jack_angvel_res", angvel);
+        if (nh.hasParam("/jack_linvel_res") && nh.hasParam("/jack_angvel_res")){
+            nh.getParam("/jack_linvel_res",linvel);
+            nh.getParam("/jack_angvel_res",angvel);
 
-        // show what you got
-        ROS_INFO("sending cmd");
-
+            // show what you got
+            ROS_INFO("v: %g",linvel[0]);
+            ROS_INFO("w: %g",angvel[2]);
+        }
+        else {
+            ROS_INFO("params not found");
+        }
+        
         // fill the message - linvel
         msg.linear.x = linvel[0];
         msg.linear.y = linvel[1];
