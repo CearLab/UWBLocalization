@@ -1,3 +1,6 @@
 # gitignore file
 *_old
-catkin_ws
+build/
+devel/
+gtec/
+UWB-Jackal-World/
