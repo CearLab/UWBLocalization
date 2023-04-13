@@ -1,4 +1,5 @@
 #!/bin/bash
+# Remark: It's best if you attach vscode to the running container
 
 # check procedure at http://wiki.ros.org/noetic/Installation/Ubuntu
 
@@ -33,3 +34,9 @@ echo $ROS_PACKAGE_PATH  # check the path
 
 # set nano as editor 
 export EDITOR='nano -w'
+
+# NOTE FOR VSCODE: remebmer to add /opt/ros/noetic/include/ in include path
+
+# install jusky for tutorials
+sudo apt install ros-noetic-husky-desktop
+sudo apt-get install ros-noetic-husky-simulator
