@@ -13,11 +13,12 @@ curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo ap
 sudo apt update
 
 # install jackal stuff
-sudo apt-get install ros-noetic-jackal-simulator 
+sudo apt-get install ros-noetic-jackal-simulator --fix-missing
 #sudo apt-get install ros-noetic-jackal-desktop // not available - check
 
 # setup environment
 # change with your shell (bash/sh/zsh)
+sudo apt install python-pygments
 echo "source /opt/ros/noetic/setup.zsh" >> ~/.zshrc
 source ~/.zshrc
 

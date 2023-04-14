@@ -47,7 +47,7 @@ ARG TARGET=base
 FROM dockoly/jackal:noetic-base
 ARG TARGET
 
-ARG USER_UID=1000
+ARG USER_UID=1005
 
 # Nvidia GPU architecture version (default: GeForce RTX 3000 series)
 # NOTE: You may have to configure this at build time!
