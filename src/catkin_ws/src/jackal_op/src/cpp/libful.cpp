@@ -1,21 +1,6 @@
 // define class with useful stuff
 
-// standard includes
-#include <algorithm>
-#include <stdexcept>
-#include <iostream>
-#include <iterator>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <cstdlib>
-
-// ros includes
-#include "ros/ros.h"
-#include "geometry_msgs/Twist.h"
-#include "std_msgs/String.h"
-#include <gtec_msgs/Ranging.h>
-#include <jackal_op/MeshUWB.h>
+#include "libful.h"
 
 class jackAPI {
 
@@ -53,10 +38,18 @@ public:
     }
 
     // subscriber callback
-    void chatterCallback(const gtec_msgs::Ranging::ConstPtr& msg) {
+    void chatterCallback(const gtec_msgs::Ranging& msg) {
 
         // store distances in the vectors
-        int i = msg.px->anchorId;
+        if (msg.tagId == 1){
+            this->DT1_int[msg.anchorId] = msg.range;
+            this->DT1[msg.anchorId] = msg.range/1000;
+        }
+        else {
+            this->DT2_int[msg.anchorId] = msg.range;
+            this->DT2[msg.anchorId] = msg.range/1000;
+        }
+        
 
     }
 };
