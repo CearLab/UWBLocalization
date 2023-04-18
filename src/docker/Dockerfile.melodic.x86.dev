@@ -43,7 +43,6 @@
 # --runtime=nvidia
 
 # Choose the container to build from (see README.md)
-ARG TARGET=base
 FROM dockoly/jackal:melodic-base
 ARG TARGET
 
@@ -52,6 +51,31 @@ ARG USER_UID=1005
 # Nvidia GPU architecture version (default: GeForce RTX 3000 series)
 # NOTE: You may have to configure this at build time!
 ARG CUDA_ARCH_BIN=8.6
+
+# Env vars for the nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES \
+${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+ENV QT_X11_NO_MITSHM 1
+
+# shouldn't be necesary (only for docker-nvidia1)
+# LABEL com.nvidia.volumes.needed="nvidia_driver"
+# ENV PATH /usr/local/nvidia/bin:${PATH}
+# ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+
+# NVIDIA DEPENDENCIES
+RUN \
+    if [ "$TARGET" = "nvidia" ]; then \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libegl1 \
+    libglvnd0 \
+    libgl1 \
+    libglx0 \
+    libxext6 \
+    libx11-6 && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*; \
+    fi
 
 # Recompile OpenCV with CUDA support on nvidia targets
 RUN \

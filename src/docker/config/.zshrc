@@ -169,5 +169,10 @@ elif echo "$USER" | grep -q 'nx'; then
     docker-compose exec stanis-base-nx zsh
   }
 fi
-source /opt/ros/noetic/setup.zsh
-source /opt/ros/noetic/setup.zsh
+source /opt/ros/melodic/setup.zsh
+source /opt/ros/melodic/setup.zsh
+source /opt/ros/melodic/setup.zsh
+source /opt/ros/melodic/setup.zsh
+source /opt/ros/melodic/setup.zsh
+source /opt/ros/melodic/setup.zsh
+source /opt/ros/melodic/setup.zsh

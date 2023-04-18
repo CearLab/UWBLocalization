@@ -1,0 +1,8 @@
+prefix=/home/ros/workspace/catkin_ws/devel
+
+Name: jackal_world
+Description: Description of jackal_world
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: gazebo_ros

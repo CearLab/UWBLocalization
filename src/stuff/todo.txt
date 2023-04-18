@@ -1,0 +1,3 @@
+1) getinfo on LOS/NLOS models for UWB (from Valentin Barral)
+    https://www.mdpi.com/1424-8220/19/16/3464
+    https://ieeexplore.ieee.org/document/9264213
