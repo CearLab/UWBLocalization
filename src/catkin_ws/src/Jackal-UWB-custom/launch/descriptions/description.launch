@@ -1,6 +1,7 @@
 <launch>
   <arg name="right_id" default="0" />
   <arg name="left_id" default="1" />
+  <arg name="rear_id" default="2" />
 
   <arg name="config" default="base" />
   <!-- fix for oneweek project -->
@@ -13,5 +14,6 @@
                     $(find jackal_description)/urdf/configs/$(arg config)
                     $(find xacro)/xacro $(find jackal-custom)/urdf/jackal_custom/custom_jackal.urdf.xacro right_id:=$(arg right_id) left_id:=$(arg left_id)
                     --inorder" />
+                    
   <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
 </launch>

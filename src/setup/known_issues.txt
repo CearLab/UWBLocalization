@@ -9,3 +9,12 @@
 
 4: when generating messages, note that message_generation is a package, NOT a message. So do not add
    it in generate_messages(DEPENDENCIES)
+
+5: how to write correctly headers and classes
+    see https://www.learncpp.com/cpp-tutorial/class-code-and-header-files/
+
+6: pub-sub with class cpp
+    see: https://roboticsbackend.com/oop-with-ros-in-cpp/
+
+7: compile a package from source
+    see: https://answers.ros.org/question/252478/how-to-build-a-package-from-source-on-ubuntu-mate-1604-lts-and-ros-kinetic/

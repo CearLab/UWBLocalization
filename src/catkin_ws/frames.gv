@@ -1,0 +1,9 @@
+digraph G {
+"robi/base_link" -> "robi/tagrear"[label="Broadcaster: /robi/tagrear_base_link\nAverage rate: 1.250 Hz\nMost recent transform: 565.210 ( -0.450 sec old)\nBuffer length: 4.000 sec\n"];
+"robi/odom" -> "robi/base_link"[label="Broadcaster: /robi/base_link_odom\nAverage rate: 1.250 Hz\nMost recent transform: 565.468 ( -0.708 sec old)\nBuffer length: 4.001 sec\n"];
+"world" -> "robi/odom"[label="Broadcaster: /robi/odom_world\nAverage rate: 1.250 Hz\nMost recent transform: 565.464 ( -0.704 sec old)\nBuffer length: 4.000 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 564.760"[ shape=plaintext ] ;
+ }->"world";
+}
