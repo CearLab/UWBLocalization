@@ -1,8 +1,0 @@
-prefix=/home/ros/workspace/catkin_ws/devel
-
-Name: gazebosensorplugins
-Description: Description of gazebosensorplugins
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: roscpp gazebo_ros gtec_msgs

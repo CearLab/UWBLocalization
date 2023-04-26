@@ -1,8 +1,0 @@
-prefix=/home/ros/workspace/catkin_ws/devel
-
-Name: foobar
-Description: Description of foobar
-Version: 1.2.4
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

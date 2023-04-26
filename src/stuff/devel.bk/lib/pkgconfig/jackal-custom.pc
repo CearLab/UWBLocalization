@@ -1,8 +1,0 @@
-prefix=/home/ros/workspace/catkin_ws/devel
-
-Name: jackal-custom
-Description: Description of jackal-custom
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: gazebo_ros

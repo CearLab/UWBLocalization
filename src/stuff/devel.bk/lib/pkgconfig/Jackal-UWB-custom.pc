@@ -1,8 +1,0 @@
-prefix=/home/ros/workspace/catkin_ws/devel
-
-Name: Jackal-UWB-custom
-Description: Description of Jackal-UWB-custom
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: gazebo_ros

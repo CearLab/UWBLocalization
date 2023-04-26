@@ -4,5 +4,4 @@ build/
 devel/
 gtec/
 UWB-Jackal-World/
-optim/
-alglib-cpp/
+stuff/

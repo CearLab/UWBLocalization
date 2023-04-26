@@ -1,8 +1,0 @@
-prefix=/home/ros/workspace/catkin_ws/devel
-
-Name: jackal_op
-Description: Description of jackal_op
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: message_runtime
