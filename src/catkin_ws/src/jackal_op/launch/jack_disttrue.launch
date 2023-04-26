@@ -1,0 +1,16 @@
+<launch>
+    <arg name="ns" default="DistTrue" />
+    <arg name="topicroot" default="" />
+    <param name="jack_disttrue_subA" type="string" value="/gtec/toa/anchors" />
+    <param name="jack_disttrue_subOdom" type="string" value="/robi/ground_truth/state" />
+    <param name="jack_disttrue_pub" type="string" value="/$(arg topicroot)/DTrue" />    
+    <param name="DistjackAPIName" type="string" value="/$(arg ns)JackAPI" />
+    <param name="NanchorMesh" type="int" value="4" />
+
+    <param name="UWBrate" type="int" value="5" />
+
+    <!-- Handle distances -->
+    <group ns="$(arg ns)"> 
+        <node name="$(arg ns)" pkg="jackal_op" type="jack_disttrue"/>
+    </group>
+</launch>

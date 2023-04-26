@@ -1,5 +1,6 @@
 <launch>
   <include file="$(find jackal-custom)/launch/empty_world.launch">
+    <!--arg name="world_name" value="$(find jackal-custom)/worlds/rolling_landscape_120m_custom.world"/-->
     <arg name="world_name" value="$(find jackal-custom)/worlds/scenario1.world"/>
     <arg name="joystick" value="true"/>
     <arg name="joy_dev" value="/dev/input/js0"/>

@@ -46,7 +46,7 @@
 FROM dockoly/jackal:melodic-base
 ARG TARGET
 
-ARG USER_UID=1005
+ARG USER_UID=1000
 
 # Nvidia GPU architecture version (default: GeForce RTX 3000 series)
 # NOTE: You may have to configure this at build time!
@@ -54,9 +54,9 @@ ARG CUDA_ARCH_BIN=8.6
 
 # Env vars for the nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES \
-${NVIDIA_VISIBLE_DEVICES:-all}
+    ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES \
-${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 ENV QT_X11_NO_MITSHM 1
 
 # shouldn't be necesary (only for docker-nvidia1)

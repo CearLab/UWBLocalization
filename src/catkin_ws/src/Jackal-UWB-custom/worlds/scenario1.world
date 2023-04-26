@@ -86,6 +86,126 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
+    <model name="boxupR">
+      <static>true</static>
+      <pose>3 3 0.2 0 0.4 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="boxflatR">
+      <static>true</static>
+      <pose>1.5 3 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2.2 1 .05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2.2 1 .05</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="boxdownR">
+      <static>true</static>
+      <pose>0 3 0.2 0 -0.4 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="boxupL">
+      <static>true</static>
+      <pose>3 -3 0.2 0 0.4 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="boxflatL">
+      <static>true</static>
+      <pose>1.5 -3 0.4 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>2.2 1 .05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>2.2 1 .05</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="boxdownL">
+      <static>true</static>
+      <pose>0 -3 0.2 0 -0.4 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 .1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     <model name='uwb_anchor0'>
       <static>1</static>
       <pose frame=''>0 0 0 0 0 0</pose>

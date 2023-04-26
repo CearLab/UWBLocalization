@@ -9,7 +9,8 @@
                 "/usr/include/**",
                 "/home/ros/workspace/catkin_ws/devel/include",
                 "/home/ros/workspace/catkin_ws/src/jackal_op/src/libful",
-                "/home/ros/workspace/catkin_ws/src/jackal_op/src/alglib-cpp/src"
+                "/home/ros/workspace/catkin_ws/src/jackal_op/src/alglib-cpp/src",
+                "/home/ros/workspace/catkin_ws/src/jackal_op/src/optim/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

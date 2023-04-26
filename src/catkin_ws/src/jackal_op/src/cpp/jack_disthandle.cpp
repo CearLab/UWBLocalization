@@ -1,5 +1,7 @@
+// node handling a single tag and doing the trilateration
 #include "libful.cpp"
 
+// dummy calback just for test
 void DummyCallback(const std_msgs::String::ConstPtr& msg)
 {
   ROS_INFO("ARARMAX");
@@ -22,18 +24,25 @@ int main(int argc, char **argv)
 
     // general stuff
     int cnt = 0;
-    ros::Rate loop_rate(20);
+    int rate = 5;
+
+    // init rate for the node
+    if (np.hasParam("/UWBrate")){
+        np.getParam("/UWBrate", rate);
+    }
+    ros::Rate loop_rate(rate);
 
     /**
      * define topic to subscribe to. Get the topics name from params server. Then create handle for subscribing.
      */
     std::string subNameT, subNameA, pubNameT, pubNameTril, jackName;
-    int Nanchors;
+    int Nanchors, tagID, GradientFlag;    
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
-    if (np.hasParam("/jack_disthandle_subT") && np.hasParam("/jack_disthandle_pub") && 
+    if (np.hasParam("/jack_disthandle_subT") && np.hasParam("/jack_disthandle_pubDist") && 
         np.hasParam("/jackAPIName") && np.hasParam("/NanchorMesh") &&
-        np.hasParam("/jack_disthandle_subA")) {
+        np.hasParam("/jack_disthandle_subA") && np.hasParam("/jack_disthandle_pubGrad") &&
+        np.hasParam("/jack_disthandle_tagID")) {
 
         // params found
         ROS_INFO("Params found");
@@ -41,13 +50,21 @@ int main(int argc, char **argv)
         // get topics and init data
         np.getParam("/jack_disthandle_subT", subNameT);  
         np.getParam("/jack_disthandle_subA", subNameA);  
-        np.getParam("/jack_disthandle_pub", pubNameT);
+        np.getParam("/jack_disthandle_pubDist", pubNameT);
         np.getParam("/jackAPIName", jackName); 
         np.getParam("/NanchorMesh", Nanchors);  
+        np.getParam("/jack_disthandle_pubGrad", pubNameTril);
+        np.getParam("/jack_disthandle_tagID", tagID);
 
         // instance of a class
-        jackAPI jackNode = jackAPI(jackName, Nanchors);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID);
         ROS_INFO("jackAPI - Class instance created");
+
+        // set gradient flag if param is present
+        if (np.hasParam("/GradientFlag")){
+            np.getParam("/GradientFlag", GradientFlag);
+            jackNode._GradientFlag = GradientFlag;
+        }
 
         // subscribe
         jackNode._jack_disthandle_ST = np.subscribe(subNameT, 1000, &jackAPI::ChatterCallbackT, &jackNode);
@@ -57,37 +74,17 @@ int main(int argc, char **argv)
 
         // publisher
         jackNode._jack_disthandle_P = np.advertise<jackal_op::MeshUWB>(pubNameT, 1000);
+        jackNode._jack_trilateration_P = np.advertise<jackal_op::GradientDescent>(pubNameTril, 1000);    
+        ROS_INFO("Publishers initialized");
 
-        ROS_INFO("Publisher MeshUWB initialized");
+        // spin
+        ROS_INFO("Spinning");
 
-        // compute trilateration and publish odometry
-        if (np.hasParam("/jack_gradient_pub")){
-
-
-            np.getParam("/jack_gradient_pub", pubNameTril);
-            // publisher
-            jackNode._jack_trilateration_P = np.advertise<jackal_op::GradientDescent>(pubNameTril, 1000);    
-
-            ROS_INFO("Publisher GradientDescent initialized");    
-
-            // spin
-            ROS_INFO("Spinning");
-
-            while (ros::ok()) {
-                ros::spinOnce();
-                loop_rate.sleep();
-                ++cnt;
-            }
-                
-            return 0;
-
-        }
-        else{
-
-            // throw error
-            ROS_ERROR("Params not found for jackal_op - jack_disthandle - trilateration");
-            return -1;
-
+        // spin with loop rate
+        while (ros::ok()) {
+            ros::spinOnce();
+            loop_rate.sleep();
+            ++cnt;
         }
 
     }

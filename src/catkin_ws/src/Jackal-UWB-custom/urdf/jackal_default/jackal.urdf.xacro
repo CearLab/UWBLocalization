@@ -52,8 +52,8 @@
     <gazebo reference="${prefix}_wheel_link">
       <material>Gazebo/DarkGrey</material>
       <selfCollide>false</selfCollide>
-      <mu1 value="0.5"/>
-      <mu2 value="0.5"/>
+      <mu1 value="1"/>
+      <mu2 value="1"/>
       <kp value="10000000.0" />
       <kd value="1" />
       <fdir1 value="1 0 0"/>
@@ -117,7 +117,7 @@
     <inertial>
       <!-- Center of mass -->
       <origin xyz="0.012  0.002 0.067" rpy="0 0 0"/>
-      <mass value="16.523"/>
+      <mass value="16.523"/>      
       <!-- Moments of inertia: ( chassis without wheels ) -->
       <inertia
         ixx="0.3136" ixy="-0.0008" ixz="0.0164"

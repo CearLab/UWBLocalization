@@ -170,9 +170,8 @@ elif echo "$USER" | grep -q 'nx'; then
   }
 fi
 source /opt/ros/melodic/setup.zsh
-source /opt/ros/melodic/setup.zsh
-source /opt/ros/melodic/setup.zsh
-source /opt/ros/melodic/setup.zsh
-source /opt/ros/melodic/setup.zsh
-source /opt/ros/melodic/setup.zsh
-source /opt/ros/melodic/setup.zsh
+
+# pyenv
+#export PATH="$HOME/.pyenv/bin:$PATH"
+#eval "$(pyenv init -)"
+#eval "$(pyenv virtualenv-init -)"

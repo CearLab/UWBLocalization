@@ -13,6 +13,8 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
+
+// dummy callback just to test
 void DummyCallback(const std_msgs::String::ConstPtr& msg)
 {
   ROS_INFO("ARARMAX");

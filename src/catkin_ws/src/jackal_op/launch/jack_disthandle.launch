@@ -1,15 +1,21 @@
 <launch>
     <arg name="ns" default="DistHandler" />
     <arg name="topicroot" default="" />
-    <param name="jack_disthandle_subT" type="string" value="/gtec/toa/ranging" />
+    <arg name="ID" default="" />
+    <arg name="SubT" default="/gtec/toa/ranging" />        
+    <param name="jack_disthandle_subT" type="string" value="$(arg SubT)" />
     <param name="jack_disthandle_subA" type="string" value="/gtec/toa/anchors" />
-    <param name="jack_disthandle_pub" type="string" value="/$(arg topicroot)/DT" />
-    <param name="jack_gradient_pub" type="string" value="/$(arg topicroot)/gradient" />
+    <param name="jack_disthandle_pubDist" type="string" value="/$(arg topicroot)/DT" />
+    <param name="jack_disthandle_pubGrad" type="string" value="/$(arg topicroot)/gradient" />
     <param name="jackAPIName" type="string" value="/$(arg ns)JackAPI" />
+    <param name="jack_disthandle_tagID" type="int" value="$(arg ID)" />
     <param name="NanchorMesh" type="int" value="4" />
+    <param name="GradientFlag" type="int" value="0" />
+
+    <param name="UWBrate" type="int" value="5" />
 
     <!-- Handle distances -->
     <group ns="$(arg ns)"> 
-        <node name="$(arg ns)T1" pkg="jackal_op" type="jack_disthandle"/>
+        <node name="$(arg ns)T$(arg ID)" pkg="jackal_op" type="jack_disthandle"/>
     </group>
   </launch>
