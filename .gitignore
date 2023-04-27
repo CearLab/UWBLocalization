@@ -2,7 +2,6 @@
 *_old
 build/
 devel/
-gtec/
-UWB-Jackal-World/
 stuff/
-.vscode
+.vscode/
+beginner_tutorials/
