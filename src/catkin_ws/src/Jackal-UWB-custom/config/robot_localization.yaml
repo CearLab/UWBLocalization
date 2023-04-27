@@ -2,7 +2,7 @@
 #
 frequency: 50
 
-odom0: ground_truth/state
+odom0: DT7/gradientOdom
 odom0_config: [true, true, true,
                false, false, false,
                false, false, false,

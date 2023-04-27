@@ -1,0 +1,11 @@
+#Configuation for robot odometry EKF
+#
+jack_disthandle_subT: "/MeshTrue/DTrue"
+jack_disthandle_subA: "/gtec/toa/anchors"
+jack_disthandle_pubDist: "/robi/DT7/DT"
+jack_disthandle_pubGrad: "/robi/DT7/gradient"
+jackAPIName: "DT7API"
+jack_disthandle_tagID: 7
+NanchorMesh: 4
+GradientFlag: 0
+UWBrate: 5

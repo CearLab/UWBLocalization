@@ -6,7 +6,6 @@
     <param name="jack_disttrue_pub" type="string" value="/$(arg topicroot)/DTrue" />    
     <param name="DistjackAPIName" type="string" value="/$(arg ns)JackAPI" />
     <param name="NanchorMesh" type="int" value="4" />
-
     <param name="UWBrate" type="int" value="5" />
 
     <!-- Handle distances -->

@@ -175,9 +175,15 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
 
         // get time
         _G.header.stamp = _begin.now();
+        _G.odom.header.stamp = _G.header.stamp;
+        _Godom.header.stamp = _G.odom.header.stamp;
+        _Godom.pose.pose.position.x = _G.odom.pose.pose.position.x;
+        _Godom.pose.pose.position.y = _G.odom.pose.pose.position.y;
+        _Godom.pose.pose.position.z = _G.odom.pose.pose.position.z;
 
         // publish
         _jack_trilateration_P.publish(_G);
+        _jack_odometry_P.publish(_Godom);
 
         ROS_INFO("Published gradient");
     }
@@ -401,6 +407,9 @@ jackal_op::GradientDescent jackAPI::OptimMin(std::vector<_Float64> p0, std::vect
 
     // assign to GradientDescent
     _G.p = _p;
+    _G.odom.pose.pose.position.x = _p[0];
+    _G.odom.pose.pose.position.y = _p[1];
+    _G.odom.pose.pose.position.z = _p[2];
     _G.A = _A;
 
     return _G;

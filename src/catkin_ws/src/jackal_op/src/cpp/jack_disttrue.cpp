@@ -39,19 +39,19 @@ int main(int argc, char **argv)
     int Nanchors;
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
-    if (np.hasParam("/jack_disttrue_subA") && np.hasParam("/jack_disttrue_subOdom") &&
-        np.hasParam("/jack_disttrue_pub") && np.hasParam("/DistjackAPIName") && 
-        np.hasParam("/NanchorMesh")) {
+    if (np.hasParam("/MeshTrue/jack_disttrue_subA") && np.hasParam("/MeshTrue/jack_disttrue_subOdom") &&
+        np.hasParam("/MeshTrue/jack_disttrue_pub") && np.hasParam("/MeshTrue/DistjackAPIName") && 
+        np.hasParam("/MeshTrue/NanchorMesh")) {
 
         // params found
         ROS_INFO("Params found");
 
         // get topics and init data
-        np.getParam("/jack_disttrue_subA", subNameA);  
-        np.getParam("/jack_disttrue_subOdom", subNameOdom);  
-        np.getParam("/jack_disttrue_pub", pubName);          
-        np.getParam("/DistjackAPIName", jackName); 
-        np.getParam("/NanchorMesh", Nanchors);  
+        np.getParam("/MeshTrue/jack_disttrue_subA", subNameA);  
+        np.getParam("/MeshTrue/jack_disttrue_subOdom", subNameOdom);  
+        np.getParam("/MeshTrue/jack_disttrue_pub", pubName);          
+        np.getParam("/MeshTrue/DistjackAPIName", jackName); 
+        np.getParam("/MeshTrue/NanchorMesh", Nanchors);  
 
         // instance of a class - tagID 7 
         jackAPI jackNode = jackAPI(jackName, Nanchors, 7);

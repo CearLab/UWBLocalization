@@ -13,6 +13,11 @@
   <arg name="rear_id" default="2" />
 
   <arg name="robot_name" default="jackal"/>
+
+  <!-- params and args for jackal_op -->
+  <arg name="topicroot" default="" />
+  <arg name="ID" default="" />
+  <arg name="SubT" default="/gtec/toa/ranging" />   
   
   <!-- Configuration of Jackal which you would like to simulate.
        See jackal_description for details. -->
@@ -23,7 +28,6 @@
     <!-- Load Jackal's description, controllers, and teleop nodes. -->
     <include file="$(find jackal-custom)/launch/descriptions/description.launch">
       <arg name="config" value="$(arg config)" />
-
       <arg name="right_id" value="$(arg right_id)" />
       <arg name="left_id" value="$(arg left_id)" />
       <arg name="rear_id" value="$(arg rear_id)" />
@@ -40,12 +44,6 @@
       <arg name="joy_dev" value="$(arg joy_dev)" />
     </include>
 
-    <!-- Distance handling node  -->
-    <!--include file="$(find jackal_op)/launch/jack_disthandle.launch">
-      <arg name="ns" value="DistHandler" />
-      <arg name="topicroot" value="$(arg ns)" />
-    </include-->
-
     <!-- Spawn Jackal -->
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
                 args="-urdf -model jackal -param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y $(arg yaw)" />
@@ -55,4 +53,15 @@
     <node pkg="tf" type="static_transform_publisher" name="tagrear_base_link" args="-0.2155 0 0.184 -1.57 0 -0.78 /$(arg ns)/base_link /$(arg ns)/tagrear 1000"/>
 
   </group>
+
+  <!-- True Distance measurement node  -->
+  <node name="MeshTrue" pkg="jackal_op" type="jack_disttrue">
+    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
+  </node>
+
+  <!-- True Distance measurement node  -->
+  <node name="DT7" pkg="jackal_op" type="jack_disthandle">
+    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle.yaml"/>
+  </node>
+
 </launch>

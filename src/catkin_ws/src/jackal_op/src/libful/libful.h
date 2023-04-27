@@ -54,11 +54,13 @@ public:
     jackal_op::MeshUWB _DTmsg; // message containing the distances measured (subscribed)
     jackal_op::GradientDescent _G;  // message with the optimization info
     gtec_msgs::Ranging _DTrueMsg;   // message with the synthetic true distances
+    nav_msgs::Odometry _Godom;      // message with the odometry
 
     ros::Subscriber _jack_disthandle_ST;    // subscriber to tag distances
     ros::Subscriber _jack_disthandle_SA;    // subscriber to anchors positions
     ros::Publisher  _jack_disthandle_P;     // publisher on the distance wrapper
     ros::Publisher  _jack_trilateration_P;  // publisher on the trilateration topic    
+    ros::Publisher  _jack_odometry_P;       // publisher on odometry topic    
 
     /** **** CONSTRUCTOR **** */
     jackAPI(std::string name, int Nanchors, int tagID);

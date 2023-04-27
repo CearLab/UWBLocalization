@@ -1,0 +1,8 @@
+#Configuation for robot odometry EKF
+#
+jack_disttrue_subA: "/gtec/toa/anchors"
+jack_disttrue_subOdom: "/robi/ground_truth/state"
+jack_disttrue_pub: "/MeshTrue/DTrue"
+DistjackAPIName: "MeshTrueAPI"
+NanchorMesh: 4
+UWBrate: 5
