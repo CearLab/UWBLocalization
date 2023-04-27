@@ -138,7 +138,9 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
 
         // populate correct tag in the UWB message
         if (msg.tagId == 0){            
-            _DTmsg.D1[msg.anchorId] = _DT[msg.anchorId];            
+            _DTmsg.D1[msg.anchorId] = _DT[msg.anchorId];   
+            _Godom.child_frame_id = "tagrear";
+            _Godom.header.frame_id = "base_link";         
         }
         else if (msg.tagId == 1){
             _DTmsg.D2[msg.anchorId] = _DT[msg.anchorId];
@@ -148,6 +150,8 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
         }
         else {
             _DTmsg.DTrue[msg.anchorId] = _DT[msg.anchorId];
+            _Godom.child_frame_id = "base_link";
+            _Godom.header.frame_id = "odom";
         }
     }
     catch(...){

@@ -35,7 +35,7 @@
 
     <!-- Control node  -->
     <include file="$(find jackal-custom)/launch/control/control.launch">
-      <arg name="enable_ekf" value="false" />
+      <arg name="enable_ekf" value="true" />
     </include>
 
     <!-- Teleop node  -->
@@ -48,20 +48,25 @@
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
                 args="-urdf -model jackal -param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y $(arg yaw)" />
 
-    <node pkg="tf" type="static_transform_publisher" name="odom_world" args="0 0 0 0 0 0 /world /$(arg ns)/odom 1000"/>
-    <node pkg="tf" type="static_transform_publisher" name="base_link_odom" args="0 0 0 0 0 0 /$(arg ns)/odom /$(arg ns)/base_link 1000"/>
-    <node pkg="tf" type="static_transform_publisher" name="tagrear_base_link" args="-0.2155 0 0.184 -1.57 0 -0.78 /$(arg ns)/base_link /$(arg ns)/tagrear 1000"/>
+    <node pkg="tf" type="static_transform_publisher" name="odom_world" args="0 0 0 0 0 0 /world /odom 1000"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_link_odom" args="0 0 0 0 0 0 /odom /base_link 1000"/>
+    <node pkg="tf" type="static_transform_publisher" name="tagrear_base_link" args="-0.2155 0 0.184 -1.57 0 -0.78 /base_link /tagrear 1000"/>
 
   </group>
 
   <!-- True Distance measurement node  -->
-  <node name="MeshTrue" pkg="jackal_op" type="jack_disttrue">
+  <node name="MeshTrue" pkg="jackal_op" type="jack_disttrue" args="MeshTrue">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
   </node>
 
-  <!-- True Distance measurement node  -->
+  <!-- True Distance measurement node -->
   <node name="DT7" pkg="jackal_op" type="jack_disthandle">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle.yaml"/>
+    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T7.yaml"/>
+  </node>
+
+  <!-- T0 (rear) Distance measurement node -->
+  <node name="DT0" pkg="jackal_op" type="jack_disthandle" args="0">
+    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T0.yaml"/>
   </node>
 
 </launch>

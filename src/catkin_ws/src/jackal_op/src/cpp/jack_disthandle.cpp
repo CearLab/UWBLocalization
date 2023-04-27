@@ -26,36 +26,66 @@ int main(int argc, char **argv)
     int cnt = 0;
     int rate = 5;
 
-    // init rate for the node
-    if (np.hasParam("/DT7/UWBrate")){
-        np.getParam("/DT7/UWBrate", rate);
-    }
-    ros::Rate loop_rate(rate);
-
     /**
      * define topic to subscribe to. Get the topics name from params server. Then create handle for subscribing.
      */
     std::string subNameT, subNameA, pubNameT, pubNameTril, jackName, pubNameTrilodom;
     int Nanchors, tagID, GradientFlag;    
 
+    // get tagID - default 7
+    if (argc > 1){
+        std::string value_from_cl = argv[1];
+        tagID = atoi(value_from_cl.c_str());
+    }
+    else{
+        tagID = 7;
+    }
+
+    // check params
+    std::string tmp;
+    std::vector<bool> flags;
+    tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_subT";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubDist";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/DT" + std::to_string(tagID) + "/jackAPIName";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/DT" + std::to_string(tagID) + "/NanchorMesh";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_subA";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubGrad";
+    flags.push_back(np.hasParam(tmp));
+
+    // init rate for the node
+    tmp = "/DT" + std::to_string(tagID) + "/UWBrate";
+    if (np.hasParam(tmp)){
+        np.getParam(tmp, rate);
+    }
+    ros::Rate loop_rate(rate);
+
     // read distances from UWB and simplify them (publish on /disthandle_pub)
-    if (np.hasParam("/DT7/jack_disthandle_subT") && np.hasParam("/DT7/jack_disthandle_pubDist") && 
-        np.hasParam("/DT7/jackAPIName") && np.hasParam("/DT7/NanchorMesh") &&
-        np.hasParam("/DT7/jack_disthandle_subA") && np.hasParam("/DT7/jack_disthandle_pubGrad") &&
-        np.hasParam("/DT7/jack_disthandle_tagID")) {
+    if (std::all_of(std::begin(flags), std::end(flags),[](bool b){return b;})) {
 
         // params found
         ROS_INFO("Params found");
 
         // get topics and init data
-        np.getParam("/DT7/jack_disthandle_subT", subNameT);  
-        np.getParam("/DT7/jack_disthandle_subA", subNameA);  
-        np.getParam("/DT7/jack_disthandle_pubDist", pubNameT);
-        np.getParam("/DT7/jackAPIName", jackName); 
-        np.getParam("/DT7/NanchorMesh", Nanchors);  
-        np.getParam("/DT7/jack_disthandle_pubGrad", pubNameTril);
-        np.getParam("/DT7/jack_disthandle_tagID", tagID);
-
+        std::string tmp;
+        std::vector<bool> flags;
+        tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_subT";
+        np.getParam(tmp, subNameT);  
+        tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubDist";
+        np.getParam(tmp, pubNameT);  
+        tmp = "/DT" + std::to_string(tagID) + "/jackAPIName";
+        np.getParam(tmp, jackName);  
+        tmp = "/DT" + std::to_string(tagID) + "/NanchorMesh";
+        np.getParam(tmp, Nanchors);  
+        tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_subA";
+        np.getParam(tmp, subNameA);  
+        tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubGrad";
+        np.getParam(tmp, pubNameTril);  
+        
         // concatenate string - odom
         pubNameTrilodom = pubNameTril + "Odom";
 
@@ -64,8 +94,9 @@ int main(int argc, char **argv)
         ROS_INFO("jackAPI - Class instance created");
 
         // set gradient flag if param is present
-        if (np.hasParam("/DT7/GradientFlag")){
-            np.getParam("/DT7/GradientFlag", GradientFlag);
+        tmp = "/DT" + std::to_string(tagID) + "/GradientFlag";
+        if (np.hasParam(tmp)){
+            np.getParam(tmp, GradientFlag);
             jackNode._GradientFlag = GradientFlag;
         }
 

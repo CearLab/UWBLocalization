@@ -24,10 +24,35 @@ int main(int argc, char **argv)
     // general stuff
     int cnt = 0;
     int rate = 5;
+    std::string ID;
+
+    // get tagID - default 7
+    if (argc > 1){
+        std::string value_from_cl = argv[1];
+        ID = value_from_cl.c_str();
+    }
+    else{
+        ID = "MeshTrue";
+    }
+
+    // check params
+    std::string tmp;
+    std::vector<bool> flags;
+    tmp = "/" + ID + "/jack_disttrue_subA";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/jack_disttrue_subOdom";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/jack_disttrue_pub";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/DistjackAPIName";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/NanchorMesh";
+    flags.push_back(np.hasParam(tmp));
 
     // init rate for the node
-    if (np.hasParam("/UWBrate")){
-        np.getParam("/UWBrate", rate);
+    tmp = "/" + ID + "/UWBrate";
+    if (np.hasParam(tmp)){
+        np.getParam(tmp, rate);
     }
     ros::Rate loop_rate(rate);
 
@@ -39,19 +64,22 @@ int main(int argc, char **argv)
     int Nanchors;
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
-    if (np.hasParam("/MeshTrue/jack_disttrue_subA") && np.hasParam("/MeshTrue/jack_disttrue_subOdom") &&
-        np.hasParam("/MeshTrue/jack_disttrue_pub") && np.hasParam("/MeshTrue/DistjackAPIName") && 
-        np.hasParam("/MeshTrue/NanchorMesh")) {
+    if (std::all_of(std::begin(flags), std::end(flags),[](bool b){return b;})) {
 
         // params found
         ROS_INFO("Params found");
 
         // get topics and init data
-        np.getParam("/MeshTrue/jack_disttrue_subA", subNameA);  
-        np.getParam("/MeshTrue/jack_disttrue_subOdom", subNameOdom);  
-        np.getParam("/MeshTrue/jack_disttrue_pub", pubName);          
-        np.getParam("/MeshTrue/DistjackAPIName", jackName); 
-        np.getParam("/MeshTrue/NanchorMesh", Nanchors);  
+        tmp = "/" + ID + "/jack_disttrue_subA";
+        np.getParam(tmp, subNameA);  
+        tmp = "/" + ID + "/jack_disttrue_subOdom";
+        np.getParam(tmp, subNameOdom);  
+        tmp = "/" + ID + "/jack_disttrue_pub";
+        np.getParam(tmp, pubName);  
+        tmp = "/" + ID + "/DistjackAPIName";
+        np.getParam(tmp, jackName);  
+        tmp = "/" + ID + "/NanchorMesh";
+        np.getParam(tmp, Nanchors);  
 
         // instance of a class - tagID 7 
         jackAPI jackNode = jackAPI(jackName, Nanchors, 7);

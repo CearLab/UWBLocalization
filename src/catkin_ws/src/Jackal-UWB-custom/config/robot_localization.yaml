@@ -1,8 +1,10 @@
 #Configuation for robot odometry EKF
 #
-frequency: 50
+frequency: 100
 
 odom0: DT7/gradientOdom
+#odom0: DT0/gradientOdom
+#odom0: ground_truth/state
 odom0_config: [true, true, true,
                false, false, false,
                false, false, false,
@@ -18,12 +20,12 @@ imu0_config: [false, false, false,
               false, false, false]
 imu0_differential: false
 
-odom_frame: /robi/odom
-base_link_frame: /robi/base_link
-world_frame: /robi/odom
+odom_frame: /odom
+base_link_frame: /base_link
+world_frame: /odom
 
 # initial state
-initial_state: [5.0, 5.0, 5.0
+initial_state: [0.0, 0.0, 0.0
                 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0,
