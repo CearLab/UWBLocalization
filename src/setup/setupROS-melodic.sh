@@ -46,9 +46,13 @@ sudo apt-get install ros-melodic-husky-simulator
 ### ONLY AFTER PULLING TechnionProject ###
 # install libs for optimization
 sudo apt install libopenblas-dev liblapack-dev
+cd setup/lib
+
+### install alglib: https://www.alglib.net/download.php
+tar -xf alglib-3.20.0.cpp.gpl.tgz
+mv alglib-3.20.0.cpp.gpl.tgz alglib-cpp/
 
 ### install armadillo: https://arma.sourceforge.net/ ##
-cd setup/lib
 tar -xf armadillo-12.2.0.tar.xz 
 mv armadillo-12.2.0.tar.xz armadillo-12.2.0/
 #! now enter the armadillo version folder 
@@ -79,6 +83,12 @@ source ~/.zshrc
 sudo apt update
 sudo apt upgrade
 
+# remember to update the submodules before building - outside docker if you need
+
 # setup for the build
 cd ~/workspace/catkin_ws
 rospack profile
+
+# IN THE JACKAL_OP CMAKELIST:
+# FIRST BUILD THE MESSAGES ONLY
+# THEN ALSO LIBFUL AND JACKAL_OP

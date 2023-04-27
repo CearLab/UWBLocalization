@@ -39,9 +39,9 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-)
+#add_service_files(
+#  FILES
+#)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -83,7 +83,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 set(ALGLIBCPP_INCLUDE_DIR
-/home/ros/workspace/stuff/alglib-cpp/src
+/home/ros/workspace/setup/lib/alglib-cpp/src
 )
 set(LIBFUL_INCLUDE_DIR
 src/libful
@@ -113,22 +113,22 @@ include_directories(
 
 ## Declare a C++ library
 set(ALGLIBCPP_SOURCES
-  /home/ros/workspace/stuff/alglib-cpp/src/alglibinternal.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/alglibmisc.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/ap.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/dataanalysis.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/diffequations.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/fasttransforms.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/integration.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/interpolation.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/kernels_avx2.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/kernels_fma.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/kernels_sse2.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/linalg.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/optimization.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/solvers.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/specialfunctions.cpp
-  /home/ros/workspace/stuff/alglib-cpp/src/statistics.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/alglibinternal.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/alglibmisc.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/ap.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/dataanalysis.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/diffequations.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/fasttransforms.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/integration.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/interpolation.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/kernels_avx2.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/kernels_fma.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/kernels_sse2.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/linalg.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/optimization.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/solvers.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/specialfunctions.cpp
+  /home/ros/workspace/setup/lib/alglib-cpp/src/statistics.cpp
 )
 add_library(alglib ${ALGLIBCPP_SOURCES})
 
