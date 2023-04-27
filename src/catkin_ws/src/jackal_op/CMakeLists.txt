@@ -132,31 +132,48 @@ set(ALGLIBCPP_SOURCES
 )
 add_library(alglib ${ALGLIBCPP_SOURCES})
 
-set(LIBFUL_SOURCES
-  src/libful/libful.cpp
+set(GENERALAPI_SOURCES
+  src/libful/GeneralAPI.cpp
 )
-add_library(libful ${LIBFUL_SOURCES})
+add_library(generalAPI ${GENERALAPI_SOURCES})
+
+set(MELODICAPI_SOURCES
+  src/libful/MelodicAPI.cpp
+)
+add_library(melodicAPI ${MELODICAPI_SOURCES})
 
 ## Declare a C++ executable
-add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
+#add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
 add_executable(jack_disttrue src/cpp/jack_disttrue.cpp)
+#add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(jack_disthandle
-${catkin_LIBRARIES} 
-alglib
-libful
-armadillo
-optim
-)
+#target_link_libraries(jack_disthandle
+#${catkin_LIBRARIES} 
+#alglib
+#armadillo
+#optim
+#generalAPI
+#melodicAPI
+#)
 
 target_link_libraries(jack_disttrue
 ${catkin_LIBRARIES} 
 alglib
-libful
 armadillo
 optim
+generalAPI
+melodicAPI
 )
+
+#target_link_libraries(jack_disthandle_dummy
+#${catkin_LIBRARIES} 
+#alglib
+#armadillo
+#optim
+#generalAPI
+#melodicAPI
+#)
 
 ## Add cmake target dependencies of the library
 #add_dependencies(jack_disthandle jackal_op_generate_messages_cpp)
