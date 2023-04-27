@@ -15,6 +15,7 @@ sudo apt update
 # install jackal stuff
 sudo apt-get install ros-melodic-jackal-simulator --fix-missing
 sudo apt-get install ros-melodic-jackal-desktop --fix-missing
+sudo apt-get install ros-melodic-jackal-navigation --fix-missing
 
 # setup environment
 # change with your shell (bash/sh/zsh)
@@ -28,9 +29,9 @@ sudo apt install python3-rosinstall-generator ros-melodic-rqt ros-melodic-rqt-co
 # create catkin workspace
 cd ~/workspace
 #mkdir -p catkin_ws/src
-cd catkin_ws
+#cd catkin_ws
 #catkin_make
-source devel/setup.zsh  # change with your shell
+#source devel/setup.zsh  # change with your shell
 echo $ROS_PACKAGE_PATH  # check the path
 
 # set nano as editor 
@@ -45,19 +46,39 @@ sudo apt-get install ros-melodic-husky-simulator
 ### ONLY AFTER PULLING TechnionProject ###
 # install libs for optimization
 sudo apt install libopenblas-dev liblapack-dev
-cd ~/workspace/catkin_ws/src/jackal_op/
+
+### install armadillo: https://arma.sourceforge.net/ ##
+cd setup/lib
+tar -xf armadillo-12.2.0.tar.xz 
+mv armadillo-12.2.0.tar.xz armadillo-12.2.0/
 #! now enter the armadillo version folder 
-#! cd armadilloV.V.V
-# standard installation in /usr/local
+cd armadillo-12.2.0
+# standard installation in /usr/lib
 # to change directory see README in armadillo dir
 cmake .
 sudo make install
-# install optim
-#! cd to the optim folder
+ls /usr/lib | grep arma 
 export ARMA_INCLUDE_PATH=/usr/lib
+cd ..
+
+### install optim: https://optimlib.readthedocs.io/en/latest/
+git clone --recurse-submodules git@github.com:kthohr/optim.git
+#! cd to the optim folder
+cd optim
 ./configure -i "/usr/local" -l arma -p
 sudo make
 sudo make install
+ls /usr/local/lib | grep optim
+cd ..
 
 # add libs
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib" >> ~/.zshrc
+source ~/.zshrc
+
+# just for safety
+sudo apt update
+sudo apt upgrade
+
+# setup for the build
+cd ~/workspace/catkin_ws
+rospack profile
