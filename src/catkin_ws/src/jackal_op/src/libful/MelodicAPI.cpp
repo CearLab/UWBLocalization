@@ -4,6 +4,9 @@
 /** **** CONSTRUCTOR **** */
 jackAPI::jackAPI(std::string name, int Nanchors, int tagID){
 
+    // counters
+    int i, j;
+
     // init timer
     _begin = ros::Time::now();
 
@@ -15,45 +18,44 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID){
 
     // set gradient flag
     _GradientFlag = 0;
-
+    
     // set mesh dimension
     _Nanchors = Nanchors;
-    _Tag->Nanchors = Nanchors;
+    _Tag.Nanchors = Nanchors;
     
     // counter
     _cnt = 0;
 
     // init J, GJ, HJ
     _G.J = 0;
-    for (int i=0; i<3; i++) {
+    for (i=0; i<3; i++) {
         _G.GJ.push_back(0.0);
     }
-    for (int i=0; i<9; i++) {
+    for (i=0; i<9; i++) {
         _G.HJ.push_back(0.0);
     }
-
+    
     // init p
     _p = {0.0, 0.0, 0.25};
-    _Tag->p = {0.0, 0.0, 0.25};
+    _Tag.p = {0.0, 0.0, 0.25};
 
     // init distance vectors
-    for (int i=0; i<_Nanchors; i++) {
+    for (i=0; i<_Nanchors; i++) {
 
         // init distances - class
         _DT.push_back(0.0);        
         _Dopt.push_back(0.0);
-        _Tag->Dopt.push_back(0.0);
-
-        // init MeshUWB message
-        _DTmsg.D1.push_back(0.0);
+        _Tag.Dopt.push_back(0.0);        
+        // init MeshUWB message        
+        _DTmsg.D1.push_back(0.0);        
         _DTmsg.D2.push_back(0.0);
         _DTmsg.D3.push_back(0.0);
         _DTmsg.DTrue.push_back(0.0);
-
+        
         // init Anchors position
-        for (int j=0; j<3; j++){
+        for (j=0; j<3; j++){
             _A.push_back(0.0);
-            _Tag->A.push_back(0.0);
+            _Tag.A.push_back(0.0);
         }
     }
 
@@ -115,16 +117,25 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
     try {
 
         //optimize
+        _Tag.A = _A;
         int success = 0;
-        success = genAPI::OptimMin(p0, _Dopt, _Tag, _GradientFlag);
+        success = genAPI::OptimMin(p0, _Dopt, &_Tag, _GradientFlag);
 
-        // get time
-        _G.A = _Tag->A;
-        _G.p = _Tag->p;
-        _G.J = _Tag->J;
-        _G.GJ = _Tag->GJ;
+        // fill messages
+        // gradient normal stuff
+        _G.A = _Tag.A;
+        _G.p = _Tag.p;
+        _G.J = _Tag.J;
+        _G.GJ = _Tag.GJ;
         _G.header.stamp = _begin.now();
+
+        // gradient odom
         _G.odom.header.stamp = _G.header.stamp;
+        _G.odom.pose.pose.position.x = _G.p[0];
+        _G.odom.pose.pose.position.y = _G.p[1];
+        _G.odom.pose.pose.position.z = _G.p[2];
+
+        // odometry
         _Godom.header.stamp = _G.odom.header.stamp;
         _Godom.pose.pose.position.x = _G.odom.pose.pose.position.x;
         _Godom.pose.pose.position.y = _G.odom.pose.pose.position.y;

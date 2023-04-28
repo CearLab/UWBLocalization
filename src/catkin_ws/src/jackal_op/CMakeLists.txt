@@ -143,28 +143,31 @@ set(MELODICAPI_SOURCES
 add_library(melodicAPI ${MELODICAPI_SOURCES})
 
 ## Declare a C++ executable
-#add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
+
+# DISTTRUE
 add_executable(jack_disttrue src/cpp/jack_disttrue.cpp)
-#add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)
-
-## Specify libraries to link a library or executable target against
-#target_link_libraries(jack_disthandle
-#${catkin_LIBRARIES} 
-#alglib
-#armadillo
-#optim
-#generalAPI
-#melodicAPI
-#)
-
 target_link_libraries(jack_disttrue
 ${catkin_LIBRARIES} 
-alglib
-armadillo
-optim
-generalAPI
 melodicAPI
+generalAPI
+alglib
+optim
+armadillo
 )
+
+# DISTHANDLE
+add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
+## Specify libraries to link a library or executable target against
+target_link_libraries(jack_disthandle
+${catkin_LIBRARIES} 
+melodicAPI
+generalAPI
+alglib
+optim
+armadillo
+)
+
+#add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)
 
 #target_link_libraries(jack_disthandle_dummy
 #${catkin_LIBRARIES} 

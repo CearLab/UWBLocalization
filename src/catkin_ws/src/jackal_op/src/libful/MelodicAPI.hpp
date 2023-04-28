@@ -31,7 +31,7 @@ public:
     int _GradientFlag;  // gradient based optimization
     std::vector<_Float64> _DT, _Dopt;  // distance vector on the measured tag + 1 dist used for opt
     std::vector<_Float64> _A, _p;   // matrix with anchors estimated position
-    genAPI::Tag *_Tag;
+    genAPI::Tag _Tag;
 
     jackal_op::MeshUWB _DTmsg; // message containing the distances measured (subscribed)
     jackal_op::GradientDescent _G;  // message with the optimization info

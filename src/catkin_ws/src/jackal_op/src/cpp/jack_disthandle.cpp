@@ -1,5 +1,5 @@
 // node handling a single tag and doing the trilateration
-#include "MelodicAPI.h"
+#include "MelodicAPI.hpp"
 
 // dummy calback just for test
 void DummyCallback(const std_msgs::String::ConstPtr& msg)

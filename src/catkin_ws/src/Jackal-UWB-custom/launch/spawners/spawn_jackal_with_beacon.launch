@@ -35,7 +35,7 @@
 
     <!-- Control node  -->
     <include file="$(find jackal-custom)/launch/control/control.launch">
-      <arg name="enable_ekf" value="true" />
+      <arg name="enable_ekf" value="false" />
     </include>
 
     <!-- Teleop node  -->
@@ -59,14 +59,14 @@
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
   </node>
 
-  <!-- True Distance measurement node -->
-  <node name="DT7" pkg="jackal_op" type="jack_disthandle">
+  <!-- True Distance handler node -->
+  <!--node name="DT7" pkg="jackal_op" type="jack_disthandle" args="7">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T7.yaml"/>
-  </node>
+  </node-->
 
-  <!-- T0 (rear) Distance measurement node -->
-  <node name="DT0" pkg="jackal_op" type="jack_disthandle" args="0">
+  <!-- T0 (rear) Distance handler node -->
+  <!--node name="DT0" pkg="jackal_op" type="jack_disthandle" args="0">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T0.yaml"/>
-  </node>
+  </node-->
 
 </launch>
