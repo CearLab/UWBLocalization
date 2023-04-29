@@ -2,4 +2,8 @@
     <node name="DT7" pkg="jackal_op" type="jack_disthandle" args="7">
         <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T7.yaml"/>
     </node>
+
+    <node name="DT0" pkg="jackal_op" type="jack_disthandle" args="0">
+        <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T0.yaml"/>
+    </node>
 </launch>

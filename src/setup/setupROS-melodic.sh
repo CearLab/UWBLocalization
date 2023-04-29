@@ -17,6 +17,9 @@ sudo apt-get install ros-melodic-jackal-simulator --fix-missing
 sudo apt-get install ros-melodic-jackal-desktop --fix-missing
 sudo apt-get install ros-melodic-jackal-navigation --fix-missing
 
+# install tf tutorials
+sudo apt-get install ros-melodic-ros-tutorials ros-melodic-geometry-tutorials ros-melodic-rviz ros-melodic-rosbash ros-melodic-rqt-tf-tree
+
 # setup environment
 # change with your shell (bash/sh/zsh)
 sudo apt install python-pygments

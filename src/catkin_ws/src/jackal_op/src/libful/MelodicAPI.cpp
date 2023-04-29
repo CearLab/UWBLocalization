@@ -26,6 +26,32 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID){
     // counter
     _cnt = 0;
 
+    // init transformation
+    // create transform
+    if (_tagID == 0){
+        _Godom.child_frame_id = "tagrear";
+        _Godom.header.frame_id = "odom";      
+    }
+    else if (_tagID == 1){
+    }
+    else if (_tagID == 2){
+    }
+    else {
+        _Godom.child_frame_id = "base_link";
+        _Godom.header.frame_id = "odom";
+    }
+    // frame transformation
+    try{
+        //_transformStamped = _tfBuffer.lookupTransform(_Godom.child_frame_id,
+        //ros::Time(0),_Godom.header.frame_id,ros::Time(0),
+        //_Godom.header.frame_id,ros::Duration(10.0));
+        _transformStamped = _tfBuffer.lookupTransform(_Godom.child_frame_id,
+        _Godom.header.frame_id,ros::Time(0));
+    }
+        catch (tf2::TransformException &ex) {
+        ROS_WARN("ARARMAX: %s",ex.what());
+    }
+
     // init J, GJ, HJ
     _G.J = 0;
     for (i=0; i<3; i++) {
@@ -81,8 +107,6 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
         // populate correct tag in the UWB message
         if (msg.tagId == 0){            
             _DTmsg.D1[msg.anchorId] = _DT[msg.anchorId];   
-            _Godom.child_frame_id = "tagrear";
-            _Godom.header.frame_id = "base_link";         
         }
         else if (msg.tagId == 1){
             _DTmsg.D2[msg.anchorId] = _DT[msg.anchorId];
@@ -116,8 +140,10 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
     // call newton raphson
     try {
 
-        //optimize
+        // copy anchors
         _Tag.A = _A;
+
+        //optimize
         int success = 0;
         success = genAPI::OptimMin(p0, _Dopt, &_Tag, _GradientFlag);
 
@@ -135,11 +161,11 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
         _G.odom.pose.pose.position.y = _G.p[1];
         _G.odom.pose.pose.position.z = _G.p[2];
 
-        // odometry
+        // odometry with frame transformation
         _Godom.header.stamp = _G.odom.header.stamp;
-        _Godom.pose.pose.position.x = _G.odom.pose.pose.position.x;
-        _Godom.pose.pose.position.y = _G.odom.pose.pose.position.y;
-        _Godom.pose.pose.position.z = _G.odom.pose.pose.position.z;
+        _Godom.pose.pose.position.x = _G.odom.pose.pose.position.x + _transformStamped.transform.translation.x;
+        _Godom.pose.pose.position.y = _G.odom.pose.pose.position.y + _transformStamped.transform.translation.y;
+        _Godom.pose.pose.position.z = _G.odom.pose.pose.position.z + _transformStamped.transform.translation.z;
 
         // publish
         _jack_trilateration_P.publish(_G);

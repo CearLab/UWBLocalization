@@ -9,6 +9,7 @@
 #include <nav_msgs/Odometry.h>
 #include <jackal_op/MeshUWB.h>
 #include <jackal_op/GradientDescent.h>
+#include <tf2_ros/transform_listener.h>
 
 // standard includes
 #include "GeneralAPI.hpp"
@@ -42,7 +43,12 @@ public:
     ros::Subscriber _jack_disthandle_SA;    // subscriber to anchors positions
     ros::Publisher  _jack_disthandle_P;     // publisher on the distance wrapper
     ros::Publisher  _jack_trilateration_P;  // publisher on the trilateration topic    
-    ros::Publisher  _jack_odometry_P;       // publisher on odometry topic    
+    ros::Publisher  _jack_odometry_P;       // publisher on odometry topic
+
+    // transformation tf 
+    static tf2_ros::Buffer _tfBuffer;  // transformation listener buffer
+    tf2_ros::TransformListener _tfListener(tf2_ros::Buffer _tfBuffer); // transformation listener
+    geometry_msgs::TransformStamped _transformStamped; // actual transformation
 
     /** **** CONSTRUCTOR **** */
     jackAPI(std::string name, int Nanchors, int tagID);
