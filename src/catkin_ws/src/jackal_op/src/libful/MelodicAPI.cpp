@@ -7,6 +7,9 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
     // counters
     int i, j;
 
+    // empty messages
+    visualization_msgs::Marker zeroMark;
+
     // init timer
     _begin = ros::Time::now();
 
@@ -15,6 +18,8 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
 
     // set tagID
     _tagID = tagID;
+
+    ROS_WARN("ID init: %d", _tagID);
 
     // set gradient flag
     _GradientFlag = 0;
@@ -97,7 +102,9 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
         _DTmsg.D1.push_back(0.0);        
         _DTmsg.D2.push_back(0.0);
         _DTmsg.D3.push_back(0.0);
-        _DTmsg.DTrue.push_back(0.0);
+
+        // init markerarray
+        _AtrueMsg.markers.push_back(zeroMark);
         
         // init Anchors position
         for (j=0; j<3; j++){
@@ -136,7 +143,7 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
             _DTmsg.D3[msg.anchorId] = _DT[msg.anchorId];
         }
         else {
-            _DTmsg.DTrue[msg.anchorId] = _DT[msg.anchorId];
+            ROS_ERROR("WRONG ID - ChatterCallback");
         }
     }
     catch(...){
@@ -193,14 +200,6 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
 
         // assign 
         _Godom = _G.odom;
-
-        ROS_INFO("Trasl: %g %g %g", _transformStamped.transform.translation.x,
-        _transformStamped.transform.translation.y,
-        _transformStamped.transform.translation.z);
-        ROS_INFO("Rot: %g %g %g %g", _transformStamped.transform.rotation.w,
-        _transformStamped.transform.rotation.x,
-        _transformStamped.transform.rotation.y,
-        _transformStamped.transform.rotation.z);
 
         // transform
         _Godom.pose.pose.position.x = _G.p[0] + _transformStamped.transform.translation.x;
@@ -289,6 +288,33 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
         // publish on topic
         _jack_disthandle_P.publish(_DTrueMsg);
     }     
+
+}
+
+// callback for the true anchors publishing
+void jackAPI::ChatterCallbackAtrue(const ros::TimerEvent& event){
+
+
+    int i, idx;
+
+    for (i=0;i<_Nanchors;i++) {
+
+        // index for x,y,z
+        idx = 3*i;
+
+        // set anchor header
+        _AtrueMsg.markers[i].header.seq = 0;
+        _AtrueMsg.markers[i].header.stamp = ros::Time::now();
+        _AtrueMsg.markers[i].id = i;
+
+        // set anchor position (ith)
+        _AtrueMsg.markers[i].pose.position.x = genAPI::Anchors[idx];
+        _AtrueMsg.markers[i].pose.position.y = genAPI::Anchors[idx+1];
+        _AtrueMsg.markers[i].pose.position.z = genAPI::Anchors[idx+2];
+    }
+
+    _jack_disthandle_PA.publish(_AtrueMsg);
+
 
 }
 

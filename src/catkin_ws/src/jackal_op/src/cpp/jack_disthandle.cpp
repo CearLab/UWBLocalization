@@ -41,6 +41,8 @@ int main(int argc, char **argv)
         tagID = 7;
     }
 
+    ROS_WARN("ID received: %d", tagID);
+
     // check params
     std::string tmp;
     std::vector<bool> flags;
@@ -128,8 +130,15 @@ int main(int argc, char **argv)
             // get transform
             if (tagID >= 0){
                 try{
-                    jackNode._transformStamped = tfBuffer.lookupTransform(jackNode._G.odom.child_frame_id,
-                    jackNode._G.odom.header.frame_id,ros::Time(0));
+                    jackNode._transformStamped = tfBuffer.lookupTransform(jackNode._G.odom.child_frame_id,jackNode._G.odom.header.frame_id,ros::Time(0));
+
+                    ROS_INFO("Trasl: %g %g %g", jackNode._transformStamped.transform.translation.x,
+                    jackNode._transformStamped.transform.translation.y,
+                    jackNode._transformStamped.transform.translation.z);
+                    ROS_INFO("Rot: %g %g %g %g", jackNode._transformStamped.transform.rotation.w,
+                    jackNode._transformStamped.transform.rotation.x,
+                    jackNode._transformStamped.transform.rotation.y,
+                    jackNode._transformStamped.transform.rotation.z);
                 }
                 catch (tf2::TransformException &ex) {
                     ROS_WARN("ARARMAX: %s",ex.what());

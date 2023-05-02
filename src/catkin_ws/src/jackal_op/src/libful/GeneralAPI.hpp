@@ -32,8 +32,15 @@ namespace genAPI {
     const std::vector<int> pos_v = {1, 5, 9};
     const std::vector<int> pos_b = {2, 6, 10};
     const std::vector<int> pos_a = {3, 7, 11};
-    //const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
-    const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
+    const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
+    //const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
+
+    // env params
+    const std::vector<_Float64> Anchors = {
+        0, -4, 3.5,
+        0, 4, 3.5,
+        4, 4, 3.5,
+        4, -4, 3.5};
 
     struct Tag {
         int Nanchors;

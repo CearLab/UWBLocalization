@@ -2,14 +2,15 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="Jackal">
     <xacro:include filename="$(find jackal-custom)/urdf/jackal_custom/custom_jackal_base.urdf.xacro" />
     
-    <xacro:arg name="right_id" default="0" />
-    <xacro:arg name="left_id" default="1" />
-    <xacro:arg name="rear_id" default="2" />
+    <xacro:arg name="rear_id" default="0" />
+    <!--xacro:arg name="right_id" default="1" /-->
+    <!--xacro:arg name="left_id" default="2" /-->
 
-    <xacro:property name="right" value="$(arg right_id)" />
-    <xacro:property name="left" value="$(arg left_id)" />
+    <!--xacro:property name="right" value="$(arg right_id)" /-->
+    <!--xacro:property name="left" value="$(arg left_id)" /-->
     <xacro:property name="rear" value="$(arg rear_id)" />
 
+    <!--
     <link name="right_tag">
         <inertial>
             <mass value="0.1" />
@@ -33,7 +34,6 @@
 
     <joint name="right_tag_joint" type="fixed">
         <origin xyz="0 -0.161786 0.184" rpy="0 0 0"/>
-        <!-- <origin xyz="0 0.161786 0" rpy="0 0 3.14159265359"/> -->
         <parent link="base_link"/>
         <child link="right_tag"/>
     </joint>
@@ -45,8 +45,10 @@
     <gazebo reference="right_tag">
         <material>Gazebo/White</material>
     </gazebo>
+    -->
 
 
+    <!--
     <link name="left_tag">
         <inertial>
             <mass value="0.1" />
@@ -70,7 +72,6 @@
 
     <joint name="left_tag_joint" type="fixed">
         <origin xyz="0 0.161786 0.184" rpy="0 0 3.14159265359"/>
-        <!-- <origin xyz="0 -0.161786 0" rpy="0 0 0"/> -->
         <parent link="base_link"/>
         <child link="left_tag"/>
     </joint>
@@ -82,6 +83,7 @@
     <gazebo reference="left_tag">
         <material>Gazebo/White</material>
     </gazebo>
+    -->
 
     <link name="rear_tag">
         <inertial>
@@ -105,8 +107,9 @@
     </link>
 
     <joint name="rear_tag_joint" type="fixed">
-        <origin xyz="-0.2155 0 0.184" rpy="-0.78 0 -1.57"/>
-        <!--origin xyz="-0.5 0 0.184" rpy="0 0 -1.57"/-->
+        <!--origin xyz="-0.2155 0 0.184" rpy="-0.78 0 -1.57"/-->
+        <!--origin xyz="-0.5 0 0.184" rpy="0 0 0"/-->
+        <origin xyz="-0.5 0 0.184" rpy="0 0 -1.57"/>
         <parent link="base_link"/>
         <child link="rear_tag"/>
     </joint>
@@ -119,6 +122,7 @@
         <material>Gazebo/White</material>
     </gazebo>
 
+    <!--
     <gazebo>
         <plugin name='libgtec_uwb_plugin' filename='libgtec_uwb_plugin.so'>
             <update_rate>5</update_rate>
@@ -128,14 +132,11 @@
             <tag_link>right_tag</tag_link>
             <anchor_prefix>uwb_anchor</anchor_prefix>
             <tag_id>${right}</tag_id>
-            <!-- Not sure this is necessary. The UWB noise model is already in UWBPlugin.cpp-->
-            <!--noise type='gaussian'>
-                <mean>0</mean>
-                <stddev>0.0</stddev>
-            </noise-->
         </plugin>
     </gazebo>
+    -->
 
+    <!--
     <gazebo>
         <plugin name='libgtec_uwb_plugin' filename='libgtec_uwb_plugin.so'>
             <update_rate>5</update_rate>
@@ -145,14 +146,11 @@
             <tag_link>left_tag</tag_link>
             <anchor_prefix>uwb_anchor</anchor_prefix>
             <tag_id>${left}</tag_id>
-            <!-- Not sure this is necessary. The UWB noise model is already in UWBPlugin.cpp-->
-            <!--noise type='gaussian'>
-                <mean>0</mean>
-                <stddev>0.0</stddev>
-            </noise-->
         </plugin>
     </gazebo>
+    -->
 
+    <!--
     <gazebo>
         <plugin name='libgtec_uwb_plugin' filename='libgtec_uwb_plugin.so'>
             <update_rate>5</update_rate>
@@ -162,13 +160,9 @@
             <tag_link>rear_tag</tag_link>
             <anchor_prefix>uwb_anchor</anchor_prefix>
             <tag_id>${rear}</tag_id>
-            <!-- Not sure this is necessary. The UWB noise model is already in UWBPlugin.cpp-->
-            <!--noise type='gaussian'>
-                <mean>0</mean>
-                <stddev>0.0</stddev>
-            </noise-->
         </plugin>
     </gazebo>
+    -->
 
     <gazebo>
         <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">

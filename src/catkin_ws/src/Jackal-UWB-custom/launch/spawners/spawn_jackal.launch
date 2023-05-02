@@ -8,10 +8,6 @@
   <arg name="joystick" default="true" />
   <arg name="joy_dev" default="/dev/input/ps4" />
 
-  <arg name="right_id" default="0" />
-  <arg name="left_id" default="1" />
-  <arg name="rear_id" default="2" />
-
   <arg name="robot_name" default="jackal"/>
 
   <!-- params and args for jackal_op -->
@@ -24,14 +20,16 @@
   <arg name="config" default="base" />
   <arg name="PI" default="3.1415926535897931"/>
 
+  <arg name="rear_id" default="0" />
+
   <group ns="frames"> 
 
     <!-- TF -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="world_baseLink" args="0 0 0 0 0 0 world base_link"/>
     <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_imuLink" args="0 0 0 0 0 0 base_link imu_link"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rightTag" args="0 -0.161786 0.184 0 0 0 base_link right_tag"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_leftTag" args="0 0.161786 0.184 0 0 0 base_link left_tag"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rearTag" args="-0.2155 0 0.184 0 0 0 base_link rear_tag"/>
+    <!--node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rightTag" args="0 -0.161786 0.184 0 0 0 base_link right_tag"/-->
+    <!--node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_leftTag" args="0 0.161786 0.184 0 0 0 base_link left_tag"/-->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rearTag" args=" -0.5 0 0.184 0 0 0 base_link rear_tag"/>
 
   </group>
 
@@ -42,7 +40,7 @@
     <param name="robot_description"
          command="$(find jackal_description)/scripts/$(arg env_runner)
                     $(find jackal_description)/urdf/configs/$(arg config)
-                    $(find xacro)/xacro $(find jackal-custom)/urdf/jackal_custom/custom_jackal.urdf.xacro right_id:=$(arg right_id) left_id:=$(arg left_id)
+                    $(find xacro)/xacro $(find jackal-custom)/urdf/jackal_custom/custom_jackal.urdf.xacro rear_id:=$(arg rear_id)
                     --inorder" />
 
     <!-- Control node  -->
@@ -62,20 +60,19 @@
 
   </group>
 
-
   <!-- True Distance measurement node  -->
   <node name="MeshTrue" pkg="jackal_op" type="jack_disttrue" args="MeshTrue 0">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
   </node>
 
-  <!-- base_link handler node -->
-  <!--node name="DT7" pkg="jackal_op" type="jack_disthandle" args="7">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T7.yaml"/>
-  </node-->
-
   <!-- T0 (rear) Distance handler node -->
   <node name="DT0" pkg="jackal_op" type="jack_disthandle" args="0">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T0.yaml"/>
+  </node>
+
+  <!-- T0 (rear) HybObs node -->
+  <node name="HYB0" pkg="jackal_op" type="jack_hybobs" args="HYB0 0">
+    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T0.yaml"/>
   </node>
 
   <!--group ns="RVIZ">

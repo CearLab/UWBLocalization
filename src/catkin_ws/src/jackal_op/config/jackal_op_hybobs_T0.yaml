@@ -2,9 +2,9 @@
 #
 jack_hybobs_subIMU: "/robi/imu/data"
 jack_hybobs_subOdom: "/robi/DT0/gradientOdom"
-jack_hybobs_pubOdom: "/HybObs/Odom"
-jack_hybobs_pubIMU: "/HybObs/IMU"
-jack_hybobs_pubBias: "/HybObs/Bias"
-DistjackAPIName: "HybObsAPI"
+jack_hybobs_pubOdom: "/HYB0/Odom"
+jack_hybobs_pubIMU: "/HYB0/IMU"
+jack_hybobs_pubBias: "/HYB0/Bias"
+DistjackAPIName: "HYB0API"
 NanchorMesh: 4
 HYBrate: 100

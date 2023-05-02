@@ -50,7 +50,9 @@ int main(int argc, char **argv)
     flags.push_back(np.hasParam(tmp));
     tmp = "/" + ID + "/jack_disttrue_subOdom";
     flags.push_back(np.hasParam(tmp));
-    tmp = "/" + ID + "/jack_disttrue_pub";
+    tmp = "/" + ID + "/jack_disttrue_pubDist";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/jack_disttrue_pubAnchors";
     flags.push_back(np.hasParam(tmp));
     tmp = "/" + ID + "/DistjackAPIName";
     flags.push_back(np.hasParam(tmp));
@@ -68,7 +70,7 @@ int main(int argc, char **argv)
      * define topic to subscribe to. Get the topics name from params server. 
      * Then create handle for subscribing.
      */
-    std::string subNameA, subNameOdom, pubName, jackName;
+    std::string subNameA, subNameOdom, pubNameDist, pubNameAnchors, jackName;
     int Nanchors;
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
@@ -82,8 +84,10 @@ int main(int argc, char **argv)
         np.getParam(tmp, subNameA);  
         tmp = "/" + ID + "/jack_disttrue_subOdom";
         np.getParam(tmp, subNameOdom);  
-        tmp = "/" + ID + "/jack_disttrue_pub";
-        np.getParam(tmp, pubName);  
+        tmp = "/" + ID + "/jack_disttrue_pubDist";
+        np.getParam(tmp, pubNameDist);  
+        tmp = "/" + ID + "/jack_disttrue_pubAnchors";
+        np.getParam(tmp, pubNameAnchors);  
         tmp = "/" + ID + "/DistjackAPIName";
         np.getParam(tmp, jackName);  
         tmp = "/" + ID + "/NanchorMesh";
@@ -103,7 +107,11 @@ int main(int argc, char **argv)
         ROS_INFO("Subscriptions done");
 
         // publisher
-        jackNode._jack_disthandle_P = np.advertise<gtec_msgs::Ranging>(pubName, 1000);
+        jackNode._jack_disthandle_P = np.advertise<gtec_msgs::Ranging>(pubNameDist, 1000);
+        jackNode._jack_disthandle_PA = np.advertise<visualization_msgs::MarkerArray>(pubNameAnchors, 1000);
+
+        // timer callaback for publishing anchors
+        ros::Timer TimerAnchors = np.createTimer(ros::Duration(1.0), &jackAPI::ChatterCallbackAtrue, &jackNode);
 
         // spin
         ROS_INFO("Spinning");

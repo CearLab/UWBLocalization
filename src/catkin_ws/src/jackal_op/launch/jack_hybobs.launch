@@ -1,5 +1,5 @@
 <launch>
-    <node name="HybObs" pkg="jackal_op" type="jack_hybobs" args="HybObs 7">
+    <node name="HybObs" pkg="jackal_op" type="jack_hybobs" args="HybObs 0">
         <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs.yaml"/>
     </node>
 </launch>

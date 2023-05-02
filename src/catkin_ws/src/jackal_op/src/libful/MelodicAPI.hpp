@@ -64,6 +64,7 @@ public:
     jackal_op::MeshUWB _DTmsg; // message containing the distances measured (subscribed)
     jackal_op::GradientDescent _G;  // message with the optimization info
     gtec_msgs::Ranging _DTrueMsg;   // message with the synthetic true distances
+    visualization_msgs::MarkerArray _AtrueMsg; // message with the synthetic true anchors
     nav_msgs::Odometry _Godom;      // message with the odometry
     sensor_msgs::Imu _Gimu;      // message with the IMU
     sensor_msgs::Imu _Gbias;      // message with the IMU
@@ -76,6 +77,7 @@ public:
     ros::Subscriber _jack_disthandle_SIMU;  // subscriber to IMU measurements
     ros::Subscriber _jack_disthandle_SJump;  // subscriber to Jump Map
     ros::Publisher  _jack_disthandle_P;     // publisher on the distance wrapper
+    ros::Publisher  _jack_disthandle_PA;     // publisher on the achor wrapper
     ros::Publisher  _jack_trilateration_P;  // publisher on the trilateration topic    
     ros::Publisher  _jack_odometry_P;       // publisher on odometry topic
     ros::Publisher  _jack_IMU_P;       // publisher on IMU topic
@@ -89,6 +91,7 @@ public:
     void ChatterCallbackT(const gtec_msgs::Ranging& msg);   // callback for the tag trilateration
     void ChatterCallbackA(const visualization_msgs::MarkerArray& msg);  // callback for the anchor positions
     void ChatterCallbackDtrue(const nav_msgs::Odometry& msg);   // callback for the true measurement handling
+    void ChatterCallbackAtrue(const ros::TimerEvent& event);   // callback for the true anchors publishing
     void ChatterCallbackHybCont(const sensor_msgs::Imu& msg);   // callback for the continuous dynamics of the observer
     void ChatterCallbackHybJump(const nav_msgs::Odometry& msg);   // callback for the discrete dynamics of the observer
 

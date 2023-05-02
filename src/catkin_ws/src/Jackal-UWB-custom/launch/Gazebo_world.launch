@@ -44,9 +44,9 @@
     <arg name="joystick" value="$(arg joystick)" />
     <arg name="joy_dev" value="$(arg joy_dev)" />
 
-    <arg name="right_id" value="0" />
-    <arg name="left_id" value="1" />
-    <arg name="rear_id" value="2" />
+    <arg name="rear_id" value="0" />
+    <!--arg name="right_id" value="0" /-->
+    <!--arg name="left_id" value="1" /-->
 
     <arg name="robot_name"  value="$(arg ns)" />
     <arg name="ns" value="$(arg ns)" />
