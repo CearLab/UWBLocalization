@@ -6,3 +6,5 @@ stuff/
 .vscode/
 beginner_tutorials/
 lib/
+*pdf
+video/
