@@ -112,3 +112,51 @@ int genAPI::OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag
     return (int)success;
 
 }
+
+// model observer
+std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector<_Float64> u){
+
+    std::vector<_Float64> xdot(genAPI::stateDim, 0.0);
+
+    // integrate position
+    xdot[genAPI::pos_p[0]] = x[genAPI::pos_v[0]];
+    xdot[genAPI::pos_p[1]] = x[genAPI::pos_v[1]];
+    xdot[genAPI::pos_p[2]] = x[genAPI::pos_v[2]];
+
+    // integrate position
+    xdot[genAPI::pos_v[0]] = x[genAPI::pos_a[0]] - x[genAPI::pos_b[0]];
+    xdot[genAPI::pos_v[1]] = x[genAPI::pos_a[1]] - x[genAPI::pos_b[1]];
+    xdot[genAPI::pos_v[2]] = x[genAPI::pos_a[2]] - x[genAPI::pos_b[2]];
+
+    // integrate bias
+    xdot[genAPI::pos_b[0]] = 0.0;
+    xdot[genAPI::pos_b[1]] = 0.0;
+    xdot[genAPI::pos_b[2]] = 0.0;
+
+    // filter acceleration
+    xdot[genAPI::pos_a[0]] = genAPI::alpha * (u[0] - x[genAPI::pos_a[0]]);
+    xdot[genAPI::pos_a[1]] = genAPI::alpha * (u[1] - x[genAPI::pos_a[1]]);
+    xdot[genAPI::pos_a[2]] = genAPI::alpha * (u[2] - x[genAPI::pos_a[2]]);
+
+
+    return xdot;
+}
+
+// Euler integration - hybrid system
+std::vector<_Float64> genAPI::odeEuler(std::vector<_Float64> x, std::vector<_Float64> u, _Float64 dt){
+
+    // init
+    std::vector<_Float64> xdot(genAPI::stateDim, 0.0);
+    std::vector<_Float64> xnew(genAPI::stateDim, 0.0);
+    std::vector<_Float64> DT(genAPI::stateDim, dt);
+    std::vector<_Float64> xstep(genAPI::stateDim, 0.0);
+
+    // compute xdot
+    xdot = genAPI::modelObserver(x, u);
+
+    // integrate - forward 
+    std::transform(DT.begin(), DT.end(), xdot.begin(), xstep.begin(), std::multiplies<float>());
+    std::transform(x.begin(), x.end(), xstep.begin(), xnew.begin(), std::plus<float>());
+
+    return xnew;
+}

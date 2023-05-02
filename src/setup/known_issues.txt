@@ -1,5 +1,6 @@
 1: gzserver not dying after killing the simulation 
     see: https://github.com/ros-simulation/gazebo_ros_pkgs/issues/751
+    cmd: killall gzclient && killall gzserver && killall rosmaster
 
 2: set vector to parameter
     sol: rosparam set nameparam '[0.5, 0, 0]' WITH THE COMMA
@@ -18,3 +19,5 @@
 
 7: compile a package from source
     see: https://answers.ros.org/question/252478/how-to-build-a-package-from-source-on-ubuntu-mate-1604-lts-and-ros-kinetic/
+
+8: the static transforms should be placeb at the beginning of the launch files

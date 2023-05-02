@@ -8,4 +8,4 @@ jackAPIName: "DT7API"
 jack_disthandle_tagID: 7
 NanchorMesh: 4
 GradientFlag: 0
-UWBrate: 5
+UWBrate: 1

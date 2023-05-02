@@ -2,9 +2,7 @@
 #
 frequency: 100
 
-odom0: DT7/gradientOdom
-#odom0: DT0/gradientOdom
-#odom0: ground_truth/state
+odom0: DT7/gradient/odom
 odom0_config: [true, true, true,
                false, false, false,
                false, false, false,
@@ -17,7 +15,7 @@ imu0_config: [false, false, false,
               false, false, false,
               false, false, false,
               false, false, false,
-              false, false, false]
+              true, true, true]
 imu0_differential: false
 
 odom_frame: /odom

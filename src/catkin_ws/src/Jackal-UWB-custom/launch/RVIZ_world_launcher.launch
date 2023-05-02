@@ -1,0 +1,5 @@
+<launch>
+  <include file="$(find jackal-custom)/launch/RVIZ_world.launch">
+    <arg name="ns" value="robi"/>
+  </include>
+</launch>

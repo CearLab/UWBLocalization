@@ -24,6 +24,7 @@ int main(int argc, char **argv)
     // general stuff
     int cnt = 0;
     int rate = 5;
+    int tagID = 7;
     std::string ID;
 
     // get tagID - default 7
@@ -34,6 +35,13 @@ int main(int argc, char **argv)
     else{
         ID = "MeshTrue";
     }
+
+    if (argc > 2){
+        std::string value_from_cl = argv[2];
+        tagID = atoi(value_from_cl.c_str());
+    }
+
+    ROS_INFO("ID %d", tagID);
 
     // check params
     std::string tmp;
@@ -81,8 +89,12 @@ int main(int argc, char **argv)
         tmp = "/" + ID + "/NanchorMesh";
         np.getParam(tmp, Nanchors);  
 
+        // init buffer and listener
+        static tf2_ros::Buffer tfBuffer; // problem line
+        tf2_ros::TransformListener tfListener(tfBuffer);
+
         // instance of a class - tagID 7 
-        jackAPI jackNode = jackAPI(jackName, Nanchors, 7);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, rate);
         ROS_INFO("jackAPI - Class instance created");
 
         // subscribe
@@ -98,7 +110,22 @@ int main(int argc, char **argv)
 
         // spin with loop rate
         while (ros::ok()) {
+
+            //spin
             ros::spinOnce();
+
+            // get transform
+            if (tagID >= 0){
+                try{
+                    jackNode._transformStamped = tfBuffer.lookupTransform(jackNode._G.odom.header.frame_id,
+                    jackNode._G.odom.child_frame_id,ros::Time(0));
+                }
+                catch (tf2::TransformException &ex) {
+                    ROS_WARN("ARARMAX: %s",ex.what());
+                }
+            }
+
+            // sleep
             loop_rate.sleep();
             ++cnt;
         }

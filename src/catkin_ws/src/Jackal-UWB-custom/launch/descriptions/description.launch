@@ -12,7 +12,7 @@
   <param name="robot_description"
          command="$(find jackal_description)/scripts/$(arg env_runner)
                     $(find jackal_description)/urdf/configs/$(arg config)
-                    $(find xacro)/xacro $(find jackal-custom)/urdf/jackal_custom/custom_jackal.urdf.xacro right_id:=$(arg right_id) left_id:=$(arg left_id)
+                    $(find xacro)/xacro $(find jackal-custom)/urdf/jackal_custom/custom_jackal_anchor.urdf.xacro right_id:=$(arg right_id) left_id:=$(arg left_id)
                     --inorder" />
                     
   <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->

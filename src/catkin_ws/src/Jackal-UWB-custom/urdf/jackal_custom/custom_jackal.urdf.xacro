@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="Jackal">
-    <xacro:include filename="$(find jackal-custom)/urdf/jackal_default/jackal.urdf.xacro" />
+    <xacro:include filename="$(find jackal-custom)/urdf/jackal_custom/custom_jackal_base.urdf.xacro" />
     
     <xacro:arg name="right_id" default="0" />
     <xacro:arg name="left_id" default="1" />
@@ -106,6 +106,7 @@
 
     <joint name="rear_tag_joint" type="fixed">
         <origin xyz="-0.2155 0 0.184" rpy="-0.78 0 -1.57"/>
+        <!--origin xyz="-0.5 0 0.184" rpy="0 0 -1.57"/-->
         <parent link="base_link"/>
         <child link="rear_tag"/>
     </joint>

@@ -364,7 +364,7 @@
       <model name='uwb_anchor0'>
         <pose frame=''>0 -4 0 0 -0 0</pose>
         <link name='link'>
-          <pose frame=''>0 -4 2.0 0 -0 0</pose>
+          <pose frame=''>0 -4 3.5 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -374,7 +374,7 @@
         <pose frame=''>0 4 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>0 4 2.0 0 -0 0</pose>
+          <pose frame=''>0 4 3.5 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -384,7 +384,7 @@
         <pose frame=''>4 4 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>4 4 2.0 0 -0 0</pose>
+          <pose frame=''>4 4 3.5 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -394,7 +394,7 @@
         <pose frame=''>4 -4 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>4 -4 2.0 0 -0 0</pose>
+          <pose frame=''>4 -4 3.5 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>

@@ -1,4 +1,5 @@
 # steps to run gazebo and rviz in a container from a nvidia PC
+## install drivers : https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
 
 ## 1 - install docker-nvidia2 (https://gist.github.com/nathzi1505/d2aab27ff93a3a9d82dada1336c45041)
 # starting from a working docker installation

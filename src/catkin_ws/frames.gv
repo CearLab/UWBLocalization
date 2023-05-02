@@ -1,0 +1,9 @@
+digraph G {
+"world" -> "odom"[label="Broadcaster: /frames/world_odom\nAverage rate: 1.333 Hz\nMost recent transform: 502.535 ( -0.007 sec old)\nBuffer length: 3.000 sec\n"];
+"odom" -> "base_link"[label="Broadcaster: /frames/odom_base_link\nAverage rate: 1.333 Hz\nMost recent transform: 502.536 ( -0.008 sec old)\nBuffer length: 3.000 sec\n"];
+"base_link" -> "tagrear"[label="Broadcaster: /frames/base_link_tagrear\nAverage rate: 1.333 Hz\nMost recent transform: 502.545 ( -0.017 sec old)\nBuffer length: 3.000 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 502.528"[ shape=plaintext ] ;
+ }->"world";
+}

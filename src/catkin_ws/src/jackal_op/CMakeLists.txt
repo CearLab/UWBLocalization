@@ -11,11 +11,12 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  tf2_ros
   std_msgs
   geometry_msgs
+  tf2_geometry_msgs
   gtec_msgs
   nav_msgs
-  tf
   message_generation
 )
 
@@ -147,35 +148,45 @@ add_library(melodicAPI ${MELODICAPI_SOURCES})
 # DISTTRUE
 add_executable(jack_disttrue src/cpp/jack_disttrue.cpp)
 target_link_libraries(jack_disttrue
-${catkin_LIBRARIES} 
 melodicAPI
+${catkin_LIBRARIES}
 generalAPI
 alglib
-optim
 armadillo
+optim
 )
 
 # DISTHANDLE
 add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
-## Specify libraries to link a library or executable target against
-target_link_libraries(jack_disthandle
-${catkin_LIBRARIES} 
+target_link_libraries(jack_disthandle 
 melodicAPI
+${catkin_LIBRARIES}
 generalAPI
 alglib
-optim
 armadillo
+optim
 )
 
-#add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)
+# HYBOBS
+add_executable(jack_hybobs src/cpp/jack_hybobs.cpp)
+target_link_libraries(jack_hybobs 
+melodicAPI
+${catkin_LIBRARIES}
+generalAPI
+alglib
+armadillo
+optim
+)
 
+# DUMMY
+#add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)
 #target_link_libraries(jack_disthandle_dummy
-#${catkin_LIBRARIES} 
+#melodicAPI
+#${catkin_LIBRARIES}
+#generalAPI
 #alglib
 #armadillo
 #optim
-#generalAPI
-#melodicAPI
 #)
 
 ## Add cmake target dependencies of the library

@@ -89,8 +89,12 @@ int main(int argc, char **argv)
         // concatenate string - odom
         pubNameTrilodom = pubNameTril + "Odom";
 
+        // init buffer and listener
+        static tf2_ros::Buffer tfBuffer; // problem line
+        tf2_ros::TransformListener tfListener(tfBuffer);
+
         // instance of a class
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, rate);
         ROS_INFO("jackAPI - Class instance created");
 
         // set gradient flag if param is present
@@ -117,9 +121,25 @@ int main(int argc, char **argv)
 
         // spin with loop rate
         while (ros::ok()) {
+            
+            //spin
             ros::spinOnce();
+
+            // get transform
+            if (tagID >= 0){
+                try{
+                    jackNode._transformStamped = tfBuffer.lookupTransform(jackNode._G.odom.child_frame_id,
+                    jackNode._G.odom.header.frame_id,ros::Time(0));
+                }
+                catch (tf2::TransformException &ex) {
+                    ROS_WARN("ARARMAX: %s",ex.what());
+                }
+            }
+
+            // sleep
             loop_rate.sleep();
             ++cnt;
+
         }
 
     }
