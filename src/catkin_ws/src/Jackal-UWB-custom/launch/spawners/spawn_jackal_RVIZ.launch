@@ -21,9 +21,7 @@
     <node pkg="tf2_ros" type="static_transform_publisher" name="world_baseLink" args="0 0 0 0 0 0 world base_link"/>
     <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_chassisLink" args="0 0 0 0 0 0 base_link chassis_link"/>
     <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_imuLink" args="0 0 0 0 0 0 base_link imu_link"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rightTag" args="0 -0.161786 0.184 0 0 0 base_link right_tag"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_leftTag" args="0 0.161786 0.184 0 0 0 base_link left_tag"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rearTag" args="-0.5 0 0.184 0 0 0 base_link rear_tag"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rearTag" args=" -0.5 0 0.184 0 0 0 base_link rear_tag"/>
 
     <!--
     <param name="FWx" value="$(eval 0.5*arg('wheelbase'))"/>
