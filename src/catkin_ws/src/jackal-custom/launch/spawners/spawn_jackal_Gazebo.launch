@@ -1,0 +1,48 @@
+<launch>
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0" />
+  <arg name="yaw" default="0" />
+  <arg name="joystick" default="true" />
+  <arg name="joy_dev" default="/dev/input/ps4" />
+
+  <!-- TF -->
+  <!--node pkg="tf2_ros" type="static_transform_publisher" name="odom_baseLink" args="0 0 0 0 0 0 odom base_link"/-->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0 0 0 0 0 0 world odom"/>
+  
+  <!-- Configuration of Jackal which you would like to simulate.
+       See jackal_description for details. -->
+  <arg name="config" default="base" />
+  <arg name="rear_id" default="0" />
+
+  <!-- Load Jackal's description, controllers, and teleop nodes. -->
+  <include file="$(find jackal-custom)/launch/descriptions/description.launch">
+    <arg name="config" value="$(arg config)" />
+    <arg name="rear_id" value="$(arg rear_id)" />
+  </include>
+
+  <!-- Control node  -->
+  <include file="$(find jackal-custom)/launch/control/control.launch">
+    <arg name="enable_ekf" value="true" />
+  </include>
+
+  <!-- Teleop node  -->
+  <include file="$(find jackal-custom)/launch/control/teleop.launch">
+    <arg name="joystick" value="$(arg joystick)" />
+    <arg name="joy_dev" value="$(arg joy_dev)" />
+  </include>
+
+  <!-- Spawn Jackal -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+              args="-urdf -model jackal -param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y $(arg yaw)" />
+
+  <!-- Navigation node -->
+  <include file="$(find jackal-custom)/launch/control/navigation/odom_navigation.launch">
+  </include>
+  <!--include file="$(find jackal-custom)/launch/control/navigation/gmapping_wrap.launch">
+  </include-->
+  <include file="$(find jackal_viz)/launch/view_robot.launch">
+    <arg name="config" value="navigation" />
+  </include>
+
+</launch>

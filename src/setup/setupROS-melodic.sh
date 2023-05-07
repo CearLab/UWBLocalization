@@ -7,7 +7,7 @@
 # sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 
 # add keys - curl already installed
-curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+# curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
 # update repo
 sudo apt update
@@ -18,7 +18,7 @@ sudo apt-get install ros-melodic-jackal-desktop --fix-missing
 sudo apt-get install ros-melodic-jackal-navigation --fix-missing
 
 # install tf tutorials
-sudo apt-get install ros-melodic-ros-tutorials ros-melodic-geometry-tutorials ros-melodic-rviz ros-melodic-rosbash ros-melodic-rqt-tf-tree
+# sudo apt-get install ros-melodic-ros-tutorials ros-melodic-geometry-tutorials ros-melodic-rviz ros-melodic-rosbash ros-melodic-rqt-tf-tree
 
 # setup environment
 # change with your shell (bash/sh/zsh)
@@ -43,8 +43,8 @@ export EDITOR='nano -w'
 # NOTE FOR VSCODE: remebmer to add /opt/ros/noetic/include/ in include path
 
 # install husky for tutorials
-sudo apt install ros-melodic-husky-desktop
-sudo apt-get install ros-melodic-husky-simulator
+# sudo apt install ros-melodic-husky-desktop
+# sudo apt-get install ros-melodic-husky-simulator
 
 ### ONLY AFTER PULLING TechnionProject ###
 # install libs for optimization
@@ -95,3 +95,8 @@ rospack profile
 # IN THE JACKAL_OP CMAKELIST:
 # FIRST BUILD THE MESSAGES ONLY
 # THEN ALSO LIBFUL AND JACKAL_OP
+
+# testing for the navigation
+sudo apt install ros-melodic-roslint  
+sudo apt install ros-melodic-sick-tim
+sudo apt install ros-melodic-rqt-tf-tree

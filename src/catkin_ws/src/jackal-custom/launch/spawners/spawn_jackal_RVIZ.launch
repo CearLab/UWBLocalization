@@ -1,0 +1,103 @@
+<launch>
+  <arg name="ns" default="" />
+
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0" />
+  <arg name="yaw" default="0" />
+
+  <arg name="robot_name" default="jackal"/>
+  <arg name="PI" default="3.1415926535897931"/>
+
+  <arg name="config" default="base" />
+  <arg name="rear_id" default="0" />
+
+  <arg name="wheelbase" value="0.262" />
+  <arg name="wheel_vertical_offset" value="0.0345" />
+  <arg name="wheel_radius" value="0.098" />
+  <arg name="wheel_width" value="0.040" />
+  <arg name="track" value="0.37559" />
+  <arg name="chassis_height" value="0.184" />
+  <arg name="mount_spacing" value="0.120" />
+  
+
+  <arg name="FLWx" value="$(eval 0.5*arg('wheelbase'))"/>
+  <arg name="FLWy" value="$(eval 0.5*arg('track'))"/>
+  <arg name="FRWx" value="$(eval 0.5*arg('wheelbase'))"/>
+  <arg name="FRWy" value="$(eval -0.5*arg('track'))"/>
+  <arg name="RLWx" value="$(eval -0.5*arg('wheelbase'))"/>
+  <arg name="RLWy" value="$(eval 0.5*arg('track'))"/>
+  <arg name="RRWx" value="$(eval -0.5*arg('wheelbase'))"/>
+  <arg name="RRWy" value="$(eval -0.5*arg('track'))"/>
+
+  <group ns="frames"> 
+
+    <!-- TF basic -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_baseLink" args="0 0 0 0 0 0 world base_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0 0 0 0 0 0 world odom"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_imuLink" args="0 0 0 0 0 0 base_link imu_link"/>
+
+    <!-- TF robot chassis -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_chassisLink" args="0 0 0 0 0 0 base_link chassis_link"/>
+
+    <!-- TF wheels FL -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_FrontLeftWheelLink" 
+        args="$(arg FLWx) $(arg FLWy) $(arg wheel_vertical_offset) 
+        0 0 0 chassis_link front_left_wheel_link"/>
+    <!-- TF wheels FR -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_FrontRightWheelLink" 
+        args="$(arg FRWx) $(arg FRWy) $(arg wheel_vertical_offset) 
+        0 0 0 chassis_link front_right_wheel_link"/>
+    <!-- TF wheels RL -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_RearLeftWheelLink" 
+        args="$(arg RLWx) $(arg RLWy) $(arg wheel_vertical_offset) 
+        0 0 0 chassis_link rear_left_wheel_link"/>
+    <!-- TF wheels RR -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_RearRightWheelLink" 
+        args="$(arg RRWx) $(arg RRWy) $(arg wheel_vertical_offset) 
+        0 0 0 chassis_link rear_right_wheel_link"/>
+
+    <!-- TF robot accessories -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_FrontFender" args="0 0 0 
+    0 0 0 chassis_link front_fender_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_RearFender" args="0 0 0 
+    $(arg PI) 0 0 chassis_link rear_fender_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_NavSat" args="-0.180 0.126 0.1815 
+    0 0 0 chassis_link navsat_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_MidMount" args="0 0 $(arg chassis_height) 
+    0 0 0 chassis_link mid_mount"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_RearMount" args="-$(arg mount_spacing) 0 0 
+    0 0 0 mid_mount rear_mount"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="chassisLink_FrontMount" args="$(arg mount_spacing) 0 0 
+    0 0 0 mid_mount front_mount"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="FrontMount_FrontLaserMount" args="0 0 0 
+    0 0 0 front_mount front_laser_mount"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="FrontLaserMount_FrontLaser" args="0 0 0.0474 
+    0 0 0 front_laser_mount front_laser"/>
+
+    <!-- TF UWB -->
+    <!--node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rightTag" args="0 -0.161786 0.184 0 0 0 base_link right_tag"/-->
+    <!--node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_leftTag" args="0 0.161786 0.184 0 0 0 base_link left_tag"/-->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="baseLink_rearTag" args=" -0.5 0 0.184 0 0 0 base_link rear_tag"/>
+
+  </group>
+
+  <group ns="RVIZ">
+
+    <arg name="env_runner" value="$(eval 'env_run' if not optenv('OS', 'unknown').lower().startswith('windows') else 'env_run.bat')" />
+
+    <arg name="model" default="$(find jackal-custom)/urdf/jackal_custom/custom_jackal.urdf.xacro"/>
+    <arg name="gui" default="true" />
+    <arg name="rvizconfig" default="$(find urdf_tutorial)/rviz/urdf.rviz" />
+    <param name="robot_description"
+         command="$(find jackal_description)/scripts/$(arg env_runner)
+                  $(find jackal-custom)/urdf/jackal_custom/configs/$(arg config)
+                  $(find xacro)/xacro $(find jackal-custom)/urdf/jackal_custom/custom_jackal.urdf.xacro rear_id:=$(arg rear_id)
+                  --inorder" />
+    <param name="use_gui" value="$(arg gui)"/>
+    
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+  </group>
+
+</launch>

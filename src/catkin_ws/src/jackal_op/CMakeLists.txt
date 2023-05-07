@@ -89,20 +89,20 @@ set(ALGLIBCPP_INCLUDE_DIR
 set(LIBFUL_INCLUDE_DIR
 src/libful
 )
-set(OPTIM_INCLUDE_DIR
-/usr/local/include/optim/BaseMatrixOps/include/
-/usr/local/include/optim/BaseMatrixOps/include/core
-/usr/local/include/optim/BaseMatrixOps/include/extra
-/usr/local/include/optim/BaseMatrixOps/include/misc
-/usr/local/include/optim/BaseMatrixOps/include/stats
-/usr/local/include/optim/constrained
-/usr/local/include/optim/line_search
-/usr/local/include/optim/misc
-/usr/local/include/optim/stats
-/usr/local/include/optim/unconstrained
-/usr/local/include/optim/zeros
-/usr/local/include/optim
-)
+#set(OPTIM_INCLUDE_DIR
+#/usr/local/include/optim/BaseMatrixOps/include/
+#/usr/local/include/optim/BaseMatrixOps/include/core
+#/usr/local/include/optim/BaseMatrixOps/include/extra
+#/usr/local/include/optim/BaseMatrixOps/include/misc
+#/usr/local/include/optim/BaseMatrixOps/include/stats
+#/usr/local/include/optim/constrained
+#/usr/local/include/optim/line_search
+#/usr/local/include/optim/misc
+#/usr/local/include/optim/stats
+#/usr/local/include/optim/unconstrained
+#/usr/local/include/optim/zeros
+#/usr/local/include/optim
+#)
 
 # include
 include_directories(
@@ -133,50 +133,50 @@ set(ALGLIBCPP_SOURCES
 )
 add_library(alglib ${ALGLIBCPP_SOURCES})
 
-set(GENERALAPI_SOURCES
-  src/libful/GeneralAPI.cpp
-)
-add_library(generalAPI ${GENERALAPI_SOURCES})
+#set(GENERALAPI_SOURCES
+#  src/libful/GeneralAPI.cpp
+#)
+#add_library(generalAPI ${GENERALAPI_SOURCES})
 
-set(MELODICAPI_SOURCES
-  src/libful/MelodicAPI.cpp
-)
-add_library(melodicAPI ${MELODICAPI_SOURCES})
+#set(MELODICAPI_SOURCES
+#  src/libful/MelodicAPI.cpp
+#)
+#add_library(melodicAPI ${MELODICAPI_SOURCES})
 
 ## Declare a C++ executable
 
 # DISTTRUE
-add_executable(jack_disttrue src/cpp/jack_disttrue.cpp)
-target_link_libraries(jack_disttrue
-melodicAPI
-${catkin_LIBRARIES}
-generalAPI
-alglib
-armadillo
-optim
-)
+#add_executable(jack_disttrue src/cpp/jack_disttrue.cpp)
+#target_link_libraries(jack_disttrue
+#melodicAPI
+#${catkin_LIBRARIES}
+#generalAPI
+#alglib
+#armadillo
+#optim
+#)
 
 # DISTHANDLE
-add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
-target_link_libraries(jack_disthandle 
-melodicAPI
-${catkin_LIBRARIES}
-generalAPI
-alglib
-armadillo
-optim
-)
+#add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
+#target_link_libraries(jack_disthandle 
+#melodicAPI
+#${catkin_LIBRARIES}
+#generalAPI
+#alglib
+#armadillo
+#optim
+#)
 
 # HYBOBS
-add_executable(jack_hybobs src/cpp/jack_hybobs.cpp)
-target_link_libraries(jack_hybobs 
-melodicAPI
-${catkin_LIBRARIES}
-generalAPI
-alglib
-armadillo
-optim
-)
+#add_executable(jack_hybobs src/cpp/jack_hybobs.cpp)
+#target_link_libraries(jack_hybobs 
+#melodicAPI
+#${catkin_LIBRARIES}
+#generalAPI
+#alglib
+#armadillo
+#optim
+#)
 
 # DUMMY
 #add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)

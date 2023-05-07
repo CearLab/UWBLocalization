@@ -1,0 +1,32 @@
+<launch>
+
+  <!-- group name -->
+  <arg name="ns" default="jackal" />
+
+  <!-- simulation setup -->
+  <arg name="use_sim_time" default="true" />
+  <arg name="gui" default="true" />
+  <arg name="headless" default="false" />
+
+  <!-- Short-term hack to support the original front_laser:=true argument for spawning
+       the simulator. This will be removed in favour of using the config:=x arg instead. -->
+  <arg name="front_laser" default="true" />
+  <arg name="default_config" value="front_laser" if="$(arg front_laser)" />
+  <arg name="default_config" value="base" unless="$(arg front_laser)" />
+  <!-- end of hack -->
+
+  <!-- Configuration of Jackal which you would like to simulate.
+       See jackal_description for details. -->
+  <arg name="config" default="$(arg default_config)" />
+
+  <!-- Spawn Jackal -->
+  <include file="$(find jackal-custom)/launch/spawners/spawn_jackal_RVIZ.launch">
+    <arg name="x" value="0" />
+    <arg name="y" value="0" />
+    <arg name="z" value="1" />
+    <arg name="yaw" value="0" />
+    <arg name="config" value="$(arg config)" />
+    <arg name="robot_name"  value="$(arg ns)" />
+    <arg name="ns" value="$(arg ns)" />
+  </include>
+</launch>

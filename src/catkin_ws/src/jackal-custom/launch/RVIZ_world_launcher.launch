@@ -1,5 +1,6 @@
 <launch>
   <include file="$(find jackal-custom)/launch/RVIZ_world.launch">
     <arg name="ns" value="robi"/>
+    <arg name="front_laser" value="true" />
   </include>
 </launch>
