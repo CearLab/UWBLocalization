@@ -10,3 +10,4 @@ lib/
 video/
 *.gv
 jackal/
+test/
