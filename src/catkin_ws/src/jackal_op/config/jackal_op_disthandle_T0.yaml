@@ -2,8 +2,8 @@
 #
 jack_disthandle_subT: "/gtec/toa/ranging"
 jack_disthandle_subA: "/gtec/toa/anchors"
-jack_disthandle_pubDist: "/robi/DT0/DT"
-jack_disthandle_pubGrad: "/robi/DT0/gradient"
+jack_disthandle_pubDist: "/DT0/DT"
+jack_disthandle_pubGrad: "/DT0/gradient"
 jackAPIName: "DT0API"
 jack_disthandle_tagID: 0
 NanchorMesh: 4

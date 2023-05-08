@@ -19,7 +19,7 @@
 
   <!-- Optionally enable teleop for the simulation -->
   <arg name="joystick" default="true" />
-  <arg name="joy_dev" default="/dev/input/ps4" />
+  <arg name="joy_dev" default="/dev/input/js0" />
 
   <!-- Launch Gazebo with the specified world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
