@@ -9,5 +9,8 @@
                     $(find jackal-custom)/urdf/configs/$(arg config)
                     $(find xacro)/xacro $(find jackal-custom)/urdf/custom_jackal.urdf.xacro rear_id:=$(arg rear_id) --inorder" />
                     
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <param name="publish_frequency" value="50"/>
+    <param name="use_tf_static" value="true"/>
+  </node>
 </launch>

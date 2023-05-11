@@ -100,3 +100,20 @@ rospack profile
 sudo apt install ros-melodic-roslint  
 sudo apt install ros-melodic-sick-tim
 sudo apt install ros-melodic-rqt-tf-tree
+
+# Tom suite
+sudo apt install ros-melodic-roscpp-tutorials
+sudo apt install ros-melodic-tf2-web-republisher
+
+# CERES
+sudo apt-get install libgoogle-glog-dev libgflags-dev
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libeigen3-dev
+sudo apt-get install libsuitesparse-dev
+# assuming that you have ceres-solver-2.1.0 folder
+sudo mkdir ceres-bin
+cd ceres-bin
+sudo cmake -DBUILD_SHARED_LIBS='ON' ../ceres-solver-2.1.0
+sudo make -j3
+sudo make test
+sudo make install

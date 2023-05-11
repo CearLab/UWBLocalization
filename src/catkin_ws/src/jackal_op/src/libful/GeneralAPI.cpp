@@ -113,6 +113,58 @@ int genAPI::OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag
 
 }
 
+// Ceres lib minimization
+int genAPI::CeresMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag){
+
+    // define iterators and stuff
+    int i;
+    bool success;
+
+    // define vars for ceres built-in fcn
+    std::vector<_Float64> poles1_x, poles1_y, poles1_z, poles2_x, poles2_y, poles2_z;
+    std::array<_Float64, 3> pc1, pc2;
+    
+    // cycleover the anchors
+    for (i=0;i<tag->Nanchors;i++){
+
+        // copy distance to be optimized
+        tag->Dopt[i] = D[i];
+
+        // copy anchor position
+        // x position - mesh 1/2
+        poles1_x.push_back(tag->A[3*i]);
+        poles2_x.push_back(tag->A[3*i]);   
+
+        // y position - mesh 1/2
+        poles1_y.push_back(tag->A[3*i+1]);
+        poles2_y.push_back(tag->A[3*i+1]); 
+
+        // y position - mesh 1/2
+        poles1_z.push_back(tag->A[3*i+2]);
+        poles2_z.push_back(tag->A[3*i+2]); 
+
+    }
+
+    // fill p0
+    for (i=0;i<3;i++){
+        pc1[i] = p0[i];
+        pc2[i] = p0[i];
+    }
+
+    // call optimlib - simplex like in this case
+    Function* function = new Function(tag->Nanchors, tag->Nanchors, 0, 0, 
+    D, D, poles1_x, poles1_y, poles1_z, poles2_x, poles2_y, poles2_z);
+    Result result = solve(function, pc1, pc2);
+
+    // copy p0_arma in _p (different types)
+    for (i=0;i<3;i++){
+        tag->p[i] = result.p1[i];
+    }
+    
+    return (int)success;
+
+}
+
 // model observer
 std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector<_Float64> u){
 

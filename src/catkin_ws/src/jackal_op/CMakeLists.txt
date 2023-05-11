@@ -19,6 +19,8 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   message_generation
 )
+find_package(Ceres REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -103,12 +105,17 @@ set(OPTIM_INCLUDE_DIR
 /usr/local/include/optim/zeros
 /usr/local/include/optim
 )
+set(CERES_INCLUDE_DIR
+/usr/local/include/ceres 
+/usr/local/include/ceres/internal
+)
 
 # include
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${ALGLIBCPP_INCLUDE_DIR}
   ${OPTIM_INCLUDE_DIR}
+  ${CERES_INCLUDE_DIR}
   ${LIBFUL_INCLUDE_DIR}
 )
 
@@ -143,39 +150,50 @@ set(MELODICAPI_SOURCES
 )
 add_library(melodicAPI ${MELODICAPI_SOURCES})
 
+set(UWBCERES_SOURCES
+  src/libful/uwb_ceres.cpp
+)
+add_library(uwbceresAPI ${UWBCERES_SOURCES})
+
 ## Declare a C++ executable
 
 # DISTTRUE
 add_executable(jack_disttrue src/cpp/jack_disttrue.cpp)
 target_link_libraries(jack_disttrue
-melodicAPI
 ${catkin_LIBRARIES}
+melodicAPI
 generalAPI
-alglib
+uwbceresAPI
+ceres
 armadillo
 optim
+alglib
 )
 
 # DISTHANDLE
 add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
 target_link_libraries(jack_disthandle 
-melodicAPI
 ${catkin_LIBRARIES}
+melodicAPI
 generalAPI
-alglib
+uwbceresAPI
+ceres
 armadillo
 optim
+alglib
 )
 
 # HYBOBS
 add_executable(jack_hybobs src/cpp/jack_hybobs.cpp)
 target_link_libraries(jack_hybobs 
-melodicAPI
 ${catkin_LIBRARIES}
+melodicAPI
 generalAPI
-alglib
+uwbceresAPI
+ceres
 armadillo
 optim
+alglib
 )
 
 # DUMMY

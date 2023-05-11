@@ -7,4 +7,4 @@ jack_hybobs_pubIMU: "/HYB0/IMU"
 jack_hybobs_pubBias: "/HYB0/Bias"
 DistjackAPIName: "HYB0API"
 NanchorMesh: 4
-HYBrate: 50
+HYBrate: 100

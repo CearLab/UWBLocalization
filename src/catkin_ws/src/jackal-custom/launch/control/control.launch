@@ -9,9 +9,21 @@
         args="jackal_joint_publisher jackal_velocity_controller" />
 
   <group if="$(arg enable_ekf)" >
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization">
-      <rosparam command="load" file="$(find jackal-custom)/config/robot_localization.yaml"/>
-    </node>
+
+    
+    <group ns="EKF"> 
+      <!-- TF -->
+      <group ns="frames">
+        <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args=" 0 0 0 0 0 0 world odom"/>
+        <node pkg="tf2_ros" type="static_transform_publisher" name="odom_base_link" args=" 0 0 0 0 0 0 odom base_link 50"/>
+      </group>
+
+      <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization">
+        <rosparam command="load" file="$(find jackal-custom)/config/robot_localization.yaml"/>
+      </node>
+      
+    </group>
+
   </group>
 
   <node pkg="twist_mux" type="twist_mux" name="twist_mux">

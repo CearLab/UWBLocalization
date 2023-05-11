@@ -22,6 +22,9 @@
 #define OPTIM_ENABLE_ARMA_WRAPPERS
 #include <optim.hpp>
 
+// ceres optimization
+#include "uwb_ceres.hpp"
+
 namespace genAPI {
 
     // model parameters
@@ -32,8 +35,8 @@ namespace genAPI {
     const std::vector<int> pos_v = {1, 5, 9};
     const std::vector<int> pos_b = {2, 6, 10};
     const std::vector<int> pos_a = {3, 7, 11};
-    const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
-    //const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
+    //const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
+    const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
 
     // env params
     const std::vector<_Float64> Anchors = {
@@ -60,6 +63,9 @@ namespace genAPI {
 
     // Optim lib minimization
     int OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag, int GradientFlag);
+
+    // Ceres lib minimization
+    int CeresMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag);
 
     // model observer
     std::vector<_Float64> modelObserver(std::vector<_Float64> x, std::vector<_Float64> u);

@@ -123,6 +123,12 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
 void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
 
     std::vector<_Float64> p0(3, 0.0);
+    int i = 0;
+
+    //init with current estimate
+    for (i=0;i<3;i++){
+        p0[i] = _p[i];
+    };
 
     // store distances in the vectors
     ROS_INFO("AnchorID: %d", msg.anchorId);
@@ -172,7 +178,8 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
         //optimize
         int success = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
-        success = genAPI::OptimMin(p0, _Dopt, &_Tag, _GradientFlag);
+        //success = genAPI::OptimMin(p0, _Dopt, &_Tag, _GradientFlag);
+        success = genAPI::CeresMin(p0, _Dopt, &_Tag);
         auto t2 = std::chrono::high_resolution_clock::now();
 
         /* Getting number of milliseconds as an integer. */

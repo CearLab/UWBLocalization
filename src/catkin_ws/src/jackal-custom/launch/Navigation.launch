@@ -1,0 +1,13 @@
+<launch>
+
+  <!-- Mapping node -->
+  <!--node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
+     <param name="base_frame" value="base_link"/>
+     <param name="odom_frame" value="odom"/>
+  </node-->
+
+  <!-- Navigation node -->
+  <include file="$(find jackal-custom)/launch/control/navigation/odom_navigation.launch">
+  </include>
+
+</launch>

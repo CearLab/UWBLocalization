@@ -92,8 +92,22 @@
     <origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
   </xacro:wheel>
 
-  <link name="base_link"></link>
+  <!--
+  <link name="odom"></link>
+  <joint name="odom_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="odom"/>
+    <child link="base_link" />
+  </joint>-->
 
+  <link name="world"></link>
+  <joint name="world_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="world"/>
+    <child link="world" />
+  </joint>
+  
+  <link name="base_link"></link>
   <joint name="base_link_joint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="base_link"/>
@@ -257,4 +271,19 @@
 
   <!-- Optional custom includes. -->
   <xacro:include filename="$(optenv JACKAL_URDF_EXTRAS empty.urdf)" />
+
+  <!---->
+  <gazebo>
+      <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>50.0</updateRate>
+          <bodyName>base_link</bodyName>
+          <frameName>world</frameName>
+          <topicName>ground_truth/state</topicName>
+          <gaussianNoise>0.0</gaussianNoise>          
+          <xyzOffsets>0 0 0</xyzOffsets>
+          <rpyOffsets>0 0 0</rpyOffsets>
+      </plugin>
+  </gazebo>
+  
 </robot>

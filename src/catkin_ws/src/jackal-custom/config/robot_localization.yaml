@@ -1,40 +1,38 @@
 #Configuation for robot odometry EKF
-
-# EKF frequency
+#
 frequency: 50
 
-odom0: /jackal_velocity_controller/odom
-odom0_config: [false, false, false,
+odom0: /ground_truth/state
+odom0_config: [true, true, true,
                false, false, false,
-               true, true, false,
-               false, false, true,
+               false, false, false,
+               false, false, false,
                false, false, false]
 odom0_differential: false
 
-#odom1: /HYB0/Odom
-#odom1_config: [true, true, false,
+odom1: /jackal_velocity_controller/odom
+odom1_config: [false, false, false,
+               false, false, false,
+               true, true, true,
+               true, true, true,
+               false, false, false]
+odom1_differential: false
+
+#odom2: /HYB0/Odom
+#odom2_config: [true, true, true,
 #               false, false, false,
 #               false, false, false,
 #               false, false, false,
 #               false, false, false]
-#odom1_differential: false
+#odom2_differential: false
 
-odom2: /groud_truth/state
-odom2_config: [true, true, false,
-               false, false, true,
-               false, false, false,
-               false, false, false,
-               false, false, false]
-odom2_differential: false
-
-imu0: imu/data
+imu0: /imu/data
 imu0_config: [false, false, false,
+              true, true, true,
               false, false, false,
-              false, false, false,
-              false, false, false,
-              true, true, false]
+              true, true, true,
+              true, true, true]
 imu0_differential: false
-imu0_remove_gravitational_acceleration: true
 
 # initial state
 initial_state: [0.0, 0.0, 0.0
@@ -43,22 +41,22 @@ initial_state: [0.0, 0.0, 0.0
                 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0]
 
-#                         x      y     z     r     p     y     xdot  ydot  zdot    rdot  pdot  ydot  xddot yddot zddot  
+#                         x      y     z     R     P     Y     xdot  ydot  zdot    Rdot  Pdot  Ydot  xddot yddot zddot  
 process_noise_covariance: [1e-1, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                            0,    1e-1, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                           0,    0,    0e+0, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                           0,    0,    0,    0e+0, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                           0,    0,    0,    0,    0e+0, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                           0,    0,    0,    0,    0,    0e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+                           0,    0,    1e-1, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                           0,    0,    0,    1e-1, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                           0,    0,    0,    0,    1e-1, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                           0,    0,    0,    0,    0,    1e-1, 0,     0,     0,    0,    0,    0,    0,    0,    0,
                            0,    0,    0,    0,    0,    0,    1e-1,  0,     0,    0,    0,    0,    0,    0,    0,
                            0,    0,    0,    0,    0,    0,    0,     1e-1,  0,    0,    0,    0,    0,    0,    0,
-                           0,    0,    0,    0,    0,    0,    0,     0,     0e+0, 0,    0,    0,    0,    0,    0,
-                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0e+0, 0,    0,    0,    0,    0,
-                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0e+0, 0,    0,    0,    0,
+                           0,    0,    0,    0,    0,    0,    0,     0,     1e-1, 0,    0,    0,    0,    0,    0,
+                           0,    0,    0,    0,    0,    0,    0,     0,     0,    1e-1, 0,    0,    0,    0,    0,
+                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1e-1, 0,    0,    0,    0,
                            0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    1e-1, 0,    0,    0,
                            0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    1e-4, 0,    0,
                            0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    1e-4, 0,
-                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0e+0]
+                           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    1e-4]
 
 initial_estimate_covariance: [1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
                               0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
@@ -77,17 +75,15 @@ initial_estimate_covariance: [1e-9, 0,    0,    0,    0,    0,    0,    0,    0,
                               0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-9]
 
 
-# frames
-odom_frame: /odom
-base_link_frame: /base_link
-world_frame: /odom
-map_frame: /map
+odom_frame: odom
+base_link_frame: base_link
+world_frame: odom
 
 predict_to_current_time: true
 
 # timeout interval (s)
 sensor_timeout: 0.1
 # planar mode
-two_d_mode: true
+two_d_mode: false
 # tf publish
 tf: true
