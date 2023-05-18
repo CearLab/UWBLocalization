@@ -139,6 +139,10 @@ int main(int argc, char **argv)
                     jackNode._transformStamped.transform.rotation.x,
                     jackNode._transformStamped.transform.rotation.y,
                     jackNode._transformStamped.transform.rotation.z);
+                    ROS_INFO("Anchor 0: %g, %g, %g", jackNode._A[0], jackNode._A[1], jackNode._A[2]);
+                    ROS_INFO("Anchor 1: %g, %g, %g", jackNode._A[3], jackNode._A[4], jackNode._A[5]);
+                    ROS_INFO("Anchor 2: %g, %g, %g", jackNode._A[6], jackNode._A[7], jackNode._A[8]);
+                    ROS_INFO("Anchor 3: %g, %g, %g", jackNode._A[9], jackNode._A[10], jackNode._A[11]);
                 }
                 catch (tf2::TransformException &ex) {
                     ROS_WARN("ARARMAX: %s",ex.what());

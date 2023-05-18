@@ -373,7 +373,8 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
 
     // fill message and publish - odometry
     _Godom.header = msg.header;
-    _Godom.child_frame_id = msg.header.frame_id;
+    _Godom.header.frame_id = "odom";
+    _Godom.child_frame_id = "base_link";
 
     // position
     _Godom.pose.pose.position.x = _xnew[genAPI::pos_p[0]];

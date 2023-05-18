@@ -1,0 +1,11 @@
+#Configuation for robot odometry EKF
+#
+jack_disthandle_subT: "/gtec/toa/ranging"
+jack_disthandle_subA: "/gtec/toa/anchors"
+jack_disthandle_pubDist: "/DT2/DT"
+jack_disthandle_pubGrad: "/DT2/gradient"
+jackAPIName: "DT2API"
+jack_disthandle_tagID: 2
+NanchorMesh: 4
+GradientFlag: 0
+UWBrate: 5

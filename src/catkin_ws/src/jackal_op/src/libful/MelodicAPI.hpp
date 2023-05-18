@@ -14,6 +14,7 @@
 
 // visualization msgs
 #include "visualization_msgs/MarkerArray.h"
+#include "visualization_msgs/Marker.h"
 
 // std msgs
 #include "std_msgs/String.h"
