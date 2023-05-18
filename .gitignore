@@ -11,3 +11,4 @@ video/
 *.gv
 jackal/
 test/
+src/catkin_ws/src/gtec/
