@@ -4,3 +4,6 @@
 [submodule "src/catkin_ws/src/gtec/rosmsgs"]
 	path = src/catkin_ws/src/gtec/rosmsgs
 	url = https://github.com/valentinbarral/rosmsgs
+[submodule "src/catkin_ws/src/robot_localization_custom"]
+	path = src/catkin_ws/src/robot_localization_custom
+	url = git@github.com:fedeoli/robot_localization_custom.git
