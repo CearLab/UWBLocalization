@@ -7,5 +7,8 @@ jack_disthandle_pubGrad: "/DT2/gradient"
 jackAPIName: "DT2API"
 jack_disthandle_tagID: 2
 NanchorMesh: 4
+Ntags: 3
+TagPair: -1
+TagDists: [0.0]
 GradientFlag: 0
 UWBrate: 5

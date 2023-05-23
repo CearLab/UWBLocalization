@@ -2,13 +2,12 @@
 #
 jack_disthandle_subT: "/gtec/toa/ranging"
 jack_disthandle_subA: "/gtec/toa/anchors"
-jack_disthandle_pubDist: "/DT1/DT"
-jack_disthandle_pubGrad: "/DT1/gradient"
-jackAPIName: "DT1API"
-jack_disthandle_tagID: 1
+jack_disthandle_pubDist: "/DT5/DT"
+jack_disthandle_pubGrad: "/DT5/gradient"
+jackAPIName: "DT5API"
 NanchorMesh: 4
 Ntags: 3
-TagPair: -1
+TagPair: 0
 TagDists: [0.0]
 GradientFlag: 0
 UWBrate: 5

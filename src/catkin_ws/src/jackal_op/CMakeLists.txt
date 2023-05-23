@@ -38,7 +38,9 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 add_message_files(
   FILES
   MeshUWB.msg
+  MeshUWBCentral.msg
   GradientDescent.msg
+  TransformArray.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -171,8 +173,21 @@ alglib
 )
 
 # DISTHANDLE
-add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
-target_link_libraries(jack_disthandle 
+#add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
+#target_link_libraries(jack_disthandle 
+#${catkin_LIBRARIES}
+#melodicAPI
+#generalAPI
+#uwbceresAPI
+#ceres
+#armadillo
+#optim
+#alglib
+#)
+
+# DISTHANDLE - CENTRALIZED
+add_executable(jack_disthandle_centralized src/cpp/jack_disthandle_centralized.cpp)
+target_link_libraries(jack_disthandle_centralized
 ${catkin_LIBRARIES}
 melodicAPI
 generalAPI
@@ -184,17 +199,17 @@ alglib
 )
 
 # HYBOBS
-add_executable(jack_hybobs src/cpp/jack_hybobs.cpp)
-target_link_libraries(jack_hybobs 
-${catkin_LIBRARIES}
-melodicAPI
-generalAPI
-uwbceresAPI
-ceres
-armadillo
-optim
-alglib
-)
+#add_executable(jack_hybobs src/cpp/jack_hybobs.cpp)
+#target_link_libraries(jack_hybobs 
+#${catkin_LIBRARIES}
+#melodicAPI
+#generalAPI
+#uwbceresAPI
+#ceres
+#armadillo
+#optim
+#alglib
+#)
 
 # DUMMY
 #add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)

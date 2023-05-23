@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     /**
      * ros::init() the node
      */
-    ros::init(argc, argv, "jack_disthandle");
+    ros::init(argc, argv, "jack_disthandle_centralized");
 
     /**
      * define nodehandle instance (general purpose)
@@ -25,13 +25,15 @@ int main(int argc, char **argv)
     // general stuff
     int cnt = 0;
     int rate = 5;
+    int i;
 
     /**
      * define topic to subscribe to. Get the topics name from params server. Then create handle for subscribing.
      */
-    std::string subNameT, subNameA, pubNameT, pubNameTril, jackName, pubNameTrilodom;
-    int Nanchors, Ntags, tagID, GradientFlag, TagPair;    
+    std::string subNameT, subNameA, pubNameT, pubNameTril, pubNameTrilodom, jackName;  
+    std::string child, base;
     std::vector<_Float64> TagDists;
+    int Nanchors, Ntags, tagID, GradientFlag, TagPair;  
 
     // get tagID - default 7
     if (argc > 1){
@@ -100,7 +102,7 @@ int main(int argc, char **argv)
         np.getParam(tmp, TagDists);
         tmp = "/DT" + std::to_string(tagID) + "/TagPair";
         np.getParam(tmp, TagPair);
-        
+
         // concatenate string - odom
         pubNameTrilodom = pubNameTril + "Odom";
 
@@ -120,22 +122,19 @@ int main(int argc, char **argv)
         }
 
         // subscribe
-        jackNode._jack_disthandle_ST = np.subscribe(subNameT, 1000, &jackAPI::ChatterCallbackT, &jackNode);
+        jackNode._jack_disthandle_ST = np.subscribe(subNameT, 1000, &jackAPI::ChatterCallbackTCentral, &jackNode);
         jackNode._jack_disthandle_SA = np.subscribe(subNameA, 1000, &jackAPI::ChatterCallbackA, &jackNode);
 
         ROS_INFO("Subscriptions done");
 
         // publisher
-        jackNode._jack_disthandle_P = np.advertise<jackal_op::MeshUWB>(pubNameT, 1000);
+        jackNode._jack_disthandle_P = np.advertise<jackal_op::MeshUWBCentral>(pubNameT, 1000);
         jackNode._jack_trilateration_P = np.advertise<jackal_op::GradientDescent>(pubNameTril, 1000);
         jackNode._jack_odometry_P = np.advertise<nav_msgs::Odometry>(pubNameTrilodom, 1000);    
         ROS_INFO("Publishers initialized");
 
         // spin
         ROS_INFO("Spinning");
-
-        // wait before proceeding - all tags to be initialized
-        //usleep(1000*2000);
 
         // spin with loop rate
         while (ros::ok()) {
@@ -146,19 +145,18 @@ int main(int argc, char **argv)
             // get transform
             if (tagID >= 0){
                 try{
-                    jackNode._transformStamped = tfBuffer.lookupTransform(jackNode._G.odom.child_frame_id,jackNode._G.odom.header.frame_id,ros::Time(0));
 
-                    ROS_INFO("Trasl: %g %g %g", jackNode._transformStamped.transform.translation.x,
-                    jackNode._transformStamped.transform.translation.y,
-                    jackNode._transformStamped.transform.translation.z);
-                    // ROS_INFO("Rot: %g %g %g %g", jackNode._transformStamped.transform.rotation.w,
-                    // jackNode._transformStamped.transform.rotation.x,
-                    // jackNode._transformStamped.transform.rotation.y,
-                    // jackNode._transformStamped.transform.rotation.z);
-                    // ROS_INFO("Anchor 0: %g, %g, %g", jackNode._A[0], jackNode._A[1], jackNode._A[2]);
-                    // ROS_INFO("Anchor 1: %g, %g, %g", jackNode._A[3], jackNode._A[4], jackNode._A[5]);
-                    // ROS_INFO("Anchor 2: %g, %g, %g", jackNode._A[6], jackNode._A[7], jackNode._A[8]);
-                    // ROS_INFO("Anchor 3: %g, %g, %g", jackNode._A[9], jackNode._A[10], jackNode._A[11]);
+                    for (i=0;i<jackNode._Ntags;i++){
+
+                        jackNode.GetFrames(child, base, i);
+                        jackNode._transformStamped.transforms[i] = tfBuffer.lookupTransform(child,base,ros::Time(0));
+
+                        // wanna see the transformation?
+                        ROS_INFO("Trasl: %g %g %g", jackNode._transformStamped.transforms[i].transform.translation.x,
+                        jackNode._transformStamped.transforms[i].transform.translation.y,
+                        jackNode._transformStamped.transforms[i].transform.translation.z);
+                    }
+                    
                 }
                 catch (tf2::TransformException &ex) {
                     ROS_WARN("ARARMAX: %s",ex.what());

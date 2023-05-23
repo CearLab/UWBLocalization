@@ -2,10 +2,10 @@
 #include "MelodicAPI.hpp"
 
 /** **** CONSTRUCTOR **** */
-jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
+jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPair, std::vector<_Float64> TagDists, int rate){
 
     // counters
-    int i, j;
+    int i, j, k;
 
     // empty messages
     visualization_msgs::Marker zeroMark;
@@ -24,9 +24,34 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
     // set gradient flag
     _GradientFlag = 0;
     
-    // set mesh dimension
+    // dimensions of mesh
     _Nanchors = Nanchors;
-    _Tag.Nanchors = Nanchors;
+    _Ntags = Ntags;
+    _Npairs = (int)(0.25*_Ntags*(_Ntags-1));
+
+    // push back TagSet
+    genAPI::Tag TagZero = genAPI::TagInit(Nanchors);
+    for (i=0; i<_Ntags; i++){
+        _TagSet.Tags.push_back(TagZero);
+    }
+    _TagSet.CurrPair.push_back(tagID);
+    _TagSet.CurrPair.push_back(TagPair);
+
+    // push back transformations
+    geometry_msgs::TransformStamped TransZero;
+    // use it for pushbacks
+    for (i=0; i<_Ntags; i++){
+        _transformStamped.transforms.push_back(TransZero);
+    }
+
+    // setup Tag set
+    _TagSet.Ntags =_Ntags;
+    for (i=0; i<_Ntags; i++){
+        _TagSet.Tags[i].Nanchors = _Nanchors;
+    }
+    _TagSet.TagDists = TagDists;
+    _TagSet.Npairs = _Npairs;
+    _TagSet.Nanchors = _Nanchors;
     
     // counter
     _cnt = 0;
@@ -37,29 +62,28 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
     // observer state
     for (i=0;i<genAPI::stateDim;i++){
         _xnew.push_back(0.0);
-    }
-     
+    }     
 
     // create transform
     if (_tagID == 0){
-        _G.odom.child_frame_id = "rear_tag";
-        _G.odom.header.frame_id = "base_link";      
+        _Godom.child_frame_id = "rear_tag";
+        _Godom.header.frame_id = "base_link";      
     }
     else if (_tagID == 1){
-        _G.odom.child_frame_id = "right_tag";
-        _G.odom.header.frame_id = "base_link"; 
+        _Godom.child_frame_id = "right_tag";
+        _Godom.header.frame_id = "base_link"; 
     }
     else if (_tagID == 2){
-        _G.odom.child_frame_id = "left_tag";
-        _G.odom.header.frame_id = "base_link";
+        _Godom.child_frame_id = "left_tag";
+        _Godom.header.frame_id = "base_link";
     }
     else {
-        _G.odom.child_frame_id = "imu_link";
-        _G.odom.header.frame_id = "base_link";
+        _Godom.child_frame_id = "imu_link";
+        _Godom.header.frame_id = "base_link";
     }
 
     // set covariance
-    _G.odom.pose.covariance = 
+    _Godom.pose.covariance = 
     {
         0.2, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.2, 0.0, 0.0, 0.0, 0.0,
@@ -68,7 +92,7 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0 
     };
-    _G.odom.twist.covariance = 
+    _Godom.twist.covariance = 
     {
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -76,6 +100,30 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0 
+    };
+    _Gimu.angular_velocity_covariance = 
+    {
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0
+    };
+    _Gimu.linear_acceleration_covariance = 
+    {
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0
+    };
+    _Gbias.angular_velocity_covariance = 
+    {
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0
+    };
+    _Gbias.linear_acceleration_covariance = 
+    {
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0
     };
 
     // init J, GJ, HJ
@@ -88,28 +136,41 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
     }
     
     // init p
-    _p = {0.0, 0.0, 0.25};
-    _Tag.p = {0.0, 0.0, 0.25};
-
+    std::vector<_Float64> p(_Ntags*3 + _Npairs, 0.0);
+    _p = p;
+    for (i=0; i<_Ntags; i++){
+        _TagSet.Tags[i].p = _p;
+    }
+    
     // init distance vectors
     for (i=0; i<_Nanchors; i++) {
 
         // init distances - class
-        _DT.push_back(0.0);        
-        _Dopt.push_back(0.0);
-        _Tag.Dopt.push_back(0.0);        
-        // init MeshUWB message        
-        _DTmsg.D1.push_back(0.0);        
-        _DTmsg.D2.push_back(0.0);
-        _DTmsg.D3.push_back(0.0);
+        _DT.push_back(0.0);
+
+        for (j=0; j<_Ntags; j++){
+
+            _DoptCentral.push_back(0.0);
+            _DTmsgCentral.DC.push_back(0.0);
+
+            _G.p.push_back(0.0);
+            _G.pg.push_back(0.0);
+
+            _TagSet.Tags[j].Dopt.push_back(0.0);
+
+        }
 
         // init markerarray
         _AtrueMsg.markers.push_back(zeroMark);
         
         // init Anchors position
         for (j=0; j<3; j++){
+
             _A.push_back(0.0);
-            _Tag.A.push_back(0.0);
+            _G.A.push_back(0.0);
+            for (k=0; k<_Ntags; k++){
+            _TagSet.Tags[k].A.push_back(0.0);
+            }
         }
     }
 
@@ -119,34 +180,53 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int rate){
 
 /** **** METHODS **** */
 
-// subscriber callback - used in the trilateration
-void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
+// set links
+void jackAPI::GetFrames(std::string& child, std::string& base, int tagID){
 
-    std::vector<_Float64> p0(3, 0.0);
+    // create transform
+    if (tagID == 0){
+        child = "rear_tag";
+        base = "base_link";      
+    }
+    else if (tagID == 1){
+        child = "right_tag";
+        base = "base_link";  
+    }
+    else if (tagID == 2){
+        child  = "left_tag";
+        base = "base_link";  
+    }
+    else {
+        child  =  "imu_link";
+        base = "base_link";  
+    }
+
+}
+
+// subscriber callback - centralized
+void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
+
+    std::vector<_Float64> p0(_p.size(), 0.0);
     int i = 0;
 
     //init with current estimate
-    for (i=0;i<3;i++){
-        p0[i] = _p[i];
-    };
+    //p0 = _p;
 
     // store distances in the vectors
     ROS_INFO("AnchorID: %d", msg.anchorId);
     ROS_INFO("TagID: %d", msg.tagId);
+
     try {
 
         // save distance read from tag
         _DT[msg.anchorId] = (double)msg.range/1000;
 
         // populate correct tag in the UWB message
-        if (msg.tagId == 0){            
-            _DTmsg.D1[msg.anchorId] = _DT[msg.anchorId];   
-        }
-        else if (msg.tagId == 1){
-            _DTmsg.D2[msg.anchorId] = _DT[msg.anchorId];
-        }
-        else if (msg.tagId == 2){
-            _DTmsg.D3[msg.anchorId] = _DT[msg.anchorId];
+        if (msg.tagId < _Ntags){            
+              
+            // set distance used to optimize
+            _DoptCentral[_Nanchors*msg.tagId  + msg.anchorId] = _DT[msg.anchorId];
+
         }
         else {
             ROS_ERROR("WRONG ID - ChatterCallback");
@@ -156,16 +236,14 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
         ROS_INFO("WRONG tag ID");
     }
 
-    // set distance used to optimize
-    if (msg.tagId == _tagID){
-        _Dopt[msg.anchorId] = _DT[msg.anchorId];
-    }
+    // set the message
+    _DTmsgCentral.DC = _DoptCentral; 
         
     //_get time
-    _DTmsg.header.stamp = _begin.now();
+    _DTmsgCentral.header.stamp = _begin.now();
 
     // publish the distance wrapper
-    _jack_disthandle_P.publish(_DTmsg);
+    _jack_disthandle_P.publish(_DTmsgCentral);
 
     ROS_INFO("Published distances");
 
@@ -173,13 +251,15 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
     try {
 
         // copy anchors
-        _Tag.A = _A;
-
+        for (i=0;i<_Nanchors;i++){
+            _TagSet.Tags[i].A = _A;
+        }
+        
         //optimize
         int success = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
-        //success = genAPI::OptimMin(p0, _Dopt, &_Tag, _GradientFlag);
-        success = genAPI::CeresMin(p0, _Dopt, &_Tag);
+        success = genAPI::OptimMin(p0, _DoptCentral, &_TagSet, _GradientFlag);
+        //success = genAPI::CeresMin(p0, _Dopt, &_Tag);
         auto t2 = std::chrono::high_resolution_clock::now();
 
         /* Getting number of milliseconds as an integer. */
@@ -191,28 +271,51 @@ void jackAPI::ChatterCallbackT(const gtec_msgs::Ranging& msg) {
         // info
         //ROS_WARN("Optim exec time: %g", (_Float64)ms_double.count());
 
+        // get final cumulative position
+        for (i=0;i<_Ntags;i++){
+            p0[3*i] = _TagSet.Tags[i].p[0];
+            p0[3*i + 1] = _TagSet.Tags[i].p[1];
+            p0[3*i + 2] = _TagSet.Tags[i].p[2];
+        }
+
         // fill messages
         // gradient normal stuff
-        _G.A = _Tag.A;
-        _G.p = _Tag.p;
-        _G.J = _Tag.J;
-        _G.GJ = _Tag.GJ;
+        _G.A = _A;
+        _G.p = p0;
+        _G.J = _TagSet.Tags[0].J;
+        _G.GJ = _TagSet.Tags[0].GJ;
         _G.header.stamp = _begin.now();
 
         // gradient odom
-        _G.odom.header.stamp = _G.header.stamp;
-        _G.odom.pose.pose.position.x = _G.p[0];
-        _G.odom.pose.pose.position.y = _G.p[1];
-        _G.odom.pose.pose.position.z = _G.p[2];
-
-        // assign 
-        _Godom = _G.odom;
+        _Godom.header.stamp = _G.header.stamp;
 
         // transform
-        _Godom.pose.pose.position.x = _G.p[0] + _transformStamped.transform.translation.x;
-        _Godom.pose.pose.position.y = _G.p[1] + _transformStamped.transform.translation.y;
-        _Godom.pose.pose.position.z = _G.p[2] + _transformStamped.transform.translation.z;
+        for (i=0;i<_Ntags;i++){
 
+            _G.pg[3*i] = _G.p[3*i] + _transformStamped.transforms[i].transform.translation.x;
+            _G.pg[3*i + 1] = _G.p[3*i + 1] + _transformStamped.transforms[i].transform.translation.y;
+            _G.pg[3*i + 2] = _G.p[3*i + 2] + _transformStamped.transforms[i].transform.translation.z;
+
+        }
+
+        // RESET ESTIMATE
+        _Godom.pose.pose.position.x = 0.0;
+        _Godom.pose.pose.position.y = 0.0;
+        _Godom.pose.pose.position.z = 0.0;   
+
+        // mean over Ntags estimates
+        for (i=0;i<_Ntags;i++){
+
+            _Godom.pose.pose.position.x += _G.pg[3*i];
+            _Godom.pose.pose.position.y += _G.pg[3*i + 1];
+            _Godom.pose.pose.position.z += _G.pg[3*i + 2];
+        }
+
+        // mean
+        _Godom.pose.pose.position.x = _Godom.pose.pose.position.x/_Ntags;
+        _Godom.pose.pose.position.y = _Godom.pose.pose.position.y/_Ntags;
+        _Godom.pose.pose.position.z = _Godom.pose.pose.position.z/_Ntags;   
+        
         // publish
         _jack_trilateration_P.publish(_G);
         _jack_odometry_P.publish(_Godom);
@@ -262,19 +365,11 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
     _DTrueMsg.rss = 0;
     _DTrueMsg.errorEstimation = 0;
 
-    ROS_INFO("Trasl: %g %g %g", _transformStamped.transform.translation.x,
-    _transformStamped.transform.translation.y,
-    _transformStamped.transform.translation.z);
-    ROS_INFO("Rot: %g %g %g %g", _transformStamped.transform.rotation.w,
-    _transformStamped.transform.rotation.x,
-    _transformStamped.transform.rotation.y,
-    _transformStamped.transform.rotation.z);
-
     // transform position
     _Float64 x,y,z;
-    x = msg.pose.pose.position.x + _transformStamped.transform.translation.x;
-    y = msg.pose.pose.position.y + _transformStamped.transform.translation.y;
-    z = msg.pose.pose.position.z + _transformStamped.transform.translation.z;
+    x = msg.pose.pose.position.x + _transformStamped.transforms[_tagID].transform.translation.x;
+    y = msg.pose.pose.position.y + _transformStamped.transforms[_tagID].transform.translation.y;
+    z = msg.pose.pose.position.z + _transformStamped.transforms[_tagID].transform.translation.z;
 
     // get true distances
     for (i=0;i<_Nanchors;i++){

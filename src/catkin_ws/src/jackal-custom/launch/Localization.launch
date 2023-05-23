@@ -17,42 +17,37 @@
   </node>
 
   <!-- ###### REAL MEASUREMENTS ######-->
-  <!-- UWB Distance measurement node  -->
+  <!-- UWB Distance measurement node  T0 -->
   <!--node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
-      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read.yaml"/>
+      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T0.yaml"/>
   </node-->
 
-  <!-- ###### TRILATERATION ######-->
+  <!-- UWB Distance measurement node  T1 -->
+  <!--node name="UWB_read_T1" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T1 1">
+      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T1.yaml"/>
+  </node-->
+
+  <!-- ###### TRILATERATION  - CENTRALIZED ######-->
   <!-- T0 (rear) Distance handler node -->
-  <node name="DT0" pkg="jackal_op" type="jack_disthandle" args="0">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T0.yaml"/>
-  </node>
-
-  <!-- T1 (right) Distance handler node -->
-  <node name="DT1" pkg="jackal_op" type="jack_disthandle" args="1">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T1.yaml"/>
-  </node>
-
-  <!-- T2 (right) Distance handler node -->
-  <node name="DT2" pkg="jackal_op" type="jack_disthandle" args="2">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_T2.yaml"/>
+  <node name="DT5" pkg="jackal_op" type="jack_disthandle_centralized" args="5">
+    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_centralized.yaml"/>
   </node>
 
   <!-- ###### OBSERVER ######-->
   <!-- T0 (rear) HybObs node -->
-  <node name="HYB0" pkg="jackal_op" type="jack_hybobs" args="HYB0 0">
+  <!--node name="HYB0" pkg="jackal_op" type="jack_hybobs" args="HYB0 0">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T0.yaml"/>
-  </node>
+  </node-->
 
   <!-- T1 (right) HybObs node -->
-  <node name="HYB1" pkg="jackal_op" type="jack_hybobs" args="HYB1 1">
+  <!--node name="HYB1" pkg="jackal_op" type="jack_hybobs" args="HYB1 1">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T1.yaml"/>
-  </node>
+  </node-->
 
   <!-- T2 (right) HybObs node -->
-  <node name="HYB2" pkg="jackal_op" type="jack_hybobs" args="HYB2 2">
+  <!--node name="HYB2" pkg="jackal_op" type="jack_hybobs" args="HYB2 2">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T2.yaml"/>
-  </node>
+  </node-->
 
 
 </launch>

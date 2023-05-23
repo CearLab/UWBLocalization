@@ -25,7 +25,10 @@ int main(int argc, char **argv)
     int cnt = 0;
     int rate = 5;
     int tagID = 7;
+    int i;
+
     std::string ID;
+    std::string child, base;
 
     // get tagID - default 7
     if (argc > 1){
@@ -41,7 +44,7 @@ int main(int argc, char **argv)
         tagID = atoi(value_from_cl.c_str());
     }
 
-    ROS_INFO("ID %d", tagID);
+    ROS_WARN("ID %s", ID.c_str());
 
     // check params
     std::string tmp;
@@ -58,6 +61,10 @@ int main(int argc, char **argv)
     flags.push_back(np.hasParam(tmp));
     tmp = "/" + ID + "/NanchorMesh";
     flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/Ntags";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/TagDists";
+    flags.push_back(np.hasParam(tmp));
 
     // init rate for the node
     tmp = "/" + ID + "/UWBrate";
@@ -71,7 +78,8 @@ int main(int argc, char **argv)
      * Then create handle for subscribing.
      */
     std::string subNameA, subNameOdom, pubNameDist, pubNameAnchors, jackName;
-    int Nanchors;
+    int Nanchors, Ntags, TagPair;
+    std::vector<_Float64> TagDists;
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
     if (std::all_of(std::begin(flags), std::end(flags),[](bool b){return b;})) {
@@ -91,14 +99,21 @@ int main(int argc, char **argv)
         tmp = "/" + ID + "/DistjackAPIName";
         np.getParam(tmp, jackName);  
         tmp = "/" + ID + "/NanchorMesh";
-        np.getParam(tmp, Nanchors);  
+        np.getParam(tmp, Nanchors);
+        tmp = "/" + ID + "/Ntags";
+        np.getParam(tmp, Ntags);  
+        tmp = "/" + ID + "/TagDists";
+        np.getParam(tmp, TagDists);  
+
+        // TagPair
+        TagPair = 0;
 
         // init buffer and listener
         static tf2_ros::Buffer tfBuffer; // problem line
         tf2_ros::TransformListener tfListener(tfBuffer);
 
         // instance of a class - tagID 7 
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, rate);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagPair, TagDists, rate);
         ROS_INFO("jackAPI - Class instance created");
 
         // subscribe
@@ -125,8 +140,15 @@ int main(int argc, char **argv)
             // get transform
             if (tagID >= 0){
                 try{
-                    jackNode._transformStamped = tfBuffer.lookupTransform(jackNode._G.odom.header.frame_id,
-                    jackNode._G.odom.child_frame_id,ros::Time(0));
+
+                    jackNode.GetFrames(child, base, tagID);
+                    jackNode._transformStamped.transforms[0] = tfBuffer.lookupTransform(base,child,ros::Time(0));
+
+                    // wanna see the transformation?
+                    ROS_INFO("Trasl: %g %g %g", 
+                    jackNode._transformStamped.transforms[0].transform.translation.x,
+                    jackNode._transformStamped.transforms[0].transform.translation.y,
+                    jackNode._transformStamped.transforms[0].transform.translation.z);
                 }
                 catch (tf2::TransformException &ex) {
                     ROS_WARN("ARARMAX: %s",ex.what());

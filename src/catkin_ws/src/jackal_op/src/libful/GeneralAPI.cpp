@@ -1,5 +1,38 @@
 // class with utilities for jackal with UWB handling
 #include "GeneralAPI.hpp"
+#include "ros/ros.h"
+
+// init Tag
+genAPI::Tag genAPI::TagInit(int Nanchors){
+
+    // counters
+    int i, j;
+
+    // init Tag
+    genAPI::Tag TagZero;
+
+    // set Nanchors
+    TagZero.Nanchors = Nanchors;
+
+    // init anchors
+    for (i=0;i<Nanchors;i++){
+
+        for (j=0;j<3;j++){
+            TagZero.A.push_back(0.0);
+        }
+
+        // measures
+        TagZero.Dopt.push_back(0.0);
+    }
+
+    // other stuff
+    TagZero.p = {0.0, 0.0, 0.0};
+    TagZero.J = 0.0;
+    TagZero.GJ = {0.0, 0.0, 0.0};
+
+    return TagZero;
+
+}
 
 // cost function - gradient on single anchor
 std::vector<_Float64> genAPI::GJi(std::vector<_Float64> p, std::vector<_Float64> A, _Float64 D){
@@ -17,7 +50,7 @@ std::vector<_Float64> genAPI::GJi(std::vector<_Float64> p, std::vector<_Float64>
     return GJ;
 }
 
-// total cost function - armadillo
+// total cost function - armadillo - position only (struct Tag)
 _Float64 genAPI::Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* tag){
 
     // define index and iterators
@@ -73,47 +106,121 @@ _Float64 genAPI::Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* t
 
 }
 
-// Optim lib minimization
-int genAPI::OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag, int GradientFlag){
+// total cost function - armadillo - bearing (struct Tags)
+_Float64 genAPI::Jtot_arma_bear(const arma::vec& p_arma, arma::vec* grad_out, void* tag){
+
+    // NB: assuming 2 tags only here
+
+    // define index and iterators
+    int i;
+    int j;
+    int k;
+
+    // cast pointer
+    genAPI::TagSet *tagP;
+    tagP = (genAPI::TagSet *)tag;
+
+    // define cost function arrays
+    std::vector<_Float64> Jp(tagP->Npairs,0.0);
+    std::vector<_Float64> Jt(tagP->Ntags,0.0);
+    _Float64 Jtot = 0.0;
+
+    // position array
+    arma::vec p0 = arma::zeros(3,1);
+    arma::vec ptilde1 = arma::zeros(3,1);   // 2 support arrays for a pair of tags 
+    arma::vec ptilde2 = arma::zeros(3,1);
+
+    // bearing var (single var now)
+    _Float32x theta = 0.0;
+    _Float64 Dtag = 0.0;
+
+    _Float64 JpS = 0.0;
+    _Float64 JpT = 0.0;
+
+    // cost function - tags
+    for (i=0;i<tagP->Ntags;i++){
+
+        // copy initial condition - tag ith
+        for (j=0;j<3;j++){
+            p0[j] = p_arma[3*i + j];
+        }
+
+        // compute Jt[i]
+        Jt[i] = genAPI::Jtot_arma(p0, grad_out, (void*)&tagP->Tags[i]);
+
+    }
+
+    // accumulate
+    for (i=0;i<tagP->Ntags;i++){
+        JpT += Jt[i];
+    }
+
+    for (j=0;j<tagP->Npairs;j++){
+        JpS += Jp[j];
+    }
+
+    Jtot = JpT;
+
+    for (j=0;i<tagP->Ntags;j++){
+        tagP->Tags[j].J = Jtot;
+    }
+
+     if (grad_out){
+        // assign the gradient here
+     }
+
+    return Jtot;
+
+}
+
+// Optim lib minimization - genberal for position and bearing
+int genAPI::OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* tag, int GradientFlag){
 
     
     // define iterators and stuff
-    int i;
+    int i, j;
     bool success;
     
     // define initial condition in armalib type
-    arma::vec p0_arma = arma::zeros(3,1);
+    arma::vec p0_arma = arma::zeros(p0.size(),1);
     
-    // cycleover the anchors
-    for (i=0;i<tag->Nanchors;i++){
-
-        // copy distance to be optimized
-        tag->Dopt[i] = D[i];
+    // cycleover the tagse and anchors
+    for (i=0;i<tag->Ntags;i++){
+        for (j=0;j<tag->Nanchors;j++){
+            // copy distance to be optimized
+            tag->Tags[i].Dopt[j] = D[tag->Nanchors*i + j];
+        }
     }
-
+    
     // copy p0 in p0_arma (different types)
-    for (i=0;i<3;i++){
+    for (i=0;i<p0.size();i++){
         p0_arma(i) = p0[i];        
     }
 
+    // settings
+    optim::algo_settings_t optimset;
+    optimset.iter_max = 5000;
+
     // call optimlib - simplex like in this case
     if (GradientFlag == 0){
-        success = optim::nm(p0_arma,genAPI::Jtot_arma,(void *)tag);
+        success = optim::nm(p0_arma,genAPI::Jtot_arma_bear,(void *)tag, optimset);
     }
     else{
-        success = optim::bfgs(p0_arma,genAPI::Jtot_arma,(void *)tag);
+        success = optim::bfgs(p0_arma,genAPI::Jtot_arma_bear,(void *)tag);
     }
 
     // copy p0_arma in _p (different types)
-    for (i=0;i<3;i++){
-        tag->p[i] = p0_arma[i];
+    for (i=0;i<tag->Ntags;i++){
+        for (j=0;j<3;j++){
+            tag->Tags[i].p[j] = p0_arma[3*i + j];
+        }
     }
     
     return (int)success;
 
 }
 
-// Ceres lib minimization
+// Ceres lib minimization - currently only position
 int genAPI::CeresMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag){
 
     // define iterators and stuff

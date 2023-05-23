@@ -54,15 +54,32 @@ namespace genAPI {
         std::vector<_Float64> GJ;
     };
 
+    struct TagSet {
+
+        int Ntags;
+        int Npairs;
+        int Nanchors;
+        std::vector<int> CurrPair;
+        std::vector<genAPI::Tag> Tags;
+        std::vector<_Float64> TagDists;
+
+    };
+
     /** **** METHODS **** */
+    // init Tag
+    Tag TagInit(int Nanchors);
+
     // cost function - gradient
     std::vector<_Float64> GJi(std::vector<_Float64> p, std::vector<_Float64> A, _Float64 D);
 
-    // Total cost function
+    // Total cost function - position only
     _Float64 Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
 
+    // Total cost function - bearing
+    _Float64 Jtot_arma_bear(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
+
     // Optim lib minimization
-    int OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag, int GradientFlag);
+    int OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* tag, int GradientFlag);
 
     // Ceres lib minimization
     int CeresMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag);
