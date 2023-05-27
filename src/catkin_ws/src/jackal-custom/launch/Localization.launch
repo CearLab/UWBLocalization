@@ -29,11 +29,10 @@
 
   <!-- ###### TRILATERATION  - CENTRALIZED ######-->
   <!-- T0 (rear) Distance handler node -->
-  <node name="DT5" pkg="jackal_op" type="jack_disthandle_centralized" args="5">
+  <!--node name="DT5" pkg="jackal_op" type="jack_disthandle_centralized" args="5">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_centralized.yaml"/>
-  </node>
+  </node-->
 
-  <!-- ###### OBSERVER ######-->
   <!-- T0 (rear) HybObs node -->
   <!--node name="HYB0" pkg="jackal_op" type="jack_hybobs" args="HYB0 0">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T0.yaml"/>

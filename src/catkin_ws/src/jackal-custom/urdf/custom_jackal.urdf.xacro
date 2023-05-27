@@ -33,7 +33,8 @@
     </link>
 
     <joint name="right_tag_joint" type="fixed">
-        <origin xyz="0 -0.5 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 -0.5 0.184" rpy="0 0 0"/-->
+        <origin xyz="0 0 0.184" rpy="0 0 0"/>
         <parent link="base_link"/>
         <child link="right_tag"/>
     </joint>
@@ -70,7 +71,8 @@
     </link>
 
     <joint name="left_tag_joint" type="fixed">
-        <origin xyz="0 0.5 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 0.5 0.184" rpy="0 0 0"/-->
+        <origin xyz="0 0 0.184" rpy="0 0 0"/>
         <parent link="base_link"/>
         <child link="left_tag"/>
     </joint>
@@ -107,7 +109,8 @@
     </link>
 
     <joint name="rear_tag_joint" type="fixed">
-        <origin xyz="-0.5 0 0.184" rpy="0 0 0"/>
+        <!--origin xyz="-0.5 0 0.184" rpy="0 0 0"/-->
+        <origin xyz="0 0 0.184" rpy="0 0 0"/>
         <parent link="base_link"/>
         <child link="rear_tag"/>
     </joint>

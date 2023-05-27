@@ -152,11 +152,6 @@ set(MELODICAPI_SOURCES
 )
 add_library(melodicAPI ${MELODICAPI_SOURCES})
 
-set(UWBCERES_SOURCES
-  src/libful/uwb_ceres.cpp
-)
-add_library(uwbceresAPI ${UWBCERES_SOURCES})
-
 ## Declare a C++ executable
 
 # DISTTRUE
@@ -165,7 +160,6 @@ target_link_libraries(jack_disttrue
 ${catkin_LIBRARIES}
 melodicAPI
 generalAPI
-uwbceresAPI
 ceres
 armadillo
 optim
@@ -191,7 +185,6 @@ target_link_libraries(jack_disthandle_centralized
 ${catkin_LIBRARIES}
 melodicAPI
 generalAPI
-uwbceresAPI
 ceres
 armadillo
 optim

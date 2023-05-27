@@ -22,8 +22,16 @@
 #define OPTIM_ENABLE_ARMA_WRAPPERS
 #include <optim.hpp>
 
-// ceres optimization
-#include "uwb_ceres.hpp"
+// ceres
+#define CERES_SHOW_RESIDUALS
+#include <ceres/ceres.h>
+
+// stuff
+#define LEN(arr) ((int) (sizeof (arr) / sizeof (arr)[0]))
+
+using ceres::CostFunction;
+using ceres::Problem;
+using ceres::Solver;
 
 namespace genAPI {
 
@@ -66,23 +74,28 @@ namespace genAPI {
     };
 
     /** **** METHODS **** */
+    
     // init Tag
     Tag TagInit(int Nanchors);
+
+    // cost function single miniblock
+    _Float64 J(double* p, double* grad_out, double* A, double D);
 
     // cost function - gradient
     std::vector<_Float64> GJi(std::vector<_Float64> p, std::vector<_Float64> A, _Float64 D);
 
     // Total cost function - position only
     _Float64 Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
+    _Float64 Jtot(double* p, double* grad_out, void* tag);
 
     // Total cost function - bearing
     _Float64 Jtot_arma_bear(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
 
     // Optim lib minimization
-    int OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* tag, int GradientFlag);
+    int OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* tag);
 
     // Ceres lib minimization
-    int CeresMin(std::vector<_Float64> p0, std::vector<_Float64> D, Tag* tag);
+    int CeresMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* tag);
 
     // model observer
     std::vector<_Float64> modelObserver(std::vector<_Float64> x, std::vector<_Float64> u);
@@ -90,4 +103,67 @@ namespace genAPI {
     // Euler integration - hybrid system
     std::vector<_Float64> odeEuler(std::vector<_Float64> x, std::vector<_Float64> u, _Float64 dt);
 
+}
+
+namespace ceresAPI {
+
+    struct CostFunctor {
+        genAPI::TagSet* _tag;
+        int _blocksize;
+        int _nblocks;
+        int _nresiduals;
+
+        bool operator()(const double* const parameters, double* residuals) const;
+    };
+
+
+    struct Result {
+        Result() {}
+
+        std::vector<_Float64> p;
+        ceres::Solver::Summary summary;
+    };
+
+    class Function : public CostFunction {
+    public:
+
+        // attributes
+        int _blocksize;
+        int _nblocks;
+        int _nresiduals;
+
+        genAPI::TagSet* _tag;
+
+        CostFunctor _CostFunctor;
+
+        Function(genAPI::TagSet* tag);
+        bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
+
+        
+    private: 
+    };
+
+    class FunctionSmall : public CostFunction {
+    public:
+
+        // attributes
+        int _blocksize;
+        int _nblocks;
+        int _nresiduals;
+
+        genAPI::TagSet* _tag;
+
+        double _A[3];
+        double _D;
+
+        FunctionSmall(genAPI::TagSet* tag, int i, int j);
+        bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
+
+        
+    private: 
+    };
+
+
+    Result solve(Function *function, arma::vec& p_arma, void* tag);
+    Result solveSmall(arma::vec& p_arma, void* tag);
 }

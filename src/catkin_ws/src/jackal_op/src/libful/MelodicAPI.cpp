@@ -20,14 +20,11 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPa
     _tagID = tagID;
 
     ROS_WARN("ID init: %d", _tagID);
-
-    // set gradient flag
-    _GradientFlag = 0;
     
     // dimensions of mesh
     _Nanchors = Nanchors;
     _Ntags = Ntags;
-    _Npairs = (int)(0.25*_Ntags*(_Ntags-1));
+    _Npairs = (int)(0*0.25*_Ntags*(_Ntags-1));
 
     // push back TagSet
     genAPI::Tag TagZero = genAPI::TagInit(Nanchors);
@@ -156,8 +153,6 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPa
             _G.p.push_back(0.0);
             _G.pg.push_back(0.0);
 
-            _TagSet.Tags[j].Dopt.push_back(0.0);
-
         }
 
         // init markerarray
@@ -213,8 +208,8 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
     //p0 = _p;
 
     // store distances in the vectors
-    ROS_INFO("AnchorID: %d", msg.anchorId);
-    ROS_INFO("TagID: %d", msg.tagId);
+    // ROS_INFO("AnchorID: %d", msg.anchorId);
+    // ROS_INFO("TagID: %d", msg.tagId);
 
     try {
 
@@ -245,7 +240,7 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
     // publish the distance wrapper
     _jack_disthandle_P.publish(_DTmsgCentral);
 
-    ROS_INFO("Published distances");
+    //ROS_INFO("Published distances");
 
     // call newton raphson
     try {
@@ -258,8 +253,8 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         //optimize
         int success = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
-        success = genAPI::OptimMin(p0, _DoptCentral, &_TagSet, _GradientFlag);
-        //success = genAPI::CeresMin(p0, _Dopt, &_Tag);
+        //success = genAPI::OptimMin(p0, _DoptCentral, &_TagSet);
+        success = genAPI::CeresMin(p0, _DoptCentral, &_TagSet);
         auto t2 = std::chrono::high_resolution_clock::now();
 
         /* Getting number of milliseconds as an integer. */
@@ -320,7 +315,7 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         _jack_trilateration_P.publish(_G);
         _jack_odometry_P.publish(_Godom);
 
-        ROS_INFO("Published gradient");
+        //ROS_INFO("Published gradient");
     }
     catch(...){
         ROS_INFO("Failed Optim + Transform");
@@ -347,7 +342,7 @@ void jackAPI::ChatterCallbackA(const visualization_msgs::MarkerArray& msg) {
 
     }    
 
-    ROS_INFO("Anchors received");
+    //ROS_INFO("Anchors received");
 
 }
 
@@ -367,9 +362,9 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
 
     // transform position
     _Float64 x,y,z;
-    x = msg.pose.pose.position.x + _transformStamped.transforms[_tagID].transform.translation.x;
-    y = msg.pose.pose.position.y + _transformStamped.transforms[_tagID].transform.translation.y;
-    z = msg.pose.pose.position.z + _transformStamped.transforms[_tagID].transform.translation.z;
+    x = msg.pose.pose.position.x + _transformStamped.transforms[0].transform.translation.x;
+    y = msg.pose.pose.position.y + _transformStamped.transforms[0].transform.translation.y;
+    z = msg.pose.pose.position.z + _transformStamped.transforms[0].transform.translation.z;
 
     // get true distances
     for (i=0;i<_Nanchors;i++){

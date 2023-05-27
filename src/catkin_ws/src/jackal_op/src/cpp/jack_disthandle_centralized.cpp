@@ -114,13 +114,6 @@ int main(int argc, char **argv)
         jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagPair, TagDists, rate);
         ROS_INFO("jackAPI - Class instance created");
 
-        // set gradient flag if param is present
-        tmp = "/DT" + std::to_string(tagID) + "/GradientFlag";
-        if (np.hasParam(tmp)){
-            np.getParam(tmp, GradientFlag);
-            jackNode._GradientFlag = GradientFlag;
-        }
-
         // subscribe
         jackNode._jack_disthandle_ST = np.subscribe(subNameT, 1000, &jackAPI::ChatterCallbackTCentral, &jackNode);
         jackNode._jack_disthandle_SA = np.subscribe(subNameA, 1000, &jackAPI::ChatterCallbackA, &jackNode);
@@ -152,9 +145,9 @@ int main(int argc, char **argv)
                         jackNode._transformStamped.transforms[i] = tfBuffer.lookupTransform(child,base,ros::Time(0));
 
                         // wanna see the transformation?
-                        ROS_INFO("Trasl: %g %g %g", jackNode._transformStamped.transforms[i].transform.translation.x,
-                        jackNode._transformStamped.transforms[i].transform.translation.y,
-                        jackNode._transformStamped.transforms[i].transform.translation.z);
+                        // ROS_INFO("Trasl: %g %g %g", jackNode._transformStamped.transforms[i].transform.translation.x,
+                        // jackNode._transformStamped.transforms[i].transform.translation.y,
+                        // jackNode._transformStamped.transforms[i].transform.translation.z);
                     }
                     
                 }

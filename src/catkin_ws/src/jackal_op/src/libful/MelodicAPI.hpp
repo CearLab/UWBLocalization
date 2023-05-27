@@ -56,7 +56,6 @@ public:
     /** **** ATTRIBUTES **** */
     int _Nanchors, _Ntags, _Npairs;  // number of anchors for a single mesh and tags
     int _tagID; // ID of the tag read by the node
-    int _GradientFlag;  // gradient based optimization
     _Float64 _dt;   // integration step
     std::vector<_Float64> _DT, _DoptCentral;  // distance vector on the measured tag + 1 dist used for opt
     std::vector<_Float64> _A, _p;   // matrix with anchors and tag estimated position
