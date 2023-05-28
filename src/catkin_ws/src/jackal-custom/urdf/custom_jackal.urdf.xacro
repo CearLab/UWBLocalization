@@ -2,13 +2,13 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="Jackal">
     <xacro:include filename="$(find jackal-custom)/urdf/custom_jackal_base.urdf.xacro" />
     
-    <!--xacro:arg name="rear_id" default="0" /-->
+    <xacro:arg name="rear_id" default="0" />
     <xacro:arg name="right_id" default="1" />
-    <!--xacro:arg name="left_id" default="2" /-->
+    <xacro:arg name="left_id" default="2" />
 
+    <xacro:property name="rear" value="$(arg rear_id)" />
     <xacro:property name="right" value="$(arg right_id)" />
-    <!--xacro:property name="left" value="$(arg left_id)" /-->
-    <!--xacro:property name="rear" value="$(arg rear_id)" /-->
+    <xacro:property name="left" value="$(arg left_id)" />
 
     <!-- -->
     <link name="right_tag">
@@ -33,8 +33,8 @@
     </link>
 
     <joint name="right_tag_joint" type="fixed">
-        <!--origin xyz="0 -0.5 0.184" rpy="0 0 0"/-->
-        <origin xyz="0 0 0.184" rpy="0 0 0"/>
+        <origin xyz="0 -0.5 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 0 0.184" rpy="0 0 0"/-->
         <parent link="base_link"/>
         <child link="right_tag"/>
     </joint>
@@ -71,8 +71,8 @@
     </link>
 
     <joint name="left_tag_joint" type="fixed">
-        <!--origin xyz="0 0.5 0.184" rpy="0 0 0"/-->
-        <origin xyz="0 0 0.184" rpy="0 0 0"/>
+        <origin xyz="0 0.5 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 0 0.184" rpy="0 0 0"/-->
         <parent link="base_link"/>
         <child link="left_tag"/>
     </joint>
@@ -109,8 +109,8 @@
     </link>
 
     <joint name="rear_tag_joint" type="fixed">
-        <!--origin xyz="-0.5 0 0.184" rpy="0 0 0"/-->
-        <origin xyz="0 0 0.184" rpy="0 0 0"/>
+        <origin xyz="-0.5 0 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 0 0.184" rpy="0 0 0"/-->
         <parent link="base_link"/>
         <child link="rear_tag"/>
     </joint>

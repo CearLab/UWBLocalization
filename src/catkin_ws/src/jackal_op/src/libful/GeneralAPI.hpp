@@ -43,8 +43,8 @@ namespace genAPI {
     const std::vector<int> pos_v = {1, 5, 9};
     const std::vector<int> pos_b = {2, 6, 10};
     const std::vector<int> pos_a = {3, 7, 11};
-    //const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
-    const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
+    const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
+    //const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
 
     // env params
     const std::vector<_Float64> Anchors = {
@@ -79,14 +79,10 @@ namespace genAPI {
     Tag TagInit(int Nanchors);
 
     // cost function single miniblock
-    _Float64 J(double* p, double* grad_out, double* A, double D);
-
-    // cost function - gradient
-    std::vector<_Float64> GJi(std::vector<_Float64> p, std::vector<_Float64> A, _Float64 D);
+    _Float64 J(double* p, double* grad_out, double* A, double D, int* Pair);
 
     // Total cost function - position only
     _Float64 Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
-    _Float64 Jtot(double* p, double* grad_out, void* tag);
 
     // Total cost function - bearing
     _Float64 Jtot_arma_bear(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
@@ -107,40 +103,12 @@ namespace genAPI {
 
 namespace ceresAPI {
 
-    struct CostFunctor {
-        genAPI::TagSet* _tag;
-        int _blocksize;
-        int _nblocks;
-        int _nresiduals;
-
-        bool operator()(const double* const parameters, double* residuals) const;
-    };
-
 
     struct Result {
         Result() {}
 
         std::vector<_Float64> p;
         ceres::Solver::Summary summary;
-    };
-
-    class Function : public CostFunction {
-    public:
-
-        // attributes
-        int _blocksize;
-        int _nblocks;
-        int _nresiduals;
-
-        genAPI::TagSet* _tag;
-
-        CostFunctor _CostFunctor;
-
-        Function(genAPI::TagSet* tag);
-        bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
-
-        
-    private: 
     };
 
     class FunctionSmall : public CostFunction {
@@ -150,20 +118,21 @@ namespace ceresAPI {
         int _blocksize;
         int _nblocks;
         int _nresiduals;
+        int _i;
+        int _j;
+        int _k;
 
         genAPI::TagSet* _tag;
 
-        double _A[3];
         double _D;
 
-        FunctionSmall(genAPI::TagSet* tag, int i, int j);
+        FunctionSmall(genAPI::TagSet* tag, int i, int j, int k);
+        bool Setup(genAPI::TagSet* tag, int i, int j, int k);
         bool Evaluate(double const* const* parameters, double* residuals, double** jacobians) const;
 
         
     private: 
     };
 
-
-    Result solve(Function *function, arma::vec& p_arma, void* tag);
     Result solveSmall(arma::vec& p_arma, void* tag);
 }

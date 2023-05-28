@@ -28,25 +28,14 @@
   </node-->
 
   <!-- ###### TRILATERATION  - CENTRALIZED ######-->
-  <!-- T0 (rear) Distance handler node -->
-  <!--node name="DT5" pkg="jackal_op" type="jack_disthandle_centralized" args="5">
+  <node name="DT5" pkg="jackal_op" type="jack_disthandle_centralized" args="5">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_centralized.yaml"/>
-  </node-->
+  </node>
 
-  <!-- T0 (rear) HybObs node -->
-  <!--node name="HYB0" pkg="jackal_op" type="jack_hybobs" args="HYB0 0">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T0.yaml"/>
-  </node-->
-
-  <!-- T1 (right) HybObs node -->
-  <!--node name="HYB1" pkg="jackal_op" type="jack_hybobs" args="HYB1 1">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T1.yaml"/>
-  </node-->
-
-  <!-- T2 (right) HybObs node -->
-  <!--node name="HYB2" pkg="jackal_op" type="jack_hybobs" args="HYB2 2">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_T2.yaml"/>
-  </node-->
+  <!-- ###### HYBRID OBSERVER  - CENTRALIZED ######-->
+  <node name="HYB5" pkg="jackal_op" type="jack_hybobs_centralized" args="HYB5 5">
+    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_hybobs_centralized.yaml"/>
+  </node>
 
 
 </launch>

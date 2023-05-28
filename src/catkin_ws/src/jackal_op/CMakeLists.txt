@@ -192,17 +192,16 @@ alglib
 )
 
 # HYBOBS
-#add_executable(jack_hybobs src/cpp/jack_hybobs.cpp)
-#target_link_libraries(jack_hybobs 
-#${catkin_LIBRARIES}
-#melodicAPI
-#generalAPI
-#uwbceresAPI
-#ceres
-#armadillo
-#optim
-#alglib
-#)
+add_executable(jack_hybobs_centralized src/cpp/jack_hybobs_centralized.cpp)
+target_link_libraries(jack_hybobs_centralized 
+${catkin_LIBRARIES}
+melodicAPI
+generalAPI
+ceres
+armadillo
+optim
+alglib
+)
 
 # DUMMY
 #add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)

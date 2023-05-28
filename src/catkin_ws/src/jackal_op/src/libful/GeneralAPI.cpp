@@ -6,54 +6,25 @@
 
 /* ############# CERESAPI NAMESPACE ############# */
 /* ############################################ */
+
 /**
  * @brief Ceres cost function constructor.
  */
-ceresAPI::Function::Function(genAPI::TagSet* tag) : _tag(_tag)
-{
-    // iterator
-    int i = 0;
+ceresAPI::FunctionSmall::FunctionSmall(genAPI::TagSet* tag, int i, int j, int k){
 
-    // assign tag
-    _tag = tag;
-
-    // NB: see https://stackoverflow.com/questions/58576579/when-to-define-multiple-residual-blocks-in-ceres
-
-    // residual: ith cost function
-    // _nresiduals: thepretically, Ntags + Npairs (Tag position + geometrical constraint for bearing)
-    // _residuals: however, each residual should be initialized on its own in ceres
-    // thus, I will just use one residual where I will store the entire cost function
-    _nresiduals = 1;
-
-    // block: jth part of the optimization variables (Ntags in this case)
-    // _nblocks: theoretically Ntags(Tag position)
-    // _nblocks: however, each block should be part of a separate residual 
-    // thus, I will just use one block which will have all the tags positions 
-    _nblocks = 1;
-
-    // blocksize: 3 -> dimension of each position vector * number of tags
-    _blocksize = 3*_tag->Ntags;
-
-    // init
-    std::vector<int32_t> *block_sizes = mutable_parameter_block_sizes();
-    block_sizes->push_back(_blocksize);
-    set_num_residuals(_nresiduals);
-
-    // init the struct as well
-    _CostFunctor._tag = _tag;
-    _CostFunctor._blocksize = _blocksize;
-    _CostFunctor._nblocks = _nblocks;
-    _CostFunctor._nresiduals = _nresiduals;
-
+    this->Setup(tag, i, j, k);
 }
 
-/**
- * @brief Ceres cost function constructor.
- */
-ceresAPI::FunctionSmall::FunctionSmall(genAPI::TagSet* tag, int i, int j) : _tag(_tag)
+// setup class
+bool ceresAPI::FunctionSmall::Setup(genAPI::TagSet* tag, int i, int j, int k)
 {
     // iteratot
-    int k;
+    int it;
+
+    // iterator
+    _i = i;
+    _j = j;
+    _k = k;
 
     // assign tag
     _tag = tag;
@@ -61,98 +32,27 @@ ceresAPI::FunctionSmall::FunctionSmall(genAPI::TagSet* tag, int i, int j) : _tag
     // NB: see https://stackoverflow.com/questions/58576579/when-to-define-multiple-residual-blocks-in-ceres
 
     // residual: ith cost function
-    // _nresiduals: thepretically, Ntags + Npairs (Tag position + geometrical constraint for bearing)
-    // _residuals: however, each residual should be initialized on its own in ceres
-    // thus, I will just use one residual where I will store the entire cost function
-    _nresiduals = _tag->Nanchors*_tag->Ntags;
+    // _nresiduals: Ntags*Nanchors + Npairs (Tag position + geometrical constraint for bearing)
+    _nresiduals = _tag->Nanchors*_tag->Ntags + _tag->Npairs;
 
     // block: jth part of the optimization variables (Ntags in this case)
-    // _nblocks: theoretically Ntags(Tag position)
-    // _nblocks: however, each block should be part of a separate residual 
-    // thus, I will just use one block which will have all the tags positions 
-    _nblocks = _tag->Nanchors*_tag->Ntags;
+    // _nblocks: 1 -> I will use all the Ntags*3 pos variables 
+    _nblocks = 1;
 
-    // blocksize: 3 -> dimension of each position vector * number of tags
-    _blocksize = 3;
+    // blocksize: 3 -> dimension of each position vector * number of tags + Npairs*Nangles (1 bearing)
+    _blocksize = 3*_tag->Ntags + _tag->Npairs;
 
     // init
     std::vector<int32_t> *block_sizes = mutable_parameter_block_sizes();
-    block_sizes->push_back(_blocksize);
+    for (it=0;it<_nblocks;it++){
+        block_sizes->push_back(_blocksize);
+    }
     set_num_residuals(_nresiduals);
 
     // init J data
     _D = _tag->Tags[i].Dopt[j];
-    for (k=0;k<3;k++){
-        _A[k] = _tag->Tags[i].A[k];
-    }
     
-
-}
-
-// Ceres solution - see user manual
-ceresAPI::Result ceresAPI::solve(Function *function, arma::vec& p_arma, void* tag){
-
-    // create problem
-    ceres::Problem problem;
-
-    // iterator
-    int i, j;
-
-    // init parameters: in R: NblocksXblocksize
-    double p0[function->_blocksize];
-    for (i=0;i<function->_blocksize;i++){
-        p0[i] = p_arma(i);
-    }
-    
-    // cast pointer
-    genAPI::TagSet *tagP;
-    tagP = (genAPI::TagSet *)tag;
-
-    // assign anchors and distances
-    for (i=0;i<tagP->Ntags;i++){
-        function->_tag->Tags[i].A = tagP->Tags[i].A;
-        function->_tag->Tags[i].Dopt = tagP->Tags[i].Dopt;
-    }
-    
-    // add residuals: here one residual for all (meh..)
-    problem.AddResidualBlock(function, nullptr, &p0[0]);
-
-    // this is a test for the numerical differentiation
-    // it is exclusive with the previous
-    // ceresAPI::CostFunctor* tmp = new ceresAPI::CostFunctor;
-    // *tmp = function->_CostFunctor;
-    // CostFunction* cost_function = new ceres::NumericDiffCostFunction<ceresAPI::CostFunctor, ceres::FORWARD, 1, BLOCKSIZE>(tmp);
-    // problem.AddResidualBlock(cost_function, nullptr, p0);
-    
-    // options
-    Solver::Options options;
-    options.max_num_iterations = 10000;
-    // options.function_tolerance = 1e-10;
-    // options.gradient_tolerance = 1e-14;
-    // options.parameter_tolerance = 1e-12;
-    options.minimizer_progress_to_stdout = false;
-    options.linear_solver_type = ceres::DENSE_QR;
-    //options.trust_region_strategy_type = ceres::DOGLEG;
-    //options.line_search_direction_type = ceres::STEEPEST_DESCENT;
-    
-    // call solver
-    Result result;
-
-    // init result
-    for (i=0;i<function->_blocksize;i++){
-        result.p.push_back(0.0);
-    }
-
-    // solve problem
-    Solve(options, &problem, &result.summary);
-    ROS_WARN("SOLVED: %g %g", result.summary.initial_cost, result.summary.final_cost);
-
-    // store results
-    for (i=0;i<function->_blocksize;i++){
-        result.p[i] = p0[i];
-    }
-
-    return result;
+    return true;
 }
 
 // solve for numerous blocks
@@ -162,112 +62,126 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
     ceres::Problem problem;
 
     // iterator
-    int i, j;
-
-    // init p0 (pos vector)
-    double p0[3];
+    int i, j, k;
+    bool success;
 
     // cast pointer
     genAPI::TagSet *tagP;
     tagP = (genAPI::TagSet *)tag;
 
-    // cycle over residuals
+    // init p0 (pos vector)
+    double p0[tagP->Ntags*3+tagP->Npairs];
+    // add positions
+    for (k=0;k<3*tagP->Ntags;k++){
+        p0[k] = p_arma(k);
+    }
+    // add bearings
+    for (k=0;k<tagP->Npairs;k++){
+        p0[3*tagP->Ntags + k] = 0.0;
+    }
+
+    // cycle over residuals - position terms
     for (i=0; i<tagP->Ntags;i++){
-        for (j=0; j<tagP->Nanchors;j++){
-
-            // create functionSmall instance
-            ceresAPI::FunctionSmall* function = new ceresAPI::FunctionSmall(tagP, i, j);
-
+        for (j=0; j<tagP->Nanchors;j++){  
             // add residuals
-            problem.AddResidualBlock(function, nullptr, &p0[0]);
-
-            // delete function
-            delete[] function;
-
+            problem.AddResidualBlock(new ceresAPI::FunctionSmall(tagP, i, j, i), nullptr, &p0[0]);      
         }
     }
 
-
-
-}
-
-/**
- * @brief Ceres cost function Evaluate.
- *
- * @param parameters
- * @param residuals
- * @param jacobians
- */
-bool ceresAPI::Function::Evaluate(double const* const* parameters, double* residuals, double** jacobians) const
-{
-
-    // iterators
-    int i, j;
-
-    // init storage
-    double Jt;
-    std::vector<double> p(_blocksize, 0.0);
-    std::vector<double> grad_out(_blocksize,0.0);
-
-    // init residuals: in R: Nresiduals
-    residuals[0] = 0;
-
-    // compute residuals
-    // NB: theoretically here I am cycling over the blocks, because I am compute all the Ji (residual)
-    // depending on xj (block). For a single block there could be more than one residual
-    // but this is smth I will deal with in the residual assignment within the loop
-
-    // However, I am now implementing a single block. Thus, I am simply computing the whole cost function
-    // which is made in this case of Ntags (+ Npairs) terms
-    for (i=0;i<_tag->Ntags;i++){
-
-        // current position
-        p[0] = parameters[0][3*i + 0];
-        p[1] = parameters[0][3*i + 1];
-        p[2] = parameters[0][3*i + 2];
-
-        // compute Jt[i]
-        // There is no bearing for now, so there is a residual for each block
-        residuals[0] = residuals[0] + genAPI::Jtot(&p[0], &grad_out[0], (void*)&_tag->Tags[i]);
-
-        if (jacobians != nullptr) {
-            jacobians[0][3*i + 0] = grad_out[0];
-            jacobians[0][3*i + 1] = grad_out[1];
-            jacobians[0][3*i + 2] = grad_out[2];
-            //ROS_WARN("GRAD: %g %g %g", jacobians[0][3*i + 0], jacobians[0][3*i + 1], jacobians[0][3*i + 2]);
+    // define pairs - increasing order until Npairs (Newton)
+    if (tagP->Npairs != 0){
+        int Pairs[tagP->Npairs][2];
+        for(i=0;i<tagP->Npairs;i++){
+            Pairs[i][0] = 0;
+            Pairs[i][1] = 1;
         }
-        
+
+        // cycle over residuals - bearing terms
+        for (i=0;i<tagP->Npairs;i++){
+            // add residuals
+            problem.AddResidualBlock(new ceresAPI::FunctionSmall(tagP, Pairs[i][0], 0, Pairs[i][1]), nullptr, &p0[0]);
+        }
     }
 
-    return true;
+    // options
+    Solver::Options options;
+    options.max_num_iterations = 100;
+    options.minimizer_progress_to_stdout = false;
+
+    // minimizer - trust region
+    // options.minimizer_type = ceres::TRUST_REGION;
+    // options.trust_region_strategy_type = ceres::DOGLEG;
+    // options.dogleg_type = ceres::TRADITIONAL_DOGLEG;
+    // options.use_inner_iterations = false;
+    // options.use_nonmonotonic_steps = false;
+
+    // minimizer - line search
+    // options.minimizer_type = ceres::LINE_SEARCH;
+    // options.line_search_direction_type = ceres::BFGS;
+    
+    // minimizer - linear solver
+    options.linear_solver_type = ceres::DENSE_QR;
+
+    // call solver
+    Result result;
+    
+    // init result
+    for (i=0;i<3*tagP->Ntags+tagP->Npairs;i++){
+        result.p.push_back(0.0);
+    }
+    
+    // solve problem
+    Solve(options, &problem, &result.summary);
+    ROS_INFO("SOLVED: %g %g", result.summary.initial_cost, result.summary.final_cost);
+
+    // store results
+    for (i=0;i<3*tagP->Ntags+tagP->Npairs;i++){
+        result.p[i] = p0[i];
+    }
+
+    return result;
+
 }
 
 // evaluate for small function
 bool ceresAPI::FunctionSmall::Evaluate(double const* const* parameters, double* residuals, double** jacobians) const {
-
-    return true;
-
-}
-
-// test template for numerical differentiation - develop if necessary
-bool ceresAPI::CostFunctor::operator()(const double* const parameters, double* residuals) const {
-
-    // iterators
+    
+    // iterator
     int i, j;
+    int idJ, idR;
 
     // init storage
     double Jt;
-    double p[_blocksize];
-    double grad_out[_blocksize];
+    std::vector<double> A(3,0.0);           // position 
+    std::vector<double> p(3, 0.0);          // position
+    std::vector<double> grad_out(3,0.0);    // position
 
-    // init residuals: in R: Nresiduals
-    residuals[0] = 0;
+    // current position
+    p[0] = parameters[0][3*_i + 0];
+    p[1] = parameters[0][3*_i + 1];
+    p[2] = parameters[0][3*_i + 2];    
 
-    // assign storage - param and gradient
-    // dim 3 (space)
-    for (i = 0; i < 3; i++) {
-        p[i] = 0.0;
-        grad_out[i] = 0.0;
+    // current bearing
+    if (_tag->Npairs != 0){
+        
+        // add another position (2 tags) + 1 theta
+        for (i=0;i<3;i++){
+            p.push_back(0.0);
+            grad_out.push_back(0.0);
+        }
+
+        // set initial theta value
+        p[4] = parameters[0][3*_tag->Ntags + _i];
+    }
+
+    // init residual
+    for (i=0;i<_nresiduals;i++){
+        residuals[i] = 0.0;
+    }
+    
+    // store anchors (_A is const)
+    for (i=0;i<3;i++){
+        A[i] = _tag->Tags[_i].A[3*_j+i];
     }
 
     // compute residuals
@@ -275,25 +189,72 @@ bool ceresAPI::CostFunctor::operator()(const double* const parameters, double* r
     // depending on xj (block). For a single block there could be more than one residual
     // but this is smth I will deal with in the residual assignment within the loop
 
-    // However, I am now implementing a single block. Thus, I am simply computing the whole cost function
-    // which is made in this case of Ntags (+ Npairs) terms
-    for (i=0;i<_tag->Ntags-2;i++){
+    // compute Jt[i]
+    // Compute the block number (depends if bearing is used)
+    idR = _tag->Nanchors*_i + _j;
+    int* Pair = nullptr;
+    int PairNumber = 0;
+    double D = _D;
+    if (_tag->Npairs != 0){
+        if (_i != _k){
+            PairNumber = _i + _k;
+            Pair = new int[2];
+            Pair[0] = _i;
+            Pair[1] = _k;
+            idR = (_tag->Nanchors*3 - 1) + PairNumber;
+            D = _tag->TagDists[PairNumber];
+        }
+    }
+    
+    residuals[idR] = genAPI::J(&p[0], &grad_out[0], &A[0], D, &Pair[0]);
+    // ROS_WARN("RES %d: %g", idR, residuals[idR]);
 
-        // current position
-        p[0] = parameters[3*i + 0];
-        p[1] = parameters[3*i + 1];
-        p[2] = parameters[3*i + 2];
+    // gradient positions
+    idJ = (_tag->Nanchors*_i)*_blocksize + _j*_blocksize + 3*_i;
+    if (_tag->Npairs != 0){
+        if (_i != _k){
+            idJ = (_tag->Nanchors*_tag->Ntags)*_blocksize;
+        }
+    }
+    if (jacobians != nullptr && jacobians[0] != nullptr) {
 
-        // compute Jt[i]
-        // There is no bearing for now, so there is a residual for each block
-        //ROS_WARN("HERE: %g", _tag->Tags[i].Dopt[0]);
-        Jt += genAPI::Jtot(p, grad_out, (void*)&_tag->Tags[i]);
-        
+        // init jacobians - only at the beginning 
+        for (i=0;i<_blocksize;i++){
+            for (j=0;j<_nresiduals;j++){
+                    jacobians[0][j*_blocksize + i] = 0.0;      
+            }
+        }
+
+        // assign gradients
+        // gradient on position of tags - always
+        jacobians[0][idJ + 0] = grad_out[0];
+        jacobians[0][idJ + 1] = grad_out[1];
+        jacobians[0][idJ + 2] = grad_out[2];
+        if (_tag->Npairs != 0){
+            if (_i != _k){
+                // first Tag (Ptilde1)
+                jacobians[0][idJ + 3*_i + 0] = grad_out[0];
+                jacobians[0][idJ + 3*_i + 1] = grad_out[1];
+                jacobians[0][idJ + 3*_i + 2] = grad_out[2];
+
+                // second Tag (Ptilde2)
+                jacobians[0][idJ + 3*_k + 0] = grad_out[3];
+                jacobians[0][idJ + 3*_k + 1] = grad_out[4];
+                jacobians[0][idJ + 3*_k + 2] = grad_out[5];
+
+                // theta
+                jacobians[0][idJ + 3*_tag->Ntags + PairNumber] = grad_out[6];
+            }
+        }
     }
 
-    residuals[0] = Jt;
+    if (_i != _k){
+        delete[] Pair;
+    }
+    
 
     return true;
+
 }
 
 /* ############# GENAPI NAMESPACE ############# */
@@ -329,22 +290,6 @@ genAPI::Tag genAPI::TagInit(int Nanchors){
 
     return TagZero;
 
-}
-
-// cost function - gradient on single anchor
-std::vector<_Float64> genAPI::GJi(std::vector<_Float64> p, std::vector<_Float64> A, _Float64 D){
-
-    // init
-    std::vector<_Float64> GJ(3, 0.0);
-    _Float64 norm = 0.0;
-
-    // compute cost function gradient for single distance on direction k
-    norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
-    for (int k=0;k<3;k++){
-        GJ[k] = (p[k] - A[k]) * (1 - D/norm);
-    }
-    
-    return GJ;
 }
 
 // total cost function - armadillo - position only (struct Tag)
@@ -404,113 +349,79 @@ _Float64 genAPI::Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* t
 
 }
 
-// cost function - double
-_Float64 genAPI::Jtot(double* p, double* grad_out, void* tag){
-
-    // define index and iterators
-    int i;
-    int j;
-    int idA;
-
-    // stuff to save mid-operations
-    std::vector<_Float64> A(3, 0.0);     
-    genAPI::Tag *tagP;
-    
-    // define Jtot
-    _Float64 Jtot = 0;
-    _Float64 Jtmp = 0;   
-
-    // init - gradient
-    double GJ[3];
-    for (i=0;i<3;i++){
-        GJ[i] = 0.0;
-        grad_out[i] = 0.0;
-    }
-
-    // init norm
-    _Float64 norm = 0.0;    
-
-    // define pointer class
-    tagP = (genAPI::Tag *)tag; 
-    tagP->J = 0;    // init cost fcn
-
-    for (i=0;i<tagP->Nanchors;i++){
-
-        // anchor startpos
-        idA = (i)*3;
-
-        // get anchor position
-        for (j=0;j<3;j++){
-            A[j] = tagP->A[idA+j];
-        }
-
-        // compute Ji and add    
-        norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));    
-
-        // NB: this is the cost function used in the paper
-        //Jtmp = pow(norm - tagP->Dopt[i], 2);
-
-        // however, ceres minimizes 0.5*|| f(x) ||^2
-        // Thus, we do not need to use the quadratic form, as the positive definiteness 
-        // is implied in ceres. This ease a lot the computation of the gradient
-        Jtmp = norm - 1*tagP->Dopt[i];
-        //Jtmp = (p[0]-tagP->Dopt[0])*(p[1]-tagP->Dopt[1]);
-        
-        // add term
-        Jtot = Jtot + Jtmp;
-        tagP->J = tagP->J + Jtmp;
-
-        int ready = std::accumulate(tagP->Dopt.begin(), tagP->Dopt.end(), tagP->Nanchors);
-
-        if (grad_out && true) {
-
-            // compute cost function gradient for single distance on direction j       
-            for (j=0;j<3;j++){
-
-                // this is the gradient as for the paper version of the cost function
-                //GJ[j] = 1*(p[j] - A[j]) * (1 - tagP->Dopt[i]/norm); 
-
-                // this is the gradient as for the reduced cost function (see previous comment)
-                GJ[j] = (p[j] - A[j]) / (norm); 
-
-                // check nan
-                if (std::isnan(GJ[j])){
-                    GJ[j] = 0.0;
-                }
-
-                // update gradient
-                grad_out[j] = grad_out[j] + GJ[j];
-            }
-      
-        }
-
-        //ROS_WARN("A %d: %g %g %g", i, A[0], A[1], A[2]);
-        //ROS_WARN("D %d: %g", i, Jtmp);
-        //ROS_WARN("P %d: %g %g %g", i, p[0], p[1], p[2]);
-        ROS_WARN("GJ %d: %g %g %g", i, GJ[0], GJ[1], GJ[2]);
-
-    }
-
-    return Jtot;
-}
-
 // single J for ceres single block
-_Float64 genAPI::J(double* p, double* grad_out, double* A, double D){
+_Float64 genAPI::J(double* p, double* grad_out, double* A, double D, int* Pair){
 
-    // compute norm
-    double norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
+    // init J
+    double J = 0;
 
-    // compute J
-    double J = norm - D;
+    // iterator
+    int j;
 
-    // compute gradient
-    for (int j=0;j<3;j++){
-        grad_out[j] = (p[j] - A[j]) / (norm);
+    // if Pair = nullptr --> position fcn
+    if (Pair == nullptr){
+        // compute norm
+        double norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
+
+        // compute J
+        J = pow(norm,2) - pow(D,2);
+        //J = norm - D;
+
+        // compute gradient
+        for (j=0;j<3;j++){
+            // grad_out[j] = (p[j] - A[j]) / (norm);
+            grad_out[j] = 2*(p[j] - A[j]);
+
+            // check nan
+            if (std::isnan(grad_out[j])){
+                grad_out[j] = 0.0;
+            }
+        }
+    }
+    else{
+
+        // define tag positions
+        double Ptilde1[3];
+        double Ptilde2[3];
+
+        // transform Ptilde1: xyz
+        Ptilde1[0] = p[0] + 0.5*D*std::sin(p[6]);
+        Ptilde1[1] = p[1] - 0.5*D*std::cos(p[6]);
+        Ptilde1[2] = p[2];
+
+        // transform Ptilde2: xyz
+        Ptilde2[0] = p[3] - 0.5*D*std::sin(p[6]);
+        Ptilde2[1] = p[4] + 0.5*D*std::cos(p[6]);
+        Ptilde2[2] = p[5];
+
+        // cost function
+        double norm = sqrt( pow((Ptilde1[0]-Ptilde2[0]),2) + pow((Ptilde1[1]-Ptilde2[1]),2) + pow((Ptilde1[2]-Ptilde2[2]),2));
+        J = norm;
+
+        // compute gradient - Ptilde12
+        for (j=0;j<3;j++){
+            // gradient
+            grad_out[j] = (Ptilde1[j] - Ptilde2[j])/norm;
+            grad_out[3+j] = -grad_out[j];
+        }
+
+        // compute gradient - Theta
+        grad_out[6] = ((Ptilde1[0]-Ptilde2[0])*D*std::cos(p[6]) + (Ptilde1[1]-Ptilde2[1])*D*std::sin(p[6]))/norm;
+
+        // check nan
+        for (j=0;j<7;j++){
+            if (std::isnan(grad_out[j])){
+                grad_out[j] = 0.0;
+            }
+        }
+        
+
+
     }
 
     return J;
+    
 }
-
 
 // total cost function - armadillo - bearing (struct Tags)
 _Float64 genAPI::Jtot_arma_bear(const arma::vec& p_arma, arma::vec* grad_out, void* tag){
@@ -645,8 +556,7 @@ int genAPI::CeresMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* 
     }
 
     // call optimlib - simplex like in this case
-    ceresAPI::Function* function = new ceresAPI::Function(tag);
-    ceresAPI::Result result = ceresAPI::solve(function, p0_arma, tag);
+    ceresAPI::Result result = ceresAPI::solveSmall(p0_arma, tag);
 
     // copy p0_arma in _p (different types)
     for (i=0;i<tag->Ntags;i++){

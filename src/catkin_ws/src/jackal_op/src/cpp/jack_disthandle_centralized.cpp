@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     std::string subNameT, subNameA, pubNameT, pubNameTril, pubNameTrilodom, jackName;  
     std::string child, base;
     std::vector<_Float64> TagDists;
-    int Nanchors, Ntags, tagID, GradientFlag, TagPair;  
+    int Nanchors, Ntags, tagID;  
 
     // get tagID - default 7
     if (argc > 1){
@@ -62,8 +62,6 @@ int main(int argc, char **argv)
     tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubGrad";
     flags.push_back(np.hasParam(tmp));
     tmp = "/DT" + std::to_string(tagID) + "/Ntags";
-    flags.push_back(np.hasParam(tmp));
-    tmp = "/DT" + std::to_string(tagID) + "/TagPair";
     flags.push_back(np.hasParam(tmp));
     tmp = "/DT" + std::to_string(tagID) + "/TagDists";
     flags.push_back(np.hasParam(tmp));
@@ -100,8 +98,6 @@ int main(int argc, char **argv)
         np.getParam(tmp, Ntags);  
         tmp = "/DT" + std::to_string(tagID) + "/TagDists";
         np.getParam(tmp, TagDists);
-        tmp = "/DT" + std::to_string(tagID) + "/TagPair";
-        np.getParam(tmp, TagPair);
 
         // concatenate string - odom
         pubNameTrilodom = pubNameTril + "Odom";
@@ -111,7 +107,7 @@ int main(int argc, char **argv)
         tf2_ros::TransformListener tfListener(tfBuffer);
 
         // instance of a class
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagPair, TagDists, rate);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagDists, rate);
         ROS_INFO("jackAPI - Class instance created");
 
         // subscribe

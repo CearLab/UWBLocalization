@@ -1,5 +1,0 @@
-<launch>
-    <node name="MeshTrue" pkg="jackal_op" type="jack_disttrue" args="MeshTrue 0">
-        <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
-    </node>
-</launch>

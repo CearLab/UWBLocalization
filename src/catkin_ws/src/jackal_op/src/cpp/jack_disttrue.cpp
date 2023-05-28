@@ -78,7 +78,7 @@ int main(int argc, char **argv)
      * Then create handle for subscribing.
      */
     std::string subNameA, subNameOdom, pubNameDist, pubNameAnchors, jackName;
-    int Nanchors, Ntags, TagPair;
+    int Nanchors, Ntags;
     std::vector<_Float64> TagDists;
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
@@ -103,17 +103,14 @@ int main(int argc, char **argv)
         tmp = "/" + ID + "/Ntags";
         np.getParam(tmp, Ntags);  
         tmp = "/" + ID + "/TagDists";
-        np.getParam(tmp, TagDists);  
-
-        // TagPair
-        TagPair = 0;
+        np.getParam(tmp, TagDists);
 
         // init buffer and listener
         static tf2_ros::Buffer tfBuffer; // problem line
         tf2_ros::TransformListener tfListener(tfBuffer);
 
         // instance of a class - tagID 7 
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagPair, TagDists, rate);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagDists, rate);
         ROS_INFO("jackAPI - Class instance created");
 
         // subscribe

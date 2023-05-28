@@ -2,6 +2,7 @@
 
 // non-ros include
 #include <chrono>
+#include <random>
 
 // ros includes
 #include "ros/ros.h"
@@ -70,6 +71,9 @@ public:
     sensor_msgs::Imu _Gimu;      // message with the IMU
     sensor_msgs::Imu _Gbias;      // message with the IMU
 
+    std::mt19937 _gen;  // Standard mersenne_twister_engine seeded with _rd()
+    std::normal_distribution<double> _distribution;  // gaussian distribution
+
     // frame transformation
     jackal_op::TransformArray _transformStamped; // actual transformation
 
@@ -85,7 +89,7 @@ public:
     ros::Publisher  _jack_Bias_P;       // publisher on IMU topic
 
     /** **** CONSTRUCTOR **** */
-    jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPair, std::vector<_Float64> TagDists, int rate);
+    jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vector<_Float64> TagDists, int rate);
 
     /** **** METHODS **** */
     // subscriber callback

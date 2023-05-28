@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     /**
      * ros::init() the node
      */
-    ros::init(argc, argv, "jack_hybobs");
+    ros::init(argc, argv, "jack_hybobs_centralized");
 
     /**
      * define nodehandle instance (general purpose)
@@ -24,10 +24,10 @@ int main(int argc, char **argv)
     // general stuff
     int cnt = 0;
     int rate = 100;
-    int tagID = 7;
+    int tagID = 5;
     std::string ID;
 
-    // get tagID - default 7
+    // get tagID - default 5
     if (argc > 1){
         std::string value_from_cl = argv[1];
         ID = value_from_cl.c_str();
@@ -43,12 +43,20 @@ int main(int argc, char **argv)
 
     ROS_INFO("ID %d", tagID);
 
+    /**
+     * define topic to subscribe to. Get the topics name from params server. 
+     * Then create handle for subscribing.
+     */
+    std::string subNameIMU, subNameOdom, pubNameOdom, pubNameIMU, pubNameBias, jackName;
+    std::vector<_Float64> TagDists;
+    int Nanchors, Ntags; 
+
     // check params
     std::string tmp;
     std::vector<bool> flags;
-    tmp = "/" + ID + "/jack_hybobs_subOdom";
-    flags.push_back(np.hasParam(tmp));
     tmp = "/" + ID + "/jack_hybobs_subIMU";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/" + ID + "/jack_hybobs_subOdom";
     flags.push_back(np.hasParam(tmp));
     tmp = "/" + ID + "/jack_hybobs_pubOdom";
     flags.push_back(np.hasParam(tmp));
@@ -60,6 +68,10 @@ int main(int argc, char **argv)
     flags.push_back(np.hasParam(tmp));
     tmp = "/" + ID + "/NanchorMesh";
     flags.push_back(np.hasParam(tmp));
+    tmp = "/DT" + std::to_string(tagID) + "/Ntags";
+    flags.push_back(np.hasParam(tmp));
+    tmp = "/DT" + std::to_string(tagID) + "/TagDists";
+    flags.push_back(np.hasParam(tmp));
 
     // init rate for the node
     tmp = "/" + ID + "/HYBrate";
@@ -67,13 +79,6 @@ int main(int argc, char **argv)
         np.getParam(tmp, rate);
     }
     ros::Rate loop_rate(rate);
-
-    /**
-     * define topic to subscribe to. Get the topics name from params server. 
-     * Then create handle for subscribing.
-     */
-    std::string subNameIMU, subNameOdom, pubNameOdom, pubNameIMU, pubNameBias, jackName;
-    int Nanchors;
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
     if (std::all_of(std::begin(flags), std::end(flags),[](bool b){return b;})) {
@@ -95,14 +100,14 @@ int main(int argc, char **argv)
         tmp = "/" + ID + "/DistjackAPIName";
         np.getParam(tmp, jackName);  
         tmp = "/" + ID + "/NanchorMesh";
-        np.getParam(tmp, Nanchors);  
-
-        // init buffer and listener
-        //static tf2_ros::Buffer tfBuffer; // problem line
-        //tf2_ros::TransformListener tfListener(tfBuffer);
+        np.getParam(tmp, Nanchors); 
+        tmp = "/DT" + std::to_string(tagID) + "/Ntags";
+        np.getParam(tmp, Ntags);  
+        tmp = "/DT" + std::to_string(tagID) + "/TagDists";
+        np.getParam(tmp, TagDists);
 
         // instance of a class - tagID 7 
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, rate);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagDists, rate);
         ROS_INFO("jackAPI - Class instance created");
 
         // subscribe

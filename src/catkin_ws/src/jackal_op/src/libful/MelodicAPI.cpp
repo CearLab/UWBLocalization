@@ -2,7 +2,8 @@
 #include "MelodicAPI.hpp"
 
 /** **** CONSTRUCTOR **** */
-jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPair, std::vector<_Float64> TagDists, int rate){
+jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vector<_Float64> TagDists, int rate) 
+: _gen(std::random_device{}()), _distribution(0.0,0.0){
 
     // counters
     int i, j, k;
@@ -24,7 +25,8 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPa
     // dimensions of mesh
     _Nanchors = Nanchors;
     _Ntags = Ntags;
-    _Npairs = (int)(0*0.25*_Ntags*(_Ntags-1));
+    _Npairs = 1;
+    //_Npairs = (int)(0*0.25*_Ntags*(_Ntags-1));
 
     // push back TagSet
     genAPI::Tag TagZero = genAPI::TagInit(Nanchors);
@@ -32,7 +34,6 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPa
         _TagSet.Tags.push_back(TagZero);
     }
     _TagSet.CurrPair.push_back(tagID);
-    _TagSet.CurrPair.push_back(TagPair);
 
     // push back transformations
     geometry_msgs::TransformStamped TransZero;
@@ -161,9 +162,9 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int TagPa
         // init Anchors position
         for (j=0; j<3; j++){
 
+            for (k=0; k<_Ntags; k++){
             _A.push_back(0.0);
             _G.A.push_back(0.0);
-            for (k=0; k<_Ntags; k++){
             _TagSet.Tags[k].A.push_back(0.0);
             }
         }
@@ -202,14 +203,10 @@ void jackAPI::GetFrames(std::string& child, std::string& base, int tagID){
 void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
 
     std::vector<_Float64> p0(_p.size(), 0.0);
-    int i = 0;
+    int i, j;
 
     //init with current estimate
-    //p0 = _p;
-
-    // store distances in the vectors
-    // ROS_INFO("AnchorID: %d", msg.anchorId);
-    // ROS_INFO("TagID: %d", msg.tagId);
+    p0 = _p;
 
     try {
 
@@ -246,14 +243,14 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
     try {
 
         // copy anchors
-        for (i=0;i<_Nanchors;i++){
+        for (i=0;i<_Ntags;i++){
             _TagSet.Tags[i].A = _A;
         }
         
         //optimize
         int success = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
-        //success = genAPI::OptimMin(p0, _DoptCentral, &_TagSet);
+        // success = genAPI::OptimMin(p0, _DoptCentral, &_TagSet);
         success = genAPI::CeresMin(p0, _DoptCentral, &_TagSet);
         auto t2 = std::chrono::high_resolution_clock::now();
 
@@ -352,8 +349,13 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
     // define position
     std::vector<_Float64> ptrue(3,0.0);
 
+    // random noise
+
     // init general stuff
     int i, idA;
+
+    // noise
+    double noise = 0;
 
     // init useless fields in MeshUWB
     _DTrueMsg.seq = 0;
@@ -372,10 +374,13 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
         // get index
         idA = 3*i;  
 
+        // noise
+        noise = _distribution(_gen);
+
         // compute true distance      
         _DT[i] = sqrt( pow((x -_A[idA]),2) + 
                           pow((y -_A[idA+1]),2) + 
-                          pow((z -_A[idA+2]),2));
+                          pow((z -_A[idA+2]),2)) + noise;
 
         // set other data in the messages
         _DTrueMsg.anchorId = i;
