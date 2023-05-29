@@ -1,31 +1,36 @@
 <launch>
 
   <!-- ###### TRUE MEASUREMENTS ######-->
-  <!-- True Distance measurement node  T0-->
-  <node name="MeshTrueT0" pkg="jackal_op" type="jack_disttrue" args="MeshTrueT0 0">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
-  </node>
+  <group ns="Meas">
+    <!-- True Distance measurement node  T0-->
+    <node name="MeshTrueT0" pkg="jackal_op" type="jack_disttrue" args="Meas/MeshTrueT0 0">
+      <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
+    </node>
 
-  <!-- True Distance measurement node  T1-->
-  <node name="MeshTrueT1" pkg="jackal_op" type="jack_disttrue" args="MeshTrueT1 1">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
-  </node>
+    <!-- True Distance measurement node  T1-->
+    <!--node name="MeshTrueT1" pkg="jackal_op" type="jack_disttrue" args="MeshTrueT1 1">
+      <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
+    </node-->
 
-  <!-- True Distance measurement node  T2-->
-  <node name="MeshTrueT2" pkg="jackal_op" type="jack_disttrue" args="MeshTrueT2 2">
-    <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
-  </node>
+    <!-- True Distance measurement node  T2-->
+    <!--node name="MeshTrueT2" pkg="jackal_op" type="jack_disttrue" args="MeshTrueT2 2">
+      <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disttrue.yaml"/>
+    </node-->
 
-  <!-- ###### REAL MEASUREMENTS ######-->
-  <!-- UWB Distance measurement node  T0 -->
-  <!--node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
-      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T0.yaml"/>
-  </node-->
+    <!-- ###### REAL MEASUREMENTS ######-->
+    <!-- UWB Distance measurement node  T0 -->
+    <!--node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
+        <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T0.yaml"/>
+    </node-->
 
-  <!-- UWB Distance measurement node  T1 -->
-  <!--node name="UWB_read_T1" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T1 1">
-      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T1.yaml"/>
-  </node-->
+    <!-- UWB Distance measurement node  T1 -->
+    <!--node name="UWB_read_T1" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T1 1">
+        <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T1.yaml"/>
+    </node-->
+
+  </group>
+
+  
 
   <!-- ###### TRILATERATION  - CENTRALIZED ######-->
   <node name="DT5" pkg="jackal_op" type="jack_disthandle_centralized" args="5">

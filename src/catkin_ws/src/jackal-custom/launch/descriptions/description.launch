@@ -9,7 +9,8 @@
   <param name="robot_description"
          command="$(find jackal_description)/scripts/$(arg env_runner)
                     $(find jackal-custom)/urdf/configs/$(arg config)
-                    $(find xacro)/xacro $(find jackal-custom)/urdf/custom_jackal.urdf.xacro rear_id:=$(arg rear_id) right_id:=$(arg right_id) left_id:=$(arg left_id) --inorder" />
+                    $(find xacro)/xacro $(find jackal-custom)/urdf/custom_jackal.urdf.xacro 
+                    rear_id:=$(arg rear_id) right_id:=$(arg right_id) left_id:=$(arg left_id) --inorder" />
                     
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
     <param name="publish_frequency" value="50"/>

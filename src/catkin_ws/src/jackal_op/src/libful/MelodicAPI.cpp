@@ -25,7 +25,7 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vect
     // dimensions of mesh
     _Nanchors = Nanchors;
     _Ntags = Ntags;
-    _Npairs = 1;
+    _Npairs = 0;
     //_Npairs = (int)(0*0.25*_Ntags*(_Ntags-1));
 
     // push back TagSet
