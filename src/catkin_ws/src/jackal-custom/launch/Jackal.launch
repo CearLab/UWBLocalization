@@ -1,0 +1,24 @@
+<launch>
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0" />
+  <arg name="yaw" default="0" />
+  <arg name="joystick" default="true" />
+  <arg name="joy_dev" default="/dev/input/ps4" />
+  
+  <!-- Configuration of Jackal which you would like to simulate.
+       See jackal_description for details. -->
+  <arg name="config" default="base" />
+  <arg name="rear_id" default="0" />
+  <arg name="right_id" default="1" />
+  <arg name="left_id" default="2" />
+   
+  <!-- Load Jackal's description, controllers, and teleop nodes. -->
+  <include file="$(find jackal-custom)/launch/descriptions/description.launch">
+    <arg name="config" value="$(arg config)" />
+    <arg name="rear_id" value="$(arg rear_id)" />
+    <arg name="right_id" value="$(arg right_id)" />
+    <arg name="left_id" value="$(arg left_id)" />
+  </include>
+   
+</launch>
