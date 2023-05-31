@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="Jackal">
+    <xacro:include filename="$(find jackal-custom)/urdf/custom_jackal_base_real.urdf.xacro" />
+
+    <xacro:arg name="rear_id" default="0" />
+    <xacro:arg name="right_id" default="1" />
+    <xacro:arg name="left_id" default="2" />
+
+    <xacro:property name="rear" value="$(arg rear_id)" />
+    <xacro:property name="right" value="$(arg right_id)" />
+    <xacro:property name="left" value="$(arg left_id)" />
+
+    <!-- -->
+    <link name="right_tag">
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+        </inertial>
+
+        <collision>
+            <origin xyz="0 -0.013 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.05 0.026 0.102"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="right_tag_joint" type="fixed">
+        <origin xyz="0 -0.5 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 0 0.184" rpy="0 0 0"/-->
+        <parent link="base_link"/>
+        <child link="right_tag"/>
+    </joint>
+
+    <!-- -->
+    <link name="left_tag">
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+        </inertial>
+
+        <collision>
+            <origin xyz="0 -0.013 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.05 0.026 0.102"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 3.14159265359"/>
+            <geometry>
+                <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="left_tag_joint" type="fixed">
+        <origin xyz="0 0.5 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 0 0.184" rpy="0 0 0"/-->
+        <parent link="base_link"/>
+        <child link="left_tag"/>
+    </joint>
+    
+
+    <!-- -->
+    <link name="rear_tag">
+        <inertial>
+            <mass value="0.1" />
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+        </inertial>
+
+        <collision>
+            <origin xyz="0 -0.013 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.05 0.026 0.102"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 -1.57"/>
+            <geometry>
+                <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="rear_tag_joint" type="fixed">
+        <origin xyz="-0.5 0 0.184" rpy="0 0 0"/>
+        <!--origin xyz="0 0 0.184" rpy="0 0 0"/-->
+        <parent link="base_link"/>
+        <child link="rear_tag"/>
+    </joint>
+
+    
+</robot>
