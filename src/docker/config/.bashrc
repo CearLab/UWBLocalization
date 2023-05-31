@@ -139,3 +139,5 @@ EDITOR=/usr/bin/nano
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+source /opt/ros/melodic/setup.bash
+export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib

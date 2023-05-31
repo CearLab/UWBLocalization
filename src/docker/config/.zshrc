@@ -177,3 +177,5 @@ source /opt/ros/melodic/setup.zsh
 #eval "$(pyenv virtualenv-init -)"
 source /opt/ros/melodic/setup.zsh
 export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib
+source /opt/ros/melodic/setup.zsh
+export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib
