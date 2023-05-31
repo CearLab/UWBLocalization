@@ -13,7 +13,7 @@
                     rear_id:=$(arg rear_id) right_id:=$(arg right_id) left_id:=$(arg left_id) --inorder" />
                     
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
-    <param name="publish_frequency" value="50"/>
-    <param name="use_tf_static" value="true"/>
+    <param name="publish_frequency" value="10"/>
+    <param name="use_tf_static" value="false"/>
   </node>
 </launch>

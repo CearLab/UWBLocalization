@@ -31,19 +31,11 @@
     <arg name="world_name" value="$(arg world_name)" />
   </include>
 
-  <!-- Start navigation -->
-  <include file="$(find jackal-custom)/launch/control/Navigation.launch">
-  </include>
-
-  <!-- Start localization -->
-  <include file="$(find jackal-custom)/launch/control/Localization.launch">
-  </include>
-
   <!-- Spawn Jackal -->
   <include file="$(find jackal-custom)/launch/spawners/spawn_jackal_Gazebo.launch">
     <arg name="x" value="0" />
     <arg name="y" value="0" />
-    <arg name="z" value="1" />
+    <arg name="z" value="0.184" />
     <arg name="yaw" value="0" />
     <arg name="config" value="$(arg config)" />
     <arg name="joystick" value="$(arg joystick)" />
@@ -54,16 +46,13 @@
     <arg name="left_id" value="2" />
   </include>
 
-  <!-- Plotting -->
-  <!--node pkg="rqt_plot" type="rqt_plot" name="my_rqt_plot" 
-  args="/ground_truth/state/pose/pose/position/x
-  /ground_truth/state/pose/pose/position/y
-  /ground_truth/state/pose/pose/position/z"/-->
+  <!-- Start navigation -->
+  <include file="$(find jackal-custom)/launch/control/Navigation.launch">
+  </include>
 
-  <node pkg="rqt_plot" type="rqt_plot" name="my_rqt_plot" 
-  args="/ground_truth/state/pose/pose/position/x /EKF/odometry/filtered/pose/pose/position/x /HYB5/Odom/pose/pose/position/x
-  /ground_truth/state/pose/pose/position/y /EKF/odometry/filtered/pose/pose/position/y /HYB5/Odom/pose/pose/position/y
-  /ground_truth/state/pose/pose/position/z /EKF/odometry/filtered/pose/pose/position/z /HYB5/Odom/pose/pose/position/z"/>
+  <!-- Start localization -->
+  <include file="$(find jackal-custom)/launch/control/Localization_true.launch">
+  </include>
 
 
 </launch>

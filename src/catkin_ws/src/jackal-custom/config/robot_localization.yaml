@@ -84,18 +84,18 @@ tf: false
 #               false, false, false]
 #odom0_differential: false
 
-#odom0: /HYB5/Odom
-#odom0_config: [true, true, true,
-#               false, false, false,
-#               true, true, true,
-#               false, false, false,
-#               false, false, false]
-#odom0_config_variance: [0.20, 0.20, 0.20,
-#                        0.00, 0.00, 0.00,
-#                        0.05, 0.05, 0.05,
-#                        0.00, 0.00, 0.00,
-#                        0.00, 0.00, 0.00]
-#odom0_differential: false
+odom0: /HYB5/Odom
+odom0_config: [true, true, true,
+               false, false, false,
+               true, true, true,
+               false, false, false,
+               false, false, false]
+odom0_config_variance: [0.20, 0.20, 0.20,
+                        0.00, 0.00, 0.00,
+                        0.05, 0.05, 0.05,
+                        0.00, 0.00, 0.00,
+                        0.00, 0.00, 0.00]
+odom0_differential: false
 
 imu0: /imu/data
 imu0_config: [false, false, false,

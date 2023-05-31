@@ -21,6 +21,10 @@
     <arg name="left_id" value="$(arg left_id)" />
   </include>
 
+  <!-- Spawn Jackal -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+              args="-urdf -model jackal -param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y $(arg yaw)" />
+
   <!-- Control node  -->
   <include file="$(find jackal-custom)/launch/control/control.launch">
     <arg name="enable_ekf" value="true" />
@@ -31,10 +35,6 @@
     <arg name="joystick" value="$(arg joystick)" />
     <arg name="joy_dev" value="$(arg joy_dev)" />
   </include>
-
-  <!-- Spawn Jackal -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-              args="-urdf -model jackal -param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y $(arg yaw)" />
 
   <!-- Rviz -->
   <include file="$(find jackal-custom)/launch/descriptions/view_robot.launch">
