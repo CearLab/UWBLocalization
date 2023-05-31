@@ -1,5 +1,8 @@
 <launch>
 
+  <arg name="joystick" default="true" />
+  <arg name="joy_dev" default="/dev/input/ps4" />
+
   <!-- Teleop node  -->
   <!--include file="$(find jackal-custom)/launch/control/teleop.launch">
     <arg name="joystick" value="$(arg joystick)" />
