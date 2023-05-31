@@ -78,6 +78,19 @@ sudo make install
 ls /usr/local/lib | grep optim
 cd ..
 
+# CERES
+sudo apt-get install libgoogle-glog-dev libgflags-dev
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libeigen3-dev
+sudo apt-get install libsuitesparse-dev
+# assuming that you have ceres-solver-2.1.0 folder
+sudo mkdir ceres-bin
+cd ceres-bin
+sudo cmake -DBUILD_SHARED_LIBS='ON' ../ceres-solver-2.1.0
+sudo make -j3
+sudo make test
+sudo make install
+
 # add libs
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib:/usr/local/lib" >> ~/.zshrc
 source ~/.zshrc
@@ -105,15 +118,3 @@ sudo apt install ros-melodic-rqt-tf-tree
 sudo apt install ros-melodic-roscpp-tutorials
 sudo apt install ros-melodic-tf2-web-republisher
 
-# CERES
-sudo apt-get install libgoogle-glog-dev libgflags-dev
-sudo apt-get install libatlas-base-dev
-sudo apt-get install libeigen3-dev
-sudo apt-get install libsuitesparse-dev
-# assuming that you have ceres-solver-2.1.0 folder
-sudo mkdir ceres-bin
-cd ceres-bin
-sudo cmake -DBUILD_SHARED_LIBS='ON' ../ceres-solver-2.1.0
-sudo make -j3
-sudo make test
-sudo make install

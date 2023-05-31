@@ -166,19 +166,6 @@ optim
 alglib
 )
 
-# DISTHANDLE
-#add_executable(jack_disthandle src/cpp/jack_disthandle.cpp)
-#target_link_libraries(jack_disthandle 
-#${catkin_LIBRARIES}
-#melodicAPI
-#generalAPI
-#uwbceresAPI
-#ceres
-#armadillo
-#optim
-#alglib
-#)
-
 # DISTHANDLE - CENTRALIZED
 add_executable(jack_disthandle_centralized src/cpp/jack_disthandle_centralized.cpp)
 target_link_libraries(jack_disthandle_centralized
@@ -202,17 +189,6 @@ armadillo
 optim
 alglib
 )
-
-# DUMMY
-#add_executable(jack_disthandle_dummy src/cpp/jack_disthandle_dummy.cpp)
-#target_link_libraries(jack_disthandle_dummy
-#melodicAPI
-#${catkin_LIBRARIES}
-#generalAPI
-#alglib
-#armadillo
-#optim
-#)
 
 ## Add cmake target dependencies of the library
 #add_dependencies(jack_disthandle jackal_op_generate_messages_cpp)
