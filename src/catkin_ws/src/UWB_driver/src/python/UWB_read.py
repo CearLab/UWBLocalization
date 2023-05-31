@@ -21,7 +21,7 @@ import binascii
 BUFSIZE = 4
 
 # anchors ID dictionary
-ID = ['C693','1D16','8A1E','91AE']
+ID = ['C693','8A1E','1D16','91AE']
 
 # send commands and read output
 def serialWrite(srl, data, sleepTime):
@@ -81,6 +81,7 @@ def serialRead(srl, stopTime, D, A):
 
                     # get the ID
                     id = ID[i]
+                    #logger.info('HERE: ' + str(i))
 
                     try:
                         # find if anchor was read

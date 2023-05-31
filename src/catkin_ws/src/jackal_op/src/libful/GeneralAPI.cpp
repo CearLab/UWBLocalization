@@ -183,7 +183,7 @@ bool ceresAPI::FunctionSmall::Evaluate(double const* const* parameters, double* 
     for (i=0;i<3;i++){
         A[i] = _tag->Tags[_i].A[3*_j+i];
     }
-    //ROS_WARN("A %d: %g %g %g", _j, A[0], A[1], A[2]);
+    // ROS_WARN("A %d: %g %g %g", _j, A[0], A[1], A[2]);
 
     // compute residuals
     // NB: theoretically here I am cycling over the blocks, because I am compute all the Ji (residual)
