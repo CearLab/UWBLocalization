@@ -20,5 +20,14 @@
     <arg name="right_id" value="$(arg right_id)" />
     <arg name="left_id" value="$(arg left_id)" />
   </include>
+  
+  <!-- Control node  -->
+  <include file="$(find jackal-custom)/launch/control/control.launch">
+    <arg name="enable_ekf" value="true" />
+  </include>
+
+  <!-- Start navigation -->
+  <!--include file="$(find jackal-custom)/launch/Navigation.launch">
+  </include-->
    
 </launch>

@@ -13,10 +13,10 @@
     <!-- TF -->
     <group ns="EKF_frames">
       <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args=" 0 0 0 0 0 0 world odom"/>
-      <node pkg="tf2_ros" type="static_transform_publisher" name="odom_base_link" args="0 0 0 0 0 0 odom base_link 50"/>
+      <node pkg="tf2_ros" type="static_transform_publisher" name="odom_base_link" args="0 0 0 0 0 0 odom base_link"/>
     </group>
 
-    <node pkg="robot_localization_custom" type="ekf_localization_node" name="ekf_localization">
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization">
       <rosparam command="load" file="$(find jackal-custom)/config/robot_localization.yaml"/>
     </node>
       
@@ -25,7 +25,6 @@
   <node pkg="twist_mux" type="twist_mux" name="twist_mux">
     <rosparam command="load" file="$(find jackal_control)/config/twist_mux.yaml" />
     <remap from="cmd_vel_out" to="jackal_velocity_controller/cmd_vel"/>
-    <!--remap from="cmd_vel" to="EKF/cmd_vel"/-->
   </node>
 
   <group if="$(optenv JACKAL_CONTROL_EXTRAS 0)" >
