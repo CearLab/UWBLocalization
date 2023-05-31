@@ -4,12 +4,6 @@
     <!--include file="$(find jackal-custom)/launch/Navigation.launch">
     </include-->
 
-  <!-- Teleop node  -->
-  <!--include file="$(find jackal-custom)/launch/control/teleop.launch">
-    <arg name="joystick" value="$(arg joystick)" />
-    <arg name="joy_dev" value="$(arg joy_dev)" />
-  </include-->
-
   <!-- Rviz -->
   <include file="$(find jackal-custom)/launch/descriptions/view_robot.launch">
   </include>

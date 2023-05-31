@@ -123,45 +123,5 @@
         <material>Gazebo/White</material>
     </gazebo>
 
-    <!--
-    <gazebo>
-        <plugin name='libgtec_uwb_plugin' filename='libgtec_uwb_plugin.so'>
-            <update_rate>5</update_rate>
-            <frequency>3.9936e9</frequency>
-            <power>-14.3</power>
-            <rx_gain>2</rx_gain>
-            <tag_link>right_tag</tag_link>
-            <anchor_prefix>uwb_anchor</anchor_prefix>
-            <tag_id>${right}</tag_id>
-        </plugin>
-    </gazebo>
-    -->
-
-    <!--
-    <gazebo>
-        <plugin name='libgtec_uwb_plugin' filename='libgtec_uwb_plugin.so'>
-            <update_rate>5</update_rate>
-            <frequency>3.9936e9</frequency>
-            <power>-14.3</power>
-            <rx_gain>2</rx_gain>
-            <tag_link>left_tag</tag_link>
-            <anchor_prefix>uwb_anchor</anchor_prefix>
-            <tag_id>${left}</tag_id>
-        </plugin>
-    </gazebo>
-    -->
-
-    <!--
-    <gazebo>
-        <plugin name='libgtec_uwb_plugin' filename='libgtec_uwb_plugin.so'>
-            <update_rate>5</update_rate>
-            <frequency>3.9936e9</frequency>
-            <power>-14.3</power>
-            <rx_gain>2</rx_gain>
-            <tag_link>rear_tag</tag_link>
-            <anchor_prefix>uwb_anchor</anchor_prefix>
-            <tag_id>${rear}</tag_id>
-        </plugin>
-    </gazebo>
-    -->
+    
 </robot>
