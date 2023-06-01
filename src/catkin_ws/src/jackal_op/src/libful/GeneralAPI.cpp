@@ -365,8 +365,8 @@ _Float64 genAPI::J(double* p, double* grad_out, double* A, double D, int* Pair){
         double norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
 
         // compute J
-        J = pow(norm,2) - pow(D,2);
         //J = norm - D;
+        J = pow(norm,2) - pow(D,2);   
 
         // compute gradient
         for (j=0;j<3;j++){
