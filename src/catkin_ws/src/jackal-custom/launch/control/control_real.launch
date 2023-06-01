@@ -24,7 +24,7 @@
 
   <node pkg="twist_mux" type="twist_mux" name="twist_mux">
     <rosparam command="load" file="$(find jackal-custom)/config/control/twist_mux.yaml" />
-    <remap from="cmd_vel_out" to="jackal_velocity_controller/cmd_vel"/>
+    <remap from="cmd_vel_out" to="cmd_vel"/>
   </node>
 
   <group if="$(optenv JACKAL_CONTROL_EXTRAS 0)" >

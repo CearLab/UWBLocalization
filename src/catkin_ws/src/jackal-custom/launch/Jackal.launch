@@ -12,7 +12,7 @@
   </include>
   
   <!-- Control node  -->
-  <include file="$(find jackal-custom)/launch/control/control.launch">
+  <include file="$(find jackal-custom)/launch/control/control_real.launch">
     <arg name="enable_ekf" value="true" />
   </include>
 
