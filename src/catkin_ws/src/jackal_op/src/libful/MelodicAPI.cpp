@@ -468,7 +468,7 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
 
     // fill message and publish - odometry
     _Godom.header = msg.header;
-    _Godom.header.frame_id = "odom";
+    _Godom.header.frame_id = "world";
     _Godom.child_frame_id = "base_link";
 
     // position
@@ -506,5 +506,13 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     // publish
     _jack_Bias_P.publish(_Gbias);
 
+}
+
+// callback to remap odometry to another frame
+void jackAPI::ChatterCallbackRemap(const nav_msgs::Odometry& msg){
+
+    // copy the msg - very dummy
+    // ROS_WARN("startFrame IN: %s", msg.header.frame_id.c_str());
+    _Godom = msg;
 }
 

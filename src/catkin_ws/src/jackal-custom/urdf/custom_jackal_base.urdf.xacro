@@ -86,6 +86,13 @@
     <parent link="world"/>
     <child link="world" />
   </joint>
+
+  <link name="odom"></link>
+  <joint name="odom_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="odom"/>
+    <child link="base_link" />
+  </joint>
   
   <link name="base_link"></link>
   <joint name="base_link_joint" type="fixed">

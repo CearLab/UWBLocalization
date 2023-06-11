@@ -22,6 +22,9 @@
   <arg name="joystick" default="true" />
   <arg name="joy_dev" default="/dev/input/js0" />
 
+  <!-- set tf2 tolerance -->
+  <!--param name="/tf2/tf2_buffer/cache_time" value="1.0" /-->
+
   <!-- Launch Gazebo with the specified world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="debug" value="0" />

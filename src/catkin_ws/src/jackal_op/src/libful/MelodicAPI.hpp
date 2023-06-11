@@ -100,6 +100,7 @@ public:
     void ChatterCallbackAtrue(const ros::TimerEvent& event);   // callback for the true anchors publishing
     void ChatterCallbackHybCont(const sensor_msgs::Imu& msg);   // callback for the continuous dynamics of the observer
     void ChatterCallbackHybJump(const nav_msgs::Odometry& msg);   // callback for the discrete dynamics of the observer
+    void ChatterCallbackRemap(const nav_msgs::Odometry& msg);   // callback to remap odometry to another frame
 
     // set links
     void GetFrames(std::string& child, std::string& base, int tagID);

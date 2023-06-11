@@ -9,6 +9,9 @@
     <param name="base_global_planner" type="string" value="navfn/NavfnROS" />
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
 
+    <param name="controller_frequency" value="10.0" />
+    <param name="planner_frequency" value="5.0" />
+
     <rosparam file="$(find jackal-custom)/config/navigation/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find jackal-custom)/config/navigation/costmap_common_params.yaml" command="load" ns="local_costmap" />
     
@@ -18,8 +21,7 @@
     <rosparam file="$(find jackal-custom)/config/navigation/base_local_planner_params.yaml" command="load" />
     
     
-    <remap from="odom" to="EKF/odometry/filtered" />
-    <!--remap from="odom" to="EKF/odometry/filtered" /-->
+    <remap from="odom" to="odometry/filtered" />
      
  </node>
  
