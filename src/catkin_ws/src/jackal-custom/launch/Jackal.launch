@@ -16,13 +16,17 @@
     <arg name="enable_ekf" value="true" />
   </include>
 
-  <group ns="Meas">
 
-    <!-- ###### REAL MEASUREMENTS ######-->
-    <!-- UWB Distance measurement node  T0 -->
-    <!--node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
-        <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T0.yaml"/>
-    </node-->
-   
-  </group>
+  <!-- ###### REAL MEASUREMENTS ######-->
+  <!-- UWB Distance measurement node  T0 -->
+  <node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
+      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T0.yaml"/>
+  </node>
+
+  <!-- IMU measurements -->
+  <include file="$(find jackal-custom)/launch/sensors/imu.launch">
+    <arg name="imu" value="imu_link" />
+    <remap from="$(arg imu)/imu" to="/imu/data" />
+  </include>
+
 </launch>

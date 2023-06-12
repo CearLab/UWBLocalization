@@ -37,7 +37,7 @@
     <arg name="enable_tf" default="$(arg enable_filter)"/>
 
     <node pkg="imu_3dm_gx4" name="$(arg imu)" type="imu_3dm_gx4" output="$(arg output)">
-        <remap from="imu/imu" to="imu/data" />
+        <remap from="$(arg imu)/imu" to="imu/data" />
         <param name="device" type="string" value="$(arg device)" />
         <param name="verbose" type="bool" value="$(arg verbose)"/>
         <param name="baudrate" type="int" value="$(arg baudrate)" />
