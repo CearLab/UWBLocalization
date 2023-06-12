@@ -13,9 +13,6 @@
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization">
       <rosparam command="load" file="$(find jackal-custom)/config/robot_localization.yaml"/>
     </node>
-
-    <!--node name="jackal_op" pkg="jackal_op" type="jack_remap" args="odom /odometry/filtered 100">
-    </node-->
       
   </group>
 

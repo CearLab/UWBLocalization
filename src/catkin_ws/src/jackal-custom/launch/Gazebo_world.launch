@@ -54,7 +54,7 @@
   </include>
 
   <!-- Start localization -->
-  <include file="$(find jackal-custom)/launch/control/Localization_true.launch">
+  <include file="$(find jackal-custom)/launch/control/Localization.launch">
   </include>
 
 
