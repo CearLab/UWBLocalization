@@ -141,6 +141,7 @@ Visualization Manager:
       Enabled: true
       Show Names: false
       Show Axes: false
+      Show Arrows: false
       Frame Timeout: 15
       Frames:
         All Enabled: false
