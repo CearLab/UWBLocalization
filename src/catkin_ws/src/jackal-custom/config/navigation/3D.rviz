@@ -136,13 +136,11 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Class: TF
-      Name: TF
-      type: tf
-      tfPrefix: ""
-      updateTopic: "/tf"
-      waitForTransformDuration: 0.0
-      fixedFrame: "world"
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
     - Class: rviz/Axes
       Enabled: true
       Length: 0.25
