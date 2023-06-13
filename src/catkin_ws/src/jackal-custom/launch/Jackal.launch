@@ -10,6 +10,10 @@
   <include file="$(find jackal-custom)/launch/descriptions/description_real.launch">
     <arg name="config" value="$(arg config)" />
   </include>
+
+  <!-- Run default base jackal HW -->
+  <include file="$(find jackal-custom)/launch/descriptions/base.launch">
+  </include>
   
   <!-- Control node  -->
   <include file="$(find jackal-custom)/launch/control/control_real.launch">
@@ -24,9 +28,9 @@
   </node>
 
   <!-- IMU measurements -->
-  <include file="$(find jackal-custom)/launch/sensors/imu.launch">
+  <!--include file="$(find jackal-custom)/launch/sensors/imu.launch">
     <arg name="imu" value="imu_link" />
     <remap from="$(arg imu)/imu" to="/imu/data" />
-  </include>
+  </include-->
 
 </launch>

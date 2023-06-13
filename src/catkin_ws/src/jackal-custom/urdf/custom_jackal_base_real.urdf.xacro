@@ -107,7 +107,7 @@
       </inertial>
   </link>
 
-  <!-- FOR THE TIME BEING
+  <!-- FOR THE TIME BEING -->
   <xacro:wheel prefix="front_left">
     <origin xyz="${wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
   </xacro:wheel>
@@ -120,7 +120,7 @@
   <xacro:wheel prefix="rear_right">
     <origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
   </xacro:wheel>
-  -->
+  
 
   <xacro:unless value="$(optenv JACKAL_FRONT_ACCESSORY_FENDER 0)">
     <link name="front_fender_link">

@@ -38,6 +38,20 @@
 # $ ssh-add ~/.ssh/keyname
 # $ cat ~/.ssh/keyname.pub --> copy the output and add the key on your github.com account
 
+## SETUP THE ROBOT TO USE HARDWARE
+# $ sudo apt-get install ros-melodic-ros-base
+# $ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+# $ source ~/.bashrc
+# $ sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+# $ sudo apt install python-rosdep
+# $ sudo rosdep init
+# $ rosdep update
+# $ sudo apt-get install ros-melodic-jackal-robot
+# $ export ROBOT_SETUP='/opt/ros/melodic/setup.bash'
+# $ rosrun jackal_bringup install
+# $ sudo systemctl daemon-reload
+# $ sudo systemctl start ros
+
 ## CLONE THE PROJECT REPO
 # $ git clone git@github.com:fedeoli/TechnionProject.git
 # $ git submodule init
@@ -92,6 +106,10 @@
 # $ sudo apt update
 # $ sudo apt upgrade
 # general jackal environment
+# $ wget https://packages.clearpathrobotics.com/public.key -O - | sudo apt-key add -
+# $ sudo sh -c 'echo "deb https://packages.clearpathrobotics.com/stable/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/clearpath-latest.list'
+# $ sudo apt update
+# $ sudo apt install ros-melodic-jackal-robot --fix-missing
 # $ sudo apt-get install ros-melodic-jackal-simulator --fix-missing
 # $ sudo apt-get install ros-melodic-jackal-desktop --fix-missing
 # $ sudo apt-get install ros-melodic-jackal-navigation --fix-missing

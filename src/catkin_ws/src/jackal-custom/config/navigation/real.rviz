@@ -135,7 +135,7 @@ Visualization Manager:
       TF Prefix: ""
       Update Interval: 0
       Value: true
-      Visual Enabled: true
+      Visual Enabled: false
     - Class: rviz/Axes
       Enabled: true
       Length: 0.25
