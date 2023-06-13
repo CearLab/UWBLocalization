@@ -137,7 +137,10 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/TF
+      Name: TF
       Enabled: true
+      Show Names: false
+      Show Axis: true
       Frame Timeout: 15
       Frames:
         All Enabled: true
