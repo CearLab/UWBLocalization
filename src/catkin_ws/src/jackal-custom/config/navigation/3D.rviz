@@ -158,6 +158,7 @@ Visualization Manager:
         Value: true
       Axis: Z
       Channel Name: intensity
+  Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
