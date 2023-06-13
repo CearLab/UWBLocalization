@@ -137,7 +137,7 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: TF
-      - name: TF
+      Name: TF
       type: tf
       tfPrefix: ""
       updateTopic: "/tf"
