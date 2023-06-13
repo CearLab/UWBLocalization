@@ -143,7 +143,38 @@ Visualization Manager:
       Show Axis: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
+          base_link:
+            Value: false
+          chassis_link:
+            Value: false
+          front_fender_link:
+            Value: false
+          front_left_wheel_link:
+            Value: false
+          front_mount:
+            Value: false
+          front_right_wheel_link:
+            Value: false
+          imu_link:
+            Value: false
+          mid_mount:
+            Value: false
+          navsat_link:
+            Value: false
+          rear_fender_link:
+            Value: false
+          rear_left_wheel_link:
+            Value: false
+          rear_mount:
+            Value: false
+          rear_right_wheel_link:
+            Value: false
+          rear_tag:
+            Value: true
+          world:
+            Value: true
+
     - Class: rviz/Axes
       Enabled: true
       Length: 0.25
