@@ -144,8 +144,8 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-          base_link:
-            Value: false
+            base_link:
+              Value: false
     - Class: rviz/Axes
       Enabled: true
       Length: 0.25
