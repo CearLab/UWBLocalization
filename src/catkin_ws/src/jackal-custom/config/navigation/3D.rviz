@@ -35,7 +35,7 @@ Visualization Manager:
   Displays:
     - Alpha: 0.5
       Cell Size: 1
-      Class: rviz/3D
+      Class: rviz/Grid
       Color: 209; 209; 214
       Enabled: true
       Line Style:
