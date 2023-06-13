@@ -144,7 +144,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-
           base_link:
             Value: false
           chassis_link:
