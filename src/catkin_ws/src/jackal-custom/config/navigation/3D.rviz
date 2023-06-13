@@ -140,7 +140,7 @@ Visualization Manager:
       Name: TF
       Enabled: true
       Show Names: false
-      Show Axis: true
+      Show Axis: false
       Frame Timeout: 15
       Frames:
         All Enabled: false
