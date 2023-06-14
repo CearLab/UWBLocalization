@@ -1,0 +1,15 @@
+<!--
+Launch driver components of Jackal's supported accessories.
+
+Be careful that the defaults in this file are kept aligned with those
+in the URDF. See jackal_description/urdf/accessories.urdf.xacro.
+-->
+<launch>
+
+  <!-- Macros to generate standoffs for offset payload mounting. -->
+  <xacro:include filename="$(find jackal_description)/urdf/accessories/standoffs.urdf.xacro" />
+
+  <!-- This optional plate mounts both the upgraded GPS and the Velodyne 3D LIDAR. -->
+  <xacro:include filename="$(find jackal_description)/urdf/accessories/bridge_plate.urdf.xacro" />
+  
+</launch>

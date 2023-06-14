@@ -14,6 +14,10 @@
   <!-- Run default base jackal HW -->
   <include file="$(find jackal-custom)/launch/descriptions/base.launch">
   </include>
+
+  <!-- Run accessories jackal HW -->
+  <!--include file="$(find jackal-custom)/launch/descriptions/accessories.launch">
+  </include-->
   
   <!-- Control node  -->
   <include file="$(find jackal-custom)/launch/control/control_real.launch">
@@ -23,11 +27,11 @@
 
   <!-- ###### REAL MEASUREMENTS ######-->
   <!-- UWB Distance measurement node  T0 -->
-  <node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
+  <!--node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
       <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T0.yaml"/>
-  </node>
+  </node-->
 
-  <!-- IMU measurements -->
+  <!-- Microstrain IMU measurements -->
   <!--include file="$(find jackal-custom)/launch/sensors/imu.launch">
     <arg name="imu" value="imu_link" />
     <remap from="$(arg imu)/imu" to="/imu/data" />
