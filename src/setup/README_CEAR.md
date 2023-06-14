@@ -193,6 +193,7 @@
 # $ sudo apt install ros-melodic-rqt-tf-tree
 # $ sudo apt install ros-melodic-roscpp-tutorials
 # $ sudo apt install ros-melodic-tf2-web-republisher
+# $ sudo apt install ros-melodic-rosbridge-suite
 #
 # now get ready for the catkin build
 # $ cd ~/workspace/catkin_ws
