@@ -39,6 +39,8 @@
 # $ cat ~/.ssh/keyname.pub --> copy the output and add the key on your github.com account
 
 ## SETUP THE ROBOT TO USE HARDWARE
+# $ wget https://packages.clearpathrobotics.com/public.key -O - | sudo apt-key add -
+# $ sudo sh -c 'echo "deb https://packages.clearpathrobotics.com/stable/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/clearpath-latest.
 # $ sudo apt-get install ros-melodic-ros-base
 # $ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 # $ source ~/.bashrc
@@ -170,6 +172,7 @@
 # $ cd ceres-bin
 # $ sudo cmake -DBUILD_SHARED_LIBS='ON' ../ceres-solver-2.1.0
 # $ sudo make (very slow, check RAM because could be an issue)
+# $ sudo make install
 # if you can't compile the library, compile on your local pc and copy:
 # the .so files in /usr/local/lib
 # the .h files in /usr/local/include/ceres
