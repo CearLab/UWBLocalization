@@ -135,6 +135,7 @@ int main(int argc, char **argv)
             if (tagID >= 0){
                 try{
 
+                    // from child to odom
                     for (i=0;i<jackNode._Ntags;i++){
 
                         jackNode.GetFrames(child, base, i);
@@ -145,6 +146,8 @@ int main(int argc, char **argv)
                         // jackNode._transformStamped.transforms[i].transform.translation.y,
                         // jackNode._transformStamped.transforms[i].transform.translation.z);
                     }
+                    // from odom to world
+                    jackNode._transformStamped.transforms[jackNode._Ntags + 1] = tfBuffer.lookupTransform(base,"world",ros::Time(0));
                     
                 }
                 catch (tf2::TransformException &ex) {

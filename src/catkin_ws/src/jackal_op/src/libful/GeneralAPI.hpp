@@ -49,8 +49,8 @@ namespace genAPI {
     // env params
     const std::vector<_Float64> Anchors = {
         0, -4, 3.5,
-        0, 4, 3.5,
-        4, 4, 3.5,
+        0, +4, 3.5,
+        4, +4, 3.5,
         4, -4, 3.5};
 
     struct Tag {
@@ -67,9 +67,7 @@ namespace genAPI {
         int Ntags;
         int Npairs;
         int Nanchors;
-        std::vector<int> CurrPair;
         std::vector<genAPI::Tag> Tags;
-        std::vector<_Float64> TagDists;
 
     };
 
@@ -79,13 +77,10 @@ namespace genAPI {
     Tag TagInit(int Nanchors);
 
     // cost function single miniblock
-    _Float64 J(double* p, double* grad_out, double* A, double D, int* Pair);
+    _Float64 J(double* p, double* grad_out, double* A, double D);
 
     // Total cost function - position only
     _Float64 Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
-
-    // Total cost function - bearing
-    _Float64 Jtot_arma_bear(const arma::vec& p_arma, arma::vec* grad_out, void* tag);
 
     // Optim lib minimization
     int OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* tag);

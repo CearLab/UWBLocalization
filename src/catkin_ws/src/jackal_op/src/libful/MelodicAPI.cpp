@@ -33,12 +33,12 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vect
     for (i=0; i<_Ntags; i++){
         _TagSet.Tags.push_back(TagZero);
     }
-    _TagSet.CurrPair.push_back(tagID);
 
     // push back transformations
     geometry_msgs::TransformStamped TransZero;
     // use it for pushbacks
-    for (i=0; i<_Ntags; i++){
+    // for each tag I want the child-odom and I also want the odom-world transform
+    for (i=0; i<_Ntags+1; i++){
         _transformStamped.transforms.push_back(TransZero);
     }
 
@@ -47,8 +47,7 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vect
     for (i=0; i<_Ntags; i++){
         _TagSet.Tags[i].Nanchors = _Nanchors;
     }
-    _TagSet.TagDists = TagDists;
-    _TagSet.Npairs = _Npairs;
+    _TagSet.Npairs = 0; // there is no need to put theta in the optimization rn
     _TagSet.Nanchors = _Nanchors;
     
     // counter
@@ -124,10 +123,11 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vect
         0.0, 0.0, 0.0
     };
 
-    // init J, GJ, HJ
+    // init J, GJ, HJ, N
     _G.J = 0;
     for (i=0; i<3; i++) {
         _G.GJ.push_back(0.0);
+        _G.N.push_back(0.0);
     }
     for (i=0; i<9; i++) {
         _G.HJ.push_back(0.0);
@@ -204,6 +204,12 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
 
     std::vector<_Float64> p0(_p.size(), 0.0);
     int i, j;
+
+    // if orientation is computed ok, otherwise unused
+    arma::vec V1arma = arma::zeros(3,1);
+    arma::vec V2arma = arma::zeros(3,1);
+    arma::vec Narma = arma::zeros(3,1);
+    std::vector<_Float64> N(3, 0.0);
 
     //init with current estimate
     p0 = _p;
@@ -307,6 +313,45 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         _Godom.pose.pose.position.x = _Godom.pose.pose.position.x/_Ntags;
         _Godom.pose.pose.position.y = _Godom.pose.pose.position.y/_Ntags;
         _Godom.pose.pose.position.z = _Godom.pose.pose.position.z/_Ntags;   
+
+        // now we get the orientation
+        if (_Ntags == 3){
+
+
+            // get rotation matrix for each point
+            tf2::Quaternion rotation;
+            tf2::Vector3 translation;
+            
+            translation.setX(_transformStamped.transforms[_Ntags+1].transform.translation.x);
+            translation.setY(_transformStamped.transforms[_Ntags+1].transform.translation.y);
+            translation.setZ(_transformStamped.transforms[_Ntags+1].transform.translation.z);
+
+            rotation.setW(_transformStamped.transforms[_Ntags+1].transform.rotation.w);
+            rotation.setX(_transformStamped.transforms[_Ntags+1].transform.rotation.x);
+            rotation.setY(_transformStamped.transforms[_Ntags+1].transform.rotation.y);
+            rotation.setZ(_transformStamped.transforms[_Ntags+1].transform.rotation.z);
+
+            // define 2 vectors on the plane
+            for (i=0;i<3;i++){
+                V1arma[i] = _G.p[i] - _G.p[3*1+i];
+                V2arma[i] = _G.p[i] - _G.p[3*2+i];
+                //ROS_WARN("Vecs %d: %g %g %g", i, _G.p[3*i], _G.p[3*i+1], _G.p[3*i+2]);
+            }
+            //ROS_WARN("V1: %g %g %g", V1arma[0], V1arma[1], V1arma[2]);
+            //ROS_WARN("V2: %g %g %g", V2arma[0], V2arma[1], V2arma[2]);
+            // compute cross product - N orthogonal to plane
+            Narma = arma::cross(V1arma,V2arma);
+            Narma = arma::normalise(Narma);
+            //ROS_WARN("N: %g %g %g", Narma[0], Narma[1], Narma[2]);
+        }
+
+        // assign orientation
+        _Godom.pose.pose.orientation.x = Narma[0];
+        _Godom.pose.pose.orientation.y = Narma[1];
+        _Godom.pose.pose.orientation.z = Narma[2];
+        _G.N[0] = Narma[0];
+        _G.N[1] = Narma[1];
+        _G.N[2] = Narma[2];
         
         // publish
         _jack_trilateration_P.publish(_G);
@@ -447,6 +492,11 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     _xnew[genAPI::pos_a[1]] = xnow[genAPI::pos_a[1]];
     _xnew[genAPI::pos_a[2]] = xnow[genAPI::pos_a[2]];
 
+    // orientation
+    _G.N[0] = msg.pose.pose.orientation.x;
+    _G.N[1] = msg.pose.pose.orientation.y;
+    _G.N[2] = msg.pose.pose.orientation.z;
+
 }
 
 // subscriber callback - implements th jump map of the hybrid observer
@@ -475,6 +525,12 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     _Godom.pose.pose.position.x = _xnew[genAPI::pos_p[0]];
     _Godom.pose.pose.position.y = _xnew[genAPI::pos_p[1]];
     _Godom.pose.pose.position.z = _xnew[genAPI::pos_p[2]];
+
+    // orientation
+    //ROS_WARN("N vec: %g %g %g", _Godom.pose.pose.orientation.x, _Godom.pose.pose.orientation.y, _Godom.pose.pose.orientation.z);
+    _Godom.pose.pose.orientation.x = _G.N[0];
+    _Godom.pose.pose.orientation.y = _G.N[1];
+    _Godom.pose.pose.orientation.z = _G.N[2];
 
     // velocity
     _Godom.twist.twist.linear.x = _xnew[genAPI::pos_v[0]];

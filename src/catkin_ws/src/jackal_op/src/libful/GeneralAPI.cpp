@@ -33,14 +33,15 @@ bool ceresAPI::FunctionSmall::Setup(genAPI::TagSet* tag, int i, int j, int k)
 
     // residual: ith cost function
     // _nresiduals: Ntags*Nanchors + Npairs (Tag position + geometrical constraint for bearing)
-    _nresiduals = _tag->Nanchors*_tag->Ntags + _tag->Npairs;
+    _nresiduals = _tag->Nanchors*_tag->Ntags;
 
     // block: jth part of the optimization variables (Ntags in this case)
     // _nblocks: 1 -> I will use all the Ntags*3 pos variables 
     _nblocks = 1;
 
     // blocksize: 3 -> dimension of each position vector * number of tags + Npairs*Nangles (1 bearing)
-    _blocksize = 3*_tag->Ntags + _tag->Npairs;
+    // currently we are not optimizing on the angle, let's see where we go
+    _blocksize = 3*_tag->Ntags;
 
     // init
     std::vector<int32_t> *block_sizes = mutable_parameter_block_sizes();
@@ -70,14 +71,10 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
     tagP = (genAPI::TagSet *)tag;
 
     // init p0 (pos vector)
-    double p0[tagP->Ntags*3+tagP->Npairs];
+    double p0[tagP->Ntags*3];
     // add positions
     for (k=0;k<3*tagP->Ntags;k++){
         p0[k] = p_arma(k);
-    }
-    // add bearings
-    for (k=0;k<tagP->Npairs;k++){
-        p0[3*tagP->Ntags + k] = 0.0;
     }
 
     // cycle over residuals - position terms
@@ -85,21 +82,6 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
         for (j=0; j<tagP->Nanchors;j++){  
             // add residuals
             problem.AddResidualBlock(new ceresAPI::FunctionSmall(tagP, i, j, i), nullptr, &p0[0]);      
-        }
-    }
-
-    // define pairs - increasing order until Npairs (Newton)
-    if (tagP->Npairs != 0){
-        int Pairs[tagP->Npairs][2];
-        for(i=0;i<tagP->Npairs;i++){
-            Pairs[i][0] = 0;
-            Pairs[i][1] = 1;
-        }
-
-        // cycle over residuals - bearing terms
-        for (i=0;i<tagP->Npairs;i++){
-            // add residuals
-            problem.AddResidualBlock(new ceresAPI::FunctionSmall(tagP, Pairs[i][0], 0, Pairs[i][1]), nullptr, &p0[0]);
         }
     }
 
@@ -126,7 +108,7 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
     Result result;
     
     // init result
-    for (i=0;i<3*tagP->Ntags+tagP->Npairs;i++){
+    for (i=0;i<3*tagP->Ntags;i++){
         result.p.push_back(0.0);
     }
     
@@ -135,7 +117,7 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
     ROS_INFO("SOLVED: %g %g", result.summary.initial_cost, result.summary.final_cost);
 
     // store results
-    for (i=0;i<3*tagP->Ntags+tagP->Npairs;i++){
+    for (i=0;i<3*tagP->Ntags;i++){
         result.p[i] = p0[i];
     }
 
@@ -161,19 +143,6 @@ bool ceresAPI::FunctionSmall::Evaluate(double const* const* parameters, double* 
     p[1] = parameters[0][3*_i + 1];
     p[2] = parameters[0][3*_i + 2];    
 
-    // current bearing
-    if (_tag->Npairs != 0){
-        
-        // add another position (2 tags) + 1 theta
-        for (i=0;i<3;i++){
-            p.push_back(0.0);
-            grad_out.push_back(0.0);
-        }
-
-        // set initial theta value
-        p[4] = parameters[0][3*_tag->Ntags + _i];
-    }
-
     // init residual
     for (i=0;i<_nresiduals;i++){
         residuals[i] = 0.0;
@@ -193,30 +162,12 @@ bool ceresAPI::FunctionSmall::Evaluate(double const* const* parameters, double* 
     // compute Jt[i]
     // Compute the block number (depends if bearing is used)
     idR = _tag->Nanchors*_i + _j;
-    int* Pair = nullptr;
-    int PairNumber = 0;
-    double D = _D;
-    if (_tag->Npairs != 0){
-        if (_i != _k){
-            PairNumber = _i + _k;
-            Pair = new int[2];
-            Pair[0] = _i;
-            Pair[1] = _k;
-            idR = (_tag->Nanchors*3 - 1) + PairNumber;
-            D = _tag->TagDists[PairNumber];
-        }
-    }
     
-    residuals[idR] = genAPI::J(&p[0], &grad_out[0], &A[0], D, &Pair[0]);
+    residuals[idR] = genAPI::J(&p[0], &grad_out[0], &A[0], _D);
     // ROS_WARN("RES %d: %g", idR, residuals[idR]);
 
     // gradient positions
     idJ = (_tag->Nanchors*_i)*_blocksize + _j*_blocksize + 3*_i;
-    if (_tag->Npairs != 0){
-        if (_i != _k){
-            idJ = (_tag->Nanchors*_tag->Ntags)*_blocksize;
-        }
-    }
     if (jacobians != nullptr && jacobians[0] != nullptr) {
 
         // init jacobians - only at the beginning 
@@ -231,26 +182,6 @@ bool ceresAPI::FunctionSmall::Evaluate(double const* const* parameters, double* 
         jacobians[0][idJ + 0] = grad_out[0];
         jacobians[0][idJ + 1] = grad_out[1];
         jacobians[0][idJ + 2] = grad_out[2];
-        if (_tag->Npairs != 0){
-            if (_i != _k){
-                // first Tag (Ptilde1)
-                jacobians[0][idJ + 3*_i + 0] = grad_out[0];
-                jacobians[0][idJ + 3*_i + 1] = grad_out[1];
-                jacobians[0][idJ + 3*_i + 2] = grad_out[2];
-
-                // second Tag (Ptilde2)
-                jacobians[0][idJ + 3*_k + 0] = grad_out[3];
-                jacobians[0][idJ + 3*_k + 1] = grad_out[4];
-                jacobians[0][idJ + 3*_k + 2] = grad_out[5];
-
-                // theta
-                jacobians[0][idJ + 3*_tag->Ntags + PairNumber] = grad_out[6];
-            }
-        }
-    }
-
-    if (_i != _k){
-        delete[] Pair;
     }
     
 
@@ -351,7 +282,7 @@ _Float64 genAPI::Jtot_arma(const arma::vec& p_arma, arma::vec* grad_out, void* t
 }
 
 // single J for ceres single block
-_Float64 genAPI::J(double* p, double* grad_out, double* A, double D, int* Pair){
+_Float64 genAPI::J(double* p, double* grad_out, double* A, double D){
 
     // init J
     double J = 0;
@@ -359,136 +290,25 @@ _Float64 genAPI::J(double* p, double* grad_out, double* A, double D, int* Pair){
     // iterator
     int j;
 
-    // if Pair = nullptr --> position fcn
-    if (Pair == nullptr){
-        // compute norm
-        double norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
+    // compute norm
+    double norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
 
-        // compute J
-        //J = norm - D;
-        J = pow(norm,2) - pow(D,2);   
+    // compute J
+    //J = norm - D;
+    J = pow(norm,2) - pow(D,2);   
 
-        // compute gradient
-        for (j=0;j<3;j++){
-            // grad_out[j] = (p[j] - A[j]) / (norm);
-            grad_out[j] = 2*(p[j] - A[j]);
-
-            // check nan
-            if (std::isnan(grad_out[j])){
-                grad_out[j] = 0.0;
-            }
-        }
-    }
-    else{
-
-        // define tag positions
-        double Ptilde1[3];
-        double Ptilde2[3];
-
-        // transform Ptilde1: xyz
-        Ptilde1[0] = p[0] + 0.5*D*std::sin(p[6]);
-        Ptilde1[1] = p[1] - 0.5*D*std::cos(p[6]);
-        Ptilde1[2] = p[2];
-
-        // transform Ptilde2: xyz
-        Ptilde2[0] = p[3] - 0.5*D*std::sin(p[6]);
-        Ptilde2[1] = p[4] + 0.5*D*std::cos(p[6]);
-        Ptilde2[2] = p[5];
-
-        // cost function
-        double norm = sqrt( pow((Ptilde1[0]-Ptilde2[0]),2) + pow((Ptilde1[1]-Ptilde2[1]),2) + pow((Ptilde1[2]-Ptilde2[2]),2));
-        J = norm;
-
-        // compute gradient - Ptilde12
-        for (j=0;j<3;j++){
-            // gradient
-            grad_out[j] = (Ptilde1[j] - Ptilde2[j])/norm;
-            grad_out[3+j] = -grad_out[j];
-        }
-
-        // compute gradient - Theta
-        grad_out[6] = ((Ptilde1[0]-Ptilde2[0])*D*std::cos(p[6]) + (Ptilde1[1]-Ptilde2[1])*D*std::sin(p[6]))/norm;
+    // compute gradient
+    for (j=0;j<3;j++){
+        // grad_out[j] = (p[j] - A[j]) / (norm);
+        grad_out[j] = 2*(p[j] - A[j]);
 
         // check nan
-        for (j=0;j<7;j++){
-            if (std::isnan(grad_out[j])){
-                grad_out[j] = 0.0;
-            }
+        if (std::isnan(grad_out[j])){
+            grad_out[j] = 0.0;
         }
-        
-
-
     }
-
     return J;
     
-}
-
-// total cost function - armadillo - bearing (struct Tags)
-_Float64 genAPI::Jtot_arma_bear(const arma::vec& p_arma, arma::vec* grad_out, void* tag){
-
-    // NB: assuming 2 tags only here
-
-    // define index and iterators
-    int i;
-    int j;
-    int k;
-
-    // cast pointer
-    genAPI::TagSet *tagP;
-    tagP = (genAPI::TagSet *)tag;
-
-    // define cost function arrays
-    std::vector<_Float64> Jp(tagP->Npairs,0.0);
-    std::vector<_Float64> Jt(tagP->Ntags,0.0);
-    _Float64 Jtot = 0.0;
-
-    // position array
-    arma::vec p0 = arma::zeros(3,1);
-    arma::vec ptilde1 = arma::zeros(3,1);   // 2 support arrays for a pair of tags 
-    arma::vec ptilde2 = arma::zeros(3,1);
-
-    // bearing var (single var now)
-    _Float32x theta = 0.0;
-    _Float64 Dtag = 0.0;
-
-    _Float64 JpS = 0.0;
-    _Float64 JpT = 0.0;
-
-    // cost function - tags
-    for (i=0;i<tagP->Ntags;i++){
-
-        // copy initial condition - tag ith
-        for (j=0;j<3;j++){
-            p0[j] = p_arma[3*i + j];
-        }
-
-        // compute Jt[i]
-        Jt[i] = genAPI::Jtot_arma(p0, grad_out, (void*)&tagP->Tags[i]);
-
-    }
-
-    // accumulate
-    for (i=0;i<tagP->Ntags;i++){
-        JpT += Jt[i];
-    }
-
-    for (j=0;j<tagP->Npairs;j++){
-        JpS += Jp[j];
-    }
-
-    Jtot = JpT;
-
-    for (j=0;i<tagP->Ntags;j++){
-        tagP->Tags[j].J = Jtot;
-    }
-
-     if (grad_out){
-        // assign the gradient here
-     }
-
-    return Jtot;
-
 }
 
 // Optim lib minimization - genberal for position and bearing
@@ -520,7 +340,7 @@ int genAPI::OptimMin(std::vector<_Float64> p0, std::vector<_Float64> D, TagSet* 
     optimset.iter_max = 5000;
 
     // call optimlib - simplex like in this case
-    success = optim::nm(p0_arma,genAPI::Jtot_arma_bear,(void *)tag, optimset);
+    success = optim::nm(p0_arma,genAPI::Jtot_arma,(void *)tag, optimset);
 
     // copy p0_arma in _p (different types)
     for (i=0;i<tag->Ntags;i++){
