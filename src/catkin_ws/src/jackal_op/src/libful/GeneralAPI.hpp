@@ -48,10 +48,14 @@ namespace genAPI {
 
     // env params
     const std::vector<_Float64> Anchors = {
-        0, -4, 3.5,
-        0, +4, 3.5,
-        4, +4, 3.5,
-        4, -4, 3.5};
+        //0, -4, 3.5,
+        //0, +4, 3.5,
+        //4, +4, 3.5,
+        //4, -4, 3.5
+        0, 0, 2,
+        3, 0, 2,
+        3.8, 2.4, 2,
+        0, 3, 2};
 
     struct Tag {
         int Nanchors;
