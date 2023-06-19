@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     if (std::all_of(std::begin(flags), std::end(flags),[](bool b){return b;})) {
 
         // params found
-        ROS_INFO("Params found");
+        ROS_WARN("Params found");
 
         // get topics and init data
         tmp = "/" + ID + "/jack_hybobs_subIMU";
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 
         // instance of a class - tagID 7 
         jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagDists, rate);
-        ROS_INFO("jackAPI - Class instance created");
+        ROS_WARN("jackAPI - Class instance created");
 
         // subscribe
         jackNode._jack_disthandle_SIMU = np.subscribe(subNameIMU, 1000, &jackAPI::ChatterCallbackHybCont, &jackNode);

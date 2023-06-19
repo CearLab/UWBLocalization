@@ -6,6 +6,6 @@ jack_disttrue_pubDist: "/gtec/toa/ranging"
 jack_disttrue_pubAnchors: "/gtec/toa/anchors"
 DistjackAPIName: "MeshTrueAPI"
 NanchorMesh: 4
-Ntags: 3
+Ntags: 1
 TagDists: [0.0]
 UWBrate: 5
