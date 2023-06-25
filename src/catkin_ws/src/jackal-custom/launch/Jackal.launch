@@ -24,6 +24,10 @@
     <arg name="enable_ekf" value="true" />
   </include>
 
+  <!-- Start navigation -->
+  <include file="$(find jackal-custom)/launch/control/Navigation.launch">
+  </include>
+
 
   <!-- ###### REAL MEASUREMENTS ######-->
   <!-- UWB Distance measurement node  T0 -->
