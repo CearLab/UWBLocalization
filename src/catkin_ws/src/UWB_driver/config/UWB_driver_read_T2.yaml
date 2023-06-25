@@ -1,0 +1,7 @@
+#Configuation for robot odometry EKF
+UWB_read_SerialPort: "/dev/ttyACM3"
+UWB_read_BaudRate: "115200"
+UWB_read_pubA: "/gtec/toa/anchors"
+UWB_read_pubD: "/gtec/toa/ranging"
+UWB_read_Nanchors: "4"
+
