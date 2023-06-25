@@ -26,13 +26,13 @@ int main(int argc, char **argv)
     int cnt = 0;
     int rate = 5;
     int i;
+    bool isFramePresent;
 
     /**
      * define topic to subscribe to. Get the topics name from params server. Then create handle for subscribing.
      */
     std::string subNameT, subNameA, pubNameT, pubNameTril, pubNameTrilodom, jackName;  
     std::string child, base;
-    std::vector<_Float64> TagDists;
     int Nanchors, Ntags, tagID;  
 
     // get tagID - default 7
@@ -62,8 +62,6 @@ int main(int argc, char **argv)
     tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubGrad";
     flags.push_back(np.hasParam(tmp));
     tmp = "/DT" + std::to_string(tagID) + "/Ntags";
-    flags.push_back(np.hasParam(tmp));
-    tmp = "/DT" + std::to_string(tagID) + "/TagDists";
     flags.push_back(np.hasParam(tmp));
     
     // init rate for the node
@@ -95,9 +93,7 @@ int main(int argc, char **argv)
         tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubGrad";
         np.getParam(tmp, pubNameTril);
         tmp = "/DT" + std::to_string(tagID) + "/Ntags";
-        np.getParam(tmp, Ntags);  
-        tmp = "/DT" + std::to_string(tagID) + "/TagDists";
-        np.getParam(tmp, TagDists);
+        np.getParam(tmp, Ntags);
 
         // concatenate string - odom
         pubNameTrilodom = pubNameTril + "Odom";
@@ -107,7 +103,7 @@ int main(int argc, char **argv)
         tf2_ros::TransformListener tfListener(tfBuffer);
 
         // instance of a class
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagDists, rate);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, rate);
         ROS_INFO("jackAPI - Class instance created");
 
         // subscribe
@@ -139,19 +135,27 @@ int main(int argc, char **argv)
                     for (i=0;i<jackNode._Ntags;i++){
 
                         jackNode.GetFrames(child, base, i);
-                        jackNode._transformStamped.transforms[i] = tfBuffer.lookupTransform(child,base,ros::Time(0));
+                        isFramePresent = (tfBuffer._frameExists(child) && tfBuffer._frameExists(base));
+                        if (isFramePresent){
+                            jackNode._transformStamped.transforms[i] = tfBuffer.lookupTransform(child,base,ros::Time(0));
+                        }
 
-                        // wanna see the transformation?
-                        // ROS_INFO("Trasl: %g %g %g", jackNode._transformStamped.transforms[i].transform.translation.x,
-                        // jackNode._transformStamped.transforms[i].transform.translation.y,
-                        // jackNode._transformStamped.transforms[i].transform.translation.z);
                     }
                     // from odom to world
-                    //jackNode._transformStamped.transforms[jackNode._Ntags + 1] = tfBuffer.lookupTransform(base,"world",ros::Time(0));
+                    isFramePresent = (tfBuffer._frameExists("odom") && tfBuffer._frameExists("world"));
+                    if (isFramePresent){
+                        jackNode._transformStamped.transforms[jackNode._Ntags] = tfBuffer.lookupTransform("odom","world",ros::Time(0));
+                    }
+
+                    // wanna see the transformation?
+                    // ROS_WARN("Trasl: %g %g %g", 
+                    // jackNode._transformStamped.transforms[jackNode._Ntags].transform.translation.x,
+                    // jackNode._transformStamped.transforms[jackNode._Ntags].transform.translation.y,
+                    // jackNode._transformStamped.transforms[jackNode._Ntags].transform.translation.z);
                     
                 }
                 catch (tf2::TransformException &ex) {
-                    ROS_WARN("ARARMAX: %s",ex.what());
+                    ROS_WARN("ARARMAX DISTHANDLE: %s",ex.what());
                 }
             }
 

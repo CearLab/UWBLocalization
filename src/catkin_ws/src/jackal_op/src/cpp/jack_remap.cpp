@@ -19,7 +19,6 @@ int main(int argc, char** argv) {
   int tagID = 5;
   int Ntags = 0;
   int rate = 5;
-  std::vector<_Float64> TagDists = {0.0};
   std::string goalFrame = "odom";
   std::string currentTopic = "/odometry/filtered";
   nav_msgs::Odometry goalOdom;
@@ -44,7 +43,7 @@ int main(int argc, char** argv) {
   ros::Rate loop_rate(rate);
 
   // create class instance
-  jackAPI jackNode = jackAPI("jackRemap", Nanchors, tagID, Ntags, TagDists, rate);
+  jackAPI jackNode = jackAPI("jackRemap", Nanchors, tagID, Ntags, rate);
 
   // subscriber
   jackNode._jack_disthandle_SA = np.subscribe(currentTopic, 1000, &jackAPI::ChatterCallbackRemap, &jackNode);

@@ -48,7 +48,6 @@ int main(int argc, char **argv)
      * Then create handle for subscribing.
      */
     std::string subNameIMU, subNameOdom, pubNameOdom, pubNameIMU, pubNameBias, jackName;
-    std::vector<_Float64> TagDists;
     int Nanchors, Ntags; 
 
     // check params
@@ -69,8 +68,6 @@ int main(int argc, char **argv)
     tmp = "/" + ID + "/NanchorMesh";
     flags.push_back(np.hasParam(tmp));
     tmp = "/DT" + std::to_string(tagID) + "/Ntags";
-    flags.push_back(np.hasParam(tmp));
-    tmp = "/DT" + std::to_string(tagID) + "/TagDists";
     flags.push_back(np.hasParam(tmp));
 
     // init rate for the node
@@ -103,11 +100,9 @@ int main(int argc, char **argv)
         np.getParam(tmp, Nanchors); 
         tmp = "/DT" + std::to_string(tagID) + "/Ntags";
         np.getParam(tmp, Ntags);  
-        tmp = "/DT" + std::to_string(tagID) + "/TagDists";
-        np.getParam(tmp, TagDists);
 
         // instance of a class - tagID 7 
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagDists, rate);
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, rate);
         ROS_WARN("jackAPI - Class instance created");
 
         // subscribe

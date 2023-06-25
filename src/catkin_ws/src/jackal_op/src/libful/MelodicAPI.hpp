@@ -89,7 +89,7 @@ public:
     ros::Publisher  _jack_Bias_P;       // publisher on IMU topic
 
     /** **** CONSTRUCTOR **** */
-    jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vector<_Float64> TagDists, int rate);
+    jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate);
 
     /** **** METHODS **** */
     // subscriber callback
