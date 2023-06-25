@@ -1,4 +1,4 @@
 <launch>
   <param name="use_gui" value="true"/>
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find jackal-custom)/config/navigation/default.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find jackal-custom)/config/navigation/3D.rviz" />
 </launch>

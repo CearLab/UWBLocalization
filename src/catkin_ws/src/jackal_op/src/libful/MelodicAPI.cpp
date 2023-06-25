@@ -2,7 +2,7 @@
 #include "MelodicAPI.hpp"
 
 /** **** CONSTRUCTOR **** */
-jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vector<_Float64> TagDists, int rate) 
+jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate) 
 : _gen(std::random_device{}()), _distribution(0.0,0.0){
 
     // counters
@@ -82,9 +82,9 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vect
     // set covariance
     _Godom.pose.covariance = 
     {
-        0.2, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.2, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.2, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0 
@@ -123,14 +123,18 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, std::vect
         0.0, 0.0, 0.0
     };
 
-    // init J, GJ, HJ, N
+    // init J, GJ, HJ
     _G.J = 0;
     for (i=0; i<3; i++) {
         _G.GJ.push_back(0.0);
-        _G.N.push_back(0.0);
     }
     for (i=0; i<9; i++) {
         _G.HJ.push_back(0.0);
+    }
+
+    // quaternion
+    for (i=0; i<3; i++) {
+        _G.N.push_back(0.0);
     }
     
     // init p
@@ -182,19 +186,19 @@ void jackAPI::GetFrames(std::string& child, std::string& base, int tagID){
     // create transform
     if (tagID == 0){
         child = "rear_tag";
-        base = "base_link";      
+        base = "odom";      
     }
     else if (tagID == 1){
         child = "right_tag";
-        base = "base_link";  
+        base = "odom";  
     }
     else if (tagID == 2){
         child  = "left_tag";
-        base = "base_link";  
+        base = "odom";  
     }
     else {
         child  =  "imu_link";
-        base = "base_link";  
+        base = "odom";  
     }
 
 }
@@ -204,12 +208,6 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
 
     std::vector<_Float64> p0(_p.size(), 0.0);
     int i, j;
-
-    // if orientation is computed ok, otherwise unused
-    arma::vec V1arma = arma::zeros(3,1);
-    arma::vec V2arma = arma::zeros(3,1);
-    arma::vec Narma = arma::zeros(3,1);
-    std::vector<_Float64> N(3, 0.0);
 
     //init with current estimate
     p0 = _p;
@@ -227,7 +225,7 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
 
         }
         else {
-            ROS_ERROR("WRONG ID - ChatterCallback");
+            ROS_ERROR("WRONG ID - ChatterCallback: tag %d Ntag %d", msg.tagId, _Ntags);
         }
     }
     catch(...){
@@ -276,6 +274,72 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
             p0[3*i + 2] = _TagSet.Tags[i].p[2];
         }
 
+        // if orientation is computed ok, otherwise unused
+        arma::mat W = arma::zeros(3,_Ntags);
+        arma::mat O = arma::zeros(3,_Ntags);
+        arma::mat DELTA = arma::zeros(3,_Ntags);
+        arma::mat R = arma::zeros(3,3);
+        arma::vec Pwo = arma::zeros(3,1);
+        arma::vec delta = arma::zeros(3,1);
+
+        // test vectors
+        arma::mat TEST = arma::zeros(3,2);
+        arma::vec test = arma::zeros(3,1);
+
+        // now we get the orientation
+        if (_Ntags == 3){
+
+            // fill matrix W with the WORLD coordinates
+            // these coordinates have been obtained with 
+            // the optimization process
+            for (i=0;i<_Ntags;i++){
+                W.col(i) = {p0[3*i+0], p0[3*i+1], p0[3*i+2]};
+            }
+            
+            // fill matrix O with the Tags coordinates with
+            // respect to the ODOM reference frame. They are 
+            // gathered form the _transform array
+            for (i=0;i<_Ntags;i++){
+                O.col(i) = {-_transformStamped.transforms[i].transform.translation.x,
+                            -_transformStamped.transforms[i].transform.translation.y,
+                            -_transformStamped.transforms[i].transform.translation.z};
+            }
+        
+            // get the translation vector:
+            // fromn the outcome of the optimization we 
+            // can get an estimate of the ODOM frame.
+            // If the tags were perfectly symmetric wr2
+            // ODOM, we could just take the mean. If not, 
+            // check some workarounds, as in this case:
+            // mean over the 2 xy symmetric, and remove the common
+            // offset on z.
+            TEST.col(0) = W.col(1);
+            TEST.col(1) = W.col(2);
+            Pwo = arma::mean(TEST,1);
+            Pwo(2) = Pwo(2) - O.col(0)(2);
+            Pwo = -Pwo;
+                
+            // remove translation from WORLD coordinates:
+            // R*(W - T) = O --> R*DELTA = O
+            for (i=0;i<3;i++){
+                DELTA.col(i) = W.col(i) + Pwo;
+            }
+            
+            // compute Rotation matrix: 
+            // Solve analytically R*DELTA = O
+            // This is indeed Rwo
+            R = genAPI::procustes(DELTA,O);
+
+        }
+        else
+        {
+            // solution with 1 tag only - no orientation
+            Pwo = {p0[0], 
+                   p0[1], 
+                   p0[2]};
+            Pwo = -Pwo;
+        }
+
         // fill messages
         // gradient normal stuff
         _G.A = _A;
@@ -285,73 +349,31 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         _G.header.stamp = _begin.now();
 
         // gradient odom
-        _Godom.header.stamp = _G.header.stamp;
+        _Godom.header.stamp = _G.header.stamp; 
 
-        // transform
-        for (i=0;i<_Ntags;i++){
+        // RESET ESTIMATE (we want odom-world)
+        // This uses Pow = -Pwo as a current estimate of 
+        // ODOM reference frame
+        _Godom.pose.pose.position.x = -Pwo(0);
+        _Godom.pose.pose.position.y = -Pwo(1);
+        _Godom.pose.pose.position.z = -Pwo(2);   
 
-            _G.pg[3*i] = _G.p[3*i] + _transformStamped.transforms[i].transform.translation.x;
-            _G.pg[3*i + 1] = _G.p[3*i + 1] + _transformStamped.transforms[i].transform.translation.y;
-            _G.pg[3*i + 2] = _G.p[3*i + 2] + _transformStamped.transforms[i].transform.translation.z;
-
-        }
-
-        // RESET ESTIMATE
-        _Godom.pose.pose.position.x = 0.0;
-        _Godom.pose.pose.position.y = 0.0;
-        _Godom.pose.pose.position.z = 0.0;   
-
-        // mean over Ntags estimates
-        for (i=0;i<_Ntags;i++){
-
-            _Godom.pose.pose.position.x += _G.pg[3*i];
-            _Godom.pose.pose.position.y += _G.pg[3*i + 1];
-            _Godom.pose.pose.position.z += _G.pg[3*i + 2];
-        }
-
-        // mean
-        _Godom.pose.pose.position.x = _Godom.pose.pose.position.x/_Ntags;
-        _Godom.pose.pose.position.y = _Godom.pose.pose.position.y/_Ntags;
-        _Godom.pose.pose.position.z = _Godom.pose.pose.position.z/_Ntags;   
-
-        // now we get the orientation
-        if (_Ntags == 3){
-
-
-            // get rotation matrix for each point
-            tf2::Quaternion rotation;
-            tf2::Vector3 translation;
-            
-            translation.setX(_transformStamped.transforms[_Ntags+1].transform.translation.x);
-            translation.setY(_transformStamped.transforms[_Ntags+1].transform.translation.y);
-            translation.setZ(_transformStamped.transforms[_Ntags+1].transform.translation.z);
-
-            rotation.setW(_transformStamped.transforms[_Ntags+1].transform.rotation.w);
-            rotation.setX(_transformStamped.transforms[_Ntags+1].transform.rotation.x);
-            rotation.setY(_transformStamped.transforms[_Ntags+1].transform.rotation.y);
-            rotation.setZ(_transformStamped.transforms[_Ntags+1].transform.rotation.z);
-
-            // define 2 vectors on the plane
-            for (i=0;i<3;i++){
-                V1arma[i] = _G.p[i] - _G.p[3*1+i];
-                V2arma[i] = _G.p[i] - _G.p[3*2+i];
-                //ROS_WARN("Vecs %d: %g %g %g", i, _G.p[3*i], _G.p[3*i+1], _G.p[3*i+2]);
-            }
-            //ROS_WARN("V1: %g %g %g", V1arma[0], V1arma[1], V1arma[2]);
-            //ROS_WARN("V2: %g %g %g", V2arma[0], V2arma[1], V2arma[2]);
-            // compute cross product - N orthogonal to plane
-            Narma = arma::cross(V1arma,V2arma);
-            Narma = arma::normalise(Narma);
-            //ROS_WARN("N: %g %g %g", Narma[0], Narma[1], Narma[2]);
-        }
-
-        // assign orientation
-        _Godom.pose.pose.orientation.x = Narma[0];
-        _Godom.pose.pose.orientation.y = Narma[1];
-        _Godom.pose.pose.orientation.z = Narma[2];
-        _G.N[0] = Narma[0];
-        _G.N[1] = Narma[1];
-        _G.N[2] = Narma[2];
+        // assign orientation from Rwo
+        tf2::Quaternion quat;
+        tf2::Matrix3x3 Mat;
+        // first: I want Row = Rwo.t()
+        R = R.t();
+        // set to tf2 var
+        Mat.setValue(R(0,0), R(0,1), R(0,2),
+                     R(1,0), R(1,1), R(1,2),
+                     R(2,0), R(2,1), R(2,2));
+        // get quaternion
+        Mat.getRotation(quat);
+        // assign quaternion
+        _Godom.pose.pose.orientation.w = quat.getW();
+        _Godom.pose.pose.orientation.x = quat.getX();
+        _Godom.pose.pose.orientation.y = quat.getY();
+        _Godom.pose.pose.orientation.z = quat.getZ();
         
         // publish
         _jack_trilateration_P.publish(_G);
@@ -408,10 +430,35 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
     _DTrueMsg.errorEstimation = 0;
 
     // transform position
+    geometry_msgs::PoseStamped input, target;
+    geometry_msgs::TransformStamped transformStamped;
+    input.header = msg.header;
+    input.pose = msg.pose.pose;
+    transformStamped = _transformStamped.transforms[_tagID];
+    tf2::doTransform(input, target, transformStamped);
+
+    // orientation
+    tf2::Quaternion quaternion;
+    quaternion.setW(input.pose.orientation.w);  
+    quaternion.setX(input.pose.orientation.x);
+    quaternion.setY(input.pose.orientation.y);
+    quaternion.setZ(input.pose.orientation.z);
+    tf2::Matrix3x3 matrix(quaternion);
+    // init
+    tf2::Vector3 p0 = {input.pose.position.x, input.pose.position.y, input.pose.position.z};
+    tf2::Vector3 delta = {_transformStamped.transforms[_tagID].transform.translation.x,
+                          _transformStamped.transforms[_tagID].transform.translation.y,
+                          _transformStamped.transforms[_tagID].transform.translation.z};
+    tf2::Vector3 p1;
+
+    // rotation + translation of array
+    p1 = matrix*(delta) + p0;
+
+    // final
     _Float64 x,y,z;
-    x = msg.pose.pose.position.x + _transformStamped.transforms[0].transform.translation.x;
-    y = msg.pose.pose.position.y + _transformStamped.transforms[0].transform.translation.y;
-    z = msg.pose.pose.position.z + _transformStamped.transforms[0].transform.translation.z;
+    x = p1[0];
+    y = p1[1];
+    z = p1[2];
 
     // get true distances
     for (i=0;i<_Nanchors;i++){
@@ -424,8 +471,8 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
 
         // compute true distance      
         _DT[i] = sqrt( pow((x -_A[idA]),2) + 
-                          pow((y -_A[idA+1]),2) + 
-                          pow((z -_A[idA+2]),2)) + noise;
+                       pow((y -_A[idA+1]),2) + 
+                       pow((z -_A[idA+2]),2)) + noise;
 
         // set other data in the messages
         _DTrueMsg.anchorId = i;
@@ -493,9 +540,10 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     _xnew[genAPI::pos_a[2]] = xnow[genAPI::pos_a[2]];
 
     // orientation
-    _G.N[0] = msg.pose.pose.orientation.x;
-    _G.N[1] = msg.pose.pose.orientation.y;
-    _G.N[2] = msg.pose.pose.orientation.z;
+    _G.N[0] = msg.pose.pose.orientation.w;
+    _G.N[1] = msg.pose.pose.orientation.x;
+    _G.N[2] = msg.pose.pose.orientation.y;
+    _G.N[3] = msg.pose.pose.orientation.z;
 
 }
 
@@ -528,9 +576,10 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
 
     // orientation
     //ROS_WARN("N vec: %g %g %g", _Godom.pose.pose.orientation.x, _Godom.pose.pose.orientation.y, _Godom.pose.pose.orientation.z);
-    _Godom.pose.pose.orientation.x = _G.N[0];
-    _Godom.pose.pose.orientation.y = _G.N[1];
-    _Godom.pose.pose.orientation.z = _G.N[2];
+    _Godom.pose.pose.orientation.w = _G.N[0];
+    _Godom.pose.pose.orientation.x = _G.N[1];
+    _Godom.pose.pose.orientation.y = _G.N[2];
+    _Godom.pose.pose.orientation.z = _G.N[3];
 
     // velocity
     _Godom.twist.twist.linear.x = _xnew[genAPI::pos_v[0]];

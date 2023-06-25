@@ -87,7 +87,7 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
 
     // options
     Solver::Options options;
-    options.max_num_iterations = 100;
+    options.max_num_iterations = 1000;
     options.minimizer_progress_to_stdout = false;
 
     // minimizer - trust region
@@ -294,7 +294,7 @@ _Float64 genAPI::J(double* p, double* grad_out, double* A, double D){
     double norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
 
     // compute J
-    //J = norm - D;
+    // J = norm - D;
     J = pow(norm,2) - pow(D,2);   
 
     // compute gradient
@@ -436,4 +436,60 @@ std::vector<_Float64> genAPI::odeEuler(std::vector<_Float64> x, std::vector<_Flo
     std::transform(x.begin(), x.end(), xstep.begin(), xnew.begin(), std::plus<float>());
 
     return xnew;
+}
+
+// Gram-Schmidt
+arma::mat genAPI::gramschmidt(arma::mat U){
+
+    // define vars
+    arma::vec u = arma::zeros(3,1);
+    arma::vec v = arma::zeros(3,1);
+    arma::mat V = arma::zeros(3,3);
+    int i;
+
+    // start process - 3 dim for now
+    // see: https://math.hmc.edu/calculus/hmc-mathematics-calculus-online-tutorials/linear-algebra/gram-schmidt-method/
+    V.col(0) = U.col(0);
+    V.col(1) = U.col(1) - arma::dot(U.col(1),V.col(0))*V.col(0)/arma::norm(V.col(0));
+    V.col(2) = U.col(2) - arma::dot(U.col(2),V.col(0))*V.col(0)/arma::norm(V.col(0)) - arma::dot(U.col(2),V.col(1))*V.col(1)/arma::norm(V.col(1));
+
+    // normalization
+    for (i=0;i<3;i++){
+        V.col(i) = arma::normalise(V.col(i));
+    }
+
+    // test
+    // ROS_WARN("test: %g %g %g %g %g %g %g %g %g", U(0,0),U(1,0), U(2,0), U(0,1),U(1,1), U(2,1), U(0,2),U(1,2), U(2,2));
+    // ROS_WARN("test: %g %g %g %g %g %g %g %g %g", V(0,0),V(1,0), V(2,0), V(0,1),V(1,1), V(2,1), V(0,2),V(1,2), V(2,2));
+    // ROS_WARN("test dotprod: %g %g %g", arma::dot(V.col(0),V.col(1)), arma::dot(V.col(0),V.col(2)), arma::dot(V.col(1),V.col(2)));
+    // ROS_WARN("test norm: %g %g %g", arma::norm(V.col(0)), arma::norm(V.col(1)), arma::norm(V.col(2)));
+    
+    return V;
+}
+
+// Procustes
+arma::mat genAPI::procustes(arma::mat Cw, arma::mat Co){
+
+    // each column of W is a vector in the world frame
+    // each column of U is a vector in the odom frame
+    // we want to solve Oi = R*Wi forall i, with R orthogonal
+    // check (21/06) solution at: https://simonensemble.github.io/posts/2018-10-27-orthogonal
+    // -procrustes/#:~:text=The%20orthogonal%20Procrustes%20problem%20is,molecular%20modeling%2C%20and%20speech%20translation.
+
+    // variables
+    arma::mat R = arma::zeros(3,3);
+
+    // SVD variables
+    arma::mat U = arma::zeros(3,3);
+    arma::mat V = arma::zeros(3,3);
+    arma::vec omega = arma::zeros(3,1);
+
+    // compute singular value decomposition
+    arma::svd(U,omega,V,Cw*Co.t());
+
+    // compute result
+    R = V*U.t();
+
+    return R;
+
 }

@@ -49,21 +49,19 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}_wheel" type="fixed">
+    <joint name="${prefix}_wheel" type="continuous">
       <parent link="chassis_link"/>
       <child link="${prefix}_wheel_link" />
       <xacro:insert_block name="joint_pose" />
+      <axis xyz="0 1 0" />
     </joint>
   </xacro:macro>
 
-  <!---->
   <link name="world"></link>
-  <joint name="world_joint" type="continuous">
+  <joint name="world_joint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="world"/>
-    <child link="odom" />
-    <update_rate value="50" />
-    <axis xyz="0 1 0" />
+    <child link="world" />
   </joint>
 
   <link name="odom"></link>
@@ -133,12 +131,6 @@
     </link>
   </xacro:unless>
 
-  <joint name="front_fender_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <parent link="chassis_link" />
-    <child link="front_fender_link" />
-  </joint>
-
   <xacro:if value="$(optenv JACKAL_FRONT_ACCESSORY_FENDER 0)">
     <link name="front_fender_link">
       <visual>
@@ -157,6 +149,12 @@
     </joint>
   </xacro:if>
 
+  <joint name="front_fender_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="chassis_link" />
+    <child link="front_fender_link" />
+  </joint>
+
   <xacro:unless value="$(optenv JACKAL_REAR_ACCESSORY_FENDER 0)">
     <link name="rear_fender_link">
       <visual>
@@ -167,12 +165,6 @@
       </visual>
     </link>
   </xacro:unless>
-
-  <joint name="rear_fender_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 ${PI}"/>
-    <parent link="chassis_link" />
-    <child link="rear_fender_link" />
-  </joint>
 
   <xacro:if value="$(optenv JACKAL_REAR_ACCESSORY_FENDER 0)">
     <link name="rear_fender_link">
@@ -191,6 +183,12 @@
       <child link="rear_fender_accessory_link" />
     </joint>
   </xacro:if>
+
+  <joint name="rear_fender_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 ${PI}"/>
+    <parent link="chassis_link" />
+    <child link="rear_fender_link" />
+  </joint>
 
 
   <!-- IMU LINK -->

@@ -43,15 +43,20 @@ namespace genAPI {
     const std::vector<int> pos_v = {1, 5, 9};
     const std::vector<int> pos_b = {2, 6, 10};
     const std::vector<int> pos_a = {3, 7, 11};
-    const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
-    //const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
+    // const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
+    const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
 
     // env params
     const std::vector<_Float64> Anchors = {
         0, -4, 3.5,
         0, +4, 3.5,
         4, +4, 3.5,
-        4, -4, 3.5};
+        4, -4, 3.5
+        // 0, 0, 2,
+        // 3, 0, 2,
+        // 3.8, 2.4, 2,
+        // 0, 3, 2,
+        };
 
     struct Tag {
         int Nanchors;
@@ -93,6 +98,12 @@ namespace genAPI {
 
     // Euler integration - hybrid system
     std::vector<_Float64> odeEuler(std::vector<_Float64> x, std::vector<_Float64> u, _Float64 dt);
+
+    // Gram-Schmidt
+    arma::mat gramschmidt(arma::mat U);
+
+    // Procustes
+    arma::mat procustes(arma::mat W, arma::mat O);
 
 }
 

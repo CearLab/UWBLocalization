@@ -62,7 +62,7 @@
         <kinematic>0</kinematic>
       </link>
     </model>
-    <gravity>0 0 -9.8</gravity>
+    <gravity>0 0 -9.81</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
     <physics name='default_physics' default='0' type='ode'>
@@ -86,9 +86,10 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
+    
     <model name='uwb_anchor0'>
       <static>1</static>
-      <pose frame=''>-1.97158 -1.00088 0.5 0 -0 0</pose>
+      <pose frame=''>0 0 0 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -104,8 +105,8 @@
         <visual name='visual'>
           <geometry>
             <cylinder>
-              <radius>0.500002</radius>
-              <length>1</length>
+              <radius>0.1</radius>
+              <length>0.5</length>
             </cylinder>
           </geometry>
           <material>
@@ -123,7 +124,7 @@
     </model>
     <model name='uwb_anchor1'>
       <static>1</static>
-      <pose frame=''>1.9687 -2.96555 0.145111 0 -0 0</pose>
+      <pose frame=''>0 0 0 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -139,8 +140,8 @@
         <visual name='visual'>
           <geometry>
             <cylinder>
-              <radius>0.066045</radius>
-              <length>0.290221</length>
+              <radius>0.1</radius>
+              <length>0.5</length>
             </cylinder>
           </geometry>
           <material>
@@ -158,7 +159,7 @@
     </model>
     <model name='uwb_anchor2'>
       <static>1</static>
-      <pose frame=''>3.02128 1.99091 0.145111 0 -0 0</pose>
+      <pose frame=''>0 0 0 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -174,8 +175,43 @@
         <visual name='visual'>
           <geometry>
             <cylinder>
-              <radius>0.066045</radius>
-              <length>0.290221</length>
+              <radius>0.1</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='uwb_anchor3'>
+      <static>1</static>
+      <pose frame=''>0 0 0 0 0 0</pose>
+      <link name='link'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.145833</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.145833</iyy>
+            <iyz>0</iyz>
+            <izz>0.125</izz>
+          </inertia>
+        </inertial>
+        <visual name='visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>0.5</length>
             </cylinder>
           </geometry>
           <material>
@@ -207,30 +243,39 @@
         </link>
       </model>
       <model name='uwb_anchor0'>
-        <pose frame=''>-2 -1 0.145101 0 -0 0</pose>
-        <scale>0.13209 0.13209 0.290221</scale>
+        <pose frame=''>0 0 0 0 -0 0</pose>
         <link name='link'>
-          <pose frame=''>-2 -1 0.145101 0 -0 0</pose>
+          <pose frame=''>0 0 2 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='uwb_anchor1'>
-        <pose frame=''>2 -3 0.14511 0 -0 0</pose>
+        <pose frame=''>3 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>2 -3 0.14511 0 -0 0</pose>
+          <pose frame=''>3 0 2 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='uwb_anchor2'>
-        <pose frame=''>3 2 0.145101 0 -0 0</pose>
+        <pose frame=''>3.8 2.4 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>3 2 0.145101 0 -0 0</pose>
+          <pose frame=''>3.8 2.4 2 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='uwb_anchor3'>
+        <pose frame=''>0 3 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>0 3 2 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
