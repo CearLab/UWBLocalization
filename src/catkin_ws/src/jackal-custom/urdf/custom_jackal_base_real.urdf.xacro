@@ -49,19 +49,19 @@
       </inertial>
     </link>
 
-    <joint name="${prefix}_wheel" type="continuous">
+    <joint name="${prefix}_wheel" type="fixed">
       <parent link="chassis_link"/>
       <child link="${prefix}_wheel_link" />
       <xacro:insert_block name="joint_pose" />
-      <axis xyz="0 1 0" />
     </joint>
   </xacro:macro>
 
   <link name="world"></link>
-  <joint name="world_joint" type="fixed">
+  <joint name="world_joint" type="continuous">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="world"/>
     <child link="world" />
+    <axis xyz="0 1 0" />
   </joint>
 
   <link name="odom"></link>
@@ -70,7 +70,6 @@
     <parent link="odom"/>
     <child link="base_link" />
   </joint>
-  
   
   <link name="base_link"></link>
   <joint name="base_link_joint" type="fixed">

@@ -112,7 +112,7 @@ initial_state: [0.0, 0.0, 0.0
                 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0,
-                0.01, 0.01, 0.01]
+                0.0, 0.0, 0.0]
 
 # process covariance gains
 #                         x      y     z     R     P     Y     xdot  ydot  zdot    Rdot  Pdot  Ydot  xddot yddot zddot  
