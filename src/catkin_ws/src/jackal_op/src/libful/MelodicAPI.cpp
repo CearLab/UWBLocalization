@@ -589,19 +589,30 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     OMEGA[1] = msg.angular_velocity.y;
     OMEGA[2] = msg.angular_velocity.z;
 
-    // transform from imu_link to base_link
-    // set quaternion
-    // tf2::Quaternion quat;
-    // quat.setW(_transformStamped.transforms[_Ntags].transform.orientation.w);
-    // quat.setX(_transformStamped.transforms[_Ntags].transform.orientation.x);
-    // quat.setY(_transformStamped.transforms[_Ntags].transform.orientation.y);
-    // quat.setZ(_transformStamped.transforms[_Ntags].transform.orientation.z);
+    // input vector
+    std::vector<_Float64> U = {IMU[0], IMU[1], IMU[2], OMEGA[0], OMEGA[1], OMEGA[2]};
 
-    //ROS_INFO("IMU meas: %g %g %g", IMU[0], IMU[1], IMU[2]);
-    //ROS_INFO("dt: %g", _dt);
+    // transform from imu_link to base_link
+    // set quaternion from the rotation
+    tf2::Quaternion quat;
+    quat.setW(_transformStamped.transforms[_Ntags].transform.rotation.w);
+    quat.setX(_transformStamped.transforms[_Ntags].transform.rotation.x);
+    quat.setY(_transformStamped.transforms[_Ntags].transform.rotation.y);
+    quat.setZ(_transformStamped.transforms[_Ntags].transform.rotation.z);
+    // change frame for angular velocity
+    tf2::Matrix3x3 R(quat);
+    tf2::Vector3 omegaold = {OMEGA[0], OMEGA[1], OMEGA[2]};
+    tf2::Vector3 delta = {_transformStamped.transforms[_Ntags].transform.translation.x, 
+                          _transformStamped.transforms[_Ntags].transform.translation.y,
+                          _transformStamped.transforms[_Ntags].transform.translation.z};
+    tf2::Vector3 omeganew;
+    omeganew = R*omegaold + delta;
+
+    //ROS_INFO("IMU meas: %g %g %g", IMU[0], IMU[1], IMU[2])z
+    //ROS_INFO("dt: %g", _dt)z
 
     // integrate
-    _xnew = genAPI::odeEuler(_xnew, IMU, _dt);
+    _xnew = genAPI::odeEuler(_xnew, U, _dt);
 
     //ROS_INFO("Xnew: %g %g %g", _xnew[genAPI::pos_p[0]], _xnew[genAPI::pos_p[1]], _xnew[genAPI::pos_p[2]]);
 
@@ -616,16 +627,21 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     _Godom.pose.pose.position.z = _xnew[genAPI::pos_p[2]];
 
     // orientation
-    //ROS_WARN("N vec: %g %g %g", _Godom.pose.pose.orientation.x, _Godom.pose.pose.orientation.y, _Godom.pose.pose.orientation.z);
-    _Godom.pose.pose.orientation.w = _G.N[0];
-    _Godom.pose.pose.orientation.x = _G.N[1];
-    _Godom.pose.pose.orientation.y = _G.N[2];
-    _Godom.pose.pose.orientation.z = _G.N[3];
+    quat.setRPY(_xnew[genAPI::pos_ang[0]], _xnew[genAPI::pos_ang[1]], _xnew[genAPI::pos_ang[2]]);
+    _Godom.pose.pose.orientation.w = quat.getW();
+    _Godom.pose.pose.orientation.x = quat.getX();
+    _Godom.pose.pose.orientation.y = quat.getY();
+    _Godom.pose.pose.orientation.z = quat.getZ();
 
-    // velocity
+    // velocity - linear
     _Godom.twist.twist.linear.x = _xnew[genAPI::pos_v[0]];
     _Godom.twist.twist.linear.y = _xnew[genAPI::pos_v[1]];
     _Godom.twist.twist.linear.z = _xnew[genAPI::pos_v[2]];
+
+    // velocity - angular
+    _Godom.twist.twist.angular.x = _xnew[genAPI::pos_w[0]];
+    _Godom.twist.twist.angular.y = _xnew[genAPI::pos_w[1]];
+    _Godom.twist.twist.angular.z = _xnew[genAPI::pos_w[2]];
 
     // publish
     _jack_odometry_P.publish(_Godom);
@@ -633,10 +649,15 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     // fill message and publish - IMU
     _Gimu.header = msg.header;
     
-    // acceleration
-    _Gimu.linear_acceleration.x = _xnew[genAPI::pos_a[0]];
-    _Gimu.linear_acceleration.y = _xnew[genAPI::pos_a[1]];
-    _Gimu.linear_acceleration.z = _xnew[genAPI::pos_a[2]];
+    // acceleration - linear
+    _Gimu.linear_acceleration.x = _xnew[genAPI::pos_a[0]] - _xnew[genAPI::pos_b[0]];
+    _Gimu.linear_acceleration.y = _xnew[genAPI::pos_a[1]] - _xnew[genAPI::pos_b[1]];
+    _Gimu.linear_acceleration.z = _xnew[genAPI::pos_a[2]] - _xnew[genAPI::pos_b[2]];
+
+    // velocity - angular
+    _Gimu.angular_velocity.x = _xnew[genAPI::pos_w[0]] - _xnew[genAPI::pos_bw[0]];
+    _Gimu.angular_velocity.y = _xnew[genAPI::pos_w[1]] - _xnew[genAPI::pos_bw[1]];
+    _Gimu.angular_velocity.z = _xnew[genAPI::pos_w[2]] - _xnew[genAPI::pos_bw[2]];
 
     // publish
     _jack_IMU_P.publish(_Gimu);
@@ -644,10 +665,15 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     // fill message and publish - bias
     _Gbias.header = msg.header;
     
-    // acceleration
+    // acceleration - linear
     _Gbias.linear_acceleration.x = _xnew[genAPI::pos_b[0]];
     _Gbias.linear_acceleration.y = _xnew[genAPI::pos_b[1]];
     _Gbias.linear_acceleration.z = _xnew[genAPI::pos_b[2]];
+
+    // velocity - angular
+    _Gbias.angular_velocity.x = _xnew[genAPI::pos_bw[0]];
+    _Gbias.angular_velocity.y = _xnew[genAPI::pos_bw[1]];
+    _Gbias.angular_velocity.z = _xnew[genAPI::pos_bw[2]];
 
     // publish
     _jack_Bias_P.publish(_Gbias);

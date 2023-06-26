@@ -400,7 +400,7 @@ std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector
     xdot[genAPI::pos_p[1]] = x[genAPI::pos_v[1]];
     xdot[genAPI::pos_p[2]] = x[genAPI::pos_v[2]];
 
-    // integrate position
+    // integrate velocity
     xdot[genAPI::pos_v[0]] = x[genAPI::pos_a[0]] - x[genAPI::pos_b[0]];
     xdot[genAPI::pos_v[1]] = x[genAPI::pos_a[1]] - x[genAPI::pos_b[1]];
     xdot[genAPI::pos_v[2]] = x[genAPI::pos_a[2]] - x[genAPI::pos_b[2]];
@@ -414,6 +414,21 @@ std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector
     xdot[genAPI::pos_a[0]] = genAPI::alpha * (u[0] - x[genAPI::pos_a[0]]);
     xdot[genAPI::pos_a[1]] = genAPI::alpha * (u[1] - x[genAPI::pos_a[1]]);
     xdot[genAPI::pos_a[2]] = genAPI::alpha * (u[2] - x[genAPI::pos_a[2]]);
+
+    // integrate angular position
+    xdot[genAPI::pos_ang[0]] = x[genAPI::pos_w[0]];
+    xdot[genAPI::pos_ang[1]] = x[genAPI::pos_w[1]];
+    xdot[genAPI::pos_ang[2]] = x[genAPI::pos_w[2]];
+
+    // integrate angular velocity bias
+    xdot[genAPI::pos_bw[0]] = 0.0;
+    xdot[genAPI::pos_bw[1]] = 0.0;
+    xdot[genAPI::pos_bw[2]] = 0.0;
+
+    // filter angular velocity
+    xdot[genAPI::pos_w[0]] = genAPI::alpha * (u[3] - x[genAPI::pos_w[0]]);
+    xdot[genAPI::pos_w[1]] = genAPI::alpha * (u[4] - x[genAPI::pos_w[1]]);
+    xdot[genAPI::pos_w[2]] = genAPI::alpha * (u[5] - x[genAPI::pos_w[2]]);
 
 
     return xdot;

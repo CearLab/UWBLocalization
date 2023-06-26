@@ -67,7 +67,7 @@ print_diagnostics: true
 debug: true
 #debug_out_file: /home/ros/workspace/catkin_ws/src/jackal-custom/log/ekf.log
 frequency: 50
-dynamic_process_noise_covariance: false
+dynamic_process_noise_covariance: true
 predict_to_current_time: true
 transform_time_offset: 1
 use_imu_yaw: false
@@ -89,23 +89,37 @@ odom0: /HYB5/Odom
 odom0_config: [true, true, true,
                true, true, true,
                true, true, true,
-               false, false, false,
+               true, true, true,
                false, false, false]
 odom0_config_variance: [0.20, 0.20, 0.20,
                         0.05, 0.05, 0.05,
                         0.05, 0.05, 0.05,
-                        0.00, 0.00, 0.00,
+                        0.01, 0.01, 0.01,
                         0.00, 0.00, 0.00]
 odom0_differential: false
 
-imu0: /imu/data
-imu0_config: [false, false, false,
+#imu0: /imu/data
+#imu0_config: [false, false, false,
+#              false, false, false,
+#              false, false, false,
+#              true, true, true,
+#              true, true, true]
+#imu0_differential: false
+#imu0_remove_gravitational_acceleration: true
+
+imu1: /HYB5/IMU
+imu1_config: [false, false, false,
               false, false, false,
               false, false, false,
-              true, true, true,
+              false, false, false,
               true, true, true]
-imu0_differential: false
-imu0_remove_gravitational_acceleration: true
+imu1_differential: false
+imu1_remove_gravitational_acceleration: false
+imu1_config_variance: [0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0,
+                       0.01, 0.01, 0.01]
 
 # initial state
 initial_state: [0.0, 0.0, 0.0
