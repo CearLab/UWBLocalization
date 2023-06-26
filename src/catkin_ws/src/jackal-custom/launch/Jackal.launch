@@ -25,8 +25,8 @@
   </include>
 
   <!-- Start navigation -->
-  <include file="$(find jackal-custom)/launch/control/Navigation.launch">
-  </include>
+  <!--include file="$(find jackal-custom)/launch/control/Navigation.launch">
+  </include-->
 
 
   <!-- ###### REAL MEASUREMENTS ######-->
