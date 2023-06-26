@@ -1,6 +1,3 @@
-[submodule "src/catkin_ws/src/gtec/UWB-Gazebo-Plugin"]
-	path = src/catkin_ws/src/gtec/UWB-Gazebo-Plugin
-	url = https://github.com/AUVSL/UWB-Gazebo-Plugin.git
 [submodule "src/catkin_ws/src/gtec/rosmsgs"]
 	path = src/catkin_ws/src/gtec/rosmsgs
 	url = https://github.com/valentinbarral/rosmsgs

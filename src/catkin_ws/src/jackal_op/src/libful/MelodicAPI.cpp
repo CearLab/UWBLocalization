@@ -539,11 +539,38 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     _xnew[genAPI::pos_a[1]] = xnow[genAPI::pos_a[1]];
     _xnew[genAPI::pos_a[2]] = xnow[genAPI::pos_a[2]];
 
-    // orientation
+    // get orientation from msg
     _G.N[0] = msg.pose.pose.orientation.w;
     _G.N[1] = msg.pose.pose.orientation.x;
     _G.N[2] = msg.pose.pose.orientation.y;
     _G.N[3] = msg.pose.pose.orientation.z;
+
+    // set quaternion
+    tf2::Quaternion quat;
+    quat.setW(_G.N[0]);
+    quat.setX(_G.N[1]);
+    quat.setY(_G.N[2]);
+    quat.setZ(_G.N[3]);
+
+    // get RPY
+    tf2::Matrix3x3 mat(quat);
+    double roll, pitch, yaw;
+    mat.getRPY(roll, pitch, yaw);
+
+    // orientation
+    _xnew[genAPI::pos_ang[0]] = xnow[genAPI::pos_ang[0]] + genAPI::theta[0] * (roll     - xnow[genAPI::pos_ang[0]]);
+    _xnew[genAPI::pos_ang[1]] = xnow[genAPI::pos_ang[1]] + genAPI::theta[0] * (pitch    - xnow[genAPI::pos_ang[1]]);
+    _xnew[genAPI::pos_ang[2]] = xnow[genAPI::pos_ang[2]] + genAPI::theta[0] * (yaw      - xnow[genAPI::pos_ang[2]]);
+
+    // angular velocity bias
+    _xnew[genAPI::pos_bw[0]] = xnow[genAPI::pos_bw[0]] + genAPI::theta[0] * (roll     - xnow[genAPI::pos_bw[0]]);
+    _xnew[genAPI::pos_bw[1]] = xnow[genAPI::pos_bw[1]] + genAPI::theta[0] * (pitch    - xnow[genAPI::pos_bw[1]]);
+    _xnew[genAPI::pos_bw[2]] = xnow[genAPI::pos_bw[2]] + genAPI::theta[0] * (yaw      - xnow[genAPI::pos_bw[2]]);
+
+    // angular velocity
+    _xnew[genAPI::pos_w[0]] = xnow[genAPI::pos_w[0]];
+    _xnew[genAPI::pos_w[1]] = xnow[genAPI::pos_w[1]];
+    _xnew[genAPI::pos_w[2]] = xnow[genAPI::pos_w[2]];
 
 }
 
@@ -555,6 +582,20 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     IMU[0] = msg.linear_acceleration.x;
     IMU[1] = msg.linear_acceleration.y;
     IMU[2] = msg.linear_acceleration.z;
+
+    // init omega meas
+    std::vector<_Float64> OMEGA(3, 0.0);
+    OMEGA[0] = msg.angular_velocity.x;
+    OMEGA[1] = msg.angular_velocity.y;
+    OMEGA[2] = msg.angular_velocity.z;
+
+    // transform from imu_link to base_link
+    // set quaternion
+    // tf2::Quaternion quat;
+    // quat.setW(_transformStamped.transforms[_Ntags].transform.orientation.w);
+    // quat.setX(_transformStamped.transforms[_Ntags].transform.orientation.x);
+    // quat.setY(_transformStamped.transforms[_Ntags].transform.orientation.y);
+    // quat.setZ(_transformStamped.transforms[_Ntags].transform.orientation.z);
 
     //ROS_INFO("IMU meas: %g %g %g", IMU[0], IMU[1], IMU[2]);
     //ROS_INFO("dt: %g", _dt);

@@ -25,6 +25,7 @@ int main(int argc, char **argv)
     int cnt = 0;
     int rate = 100;
     int tagID = 5;
+    bool isFramePresent;
     std::string ID;
 
     // get tagID - default 5
@@ -105,6 +106,10 @@ int main(int argc, char **argv)
         jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, rate);
         ROS_WARN("jackAPI - Class instance created");
 
+        // init buffer and listener
+        static tf2_ros::Buffer tfBuffer; // problem line
+        tf2_ros::TransformListener tfListener(tfBuffer);
+
         // subscribe
         jackNode._jack_disthandle_SIMU = np.subscribe(subNameIMU, 1000, &jackAPI::ChatterCallbackHybCont, &jackNode);
         jackNode._jack_disthandle_SJump = np.subscribe(subNameOdom, 1000, &jackAPI::ChatterCallbackHybJump, &jackNode);
@@ -120,6 +125,12 @@ int main(int argc, char **argv)
 
         // spin with loop rate
         while (ros::ok()) {
+
+            // from odom to world
+            isFramePresent = (tfBuffer._frameExists("odom") && tfBuffer._frameExists("imu_link"));
+            if (isFramePresent){
+                jackNode._transformStamped.transforms[jackNode._Ntags] = tfBuffer.lookupTransform("odom","imu_link",ros::Time(0));
+            }
 
             //spin
             ros::spinOnce();
