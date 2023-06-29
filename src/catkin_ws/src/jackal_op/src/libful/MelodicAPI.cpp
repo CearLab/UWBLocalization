@@ -3,7 +3,7 @@
 
 /** **** CONSTRUCTOR **** */
 jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate) 
-: _gen(std::random_device{}()), _distribution(0.0,0.0){
+: _gen(std::random_device{}()), _distribution(0.0,0.2){
 
     // counters
     int i, j, k;
@@ -563,9 +563,9 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     _xnew[genAPI::pos_ang[2]] = xnow[genAPI::pos_ang[2]] + genAPI::theta[0] * (yaw      - xnow[genAPI::pos_ang[2]]);
 
     // angular velocity bias
-    _xnew[genAPI::pos_bw[0]] = xnow[genAPI::pos_bw[0]] + genAPI::theta[0] * (roll     - xnow[genAPI::pos_bw[0]]);
-    _xnew[genAPI::pos_bw[1]] = xnow[genAPI::pos_bw[1]] + genAPI::theta[0] * (pitch    - xnow[genAPI::pos_bw[1]]);
-    _xnew[genAPI::pos_bw[2]] = xnow[genAPI::pos_bw[2]] + genAPI::theta[0] * (yaw      - xnow[genAPI::pos_bw[2]]);
+    _xnew[genAPI::pos_bw[0]] = xnow[genAPI::pos_bw[0]] + 0*genAPI::theta[0] * (roll     - xnow[genAPI::pos_ang[0]]);
+    _xnew[genAPI::pos_bw[1]] = xnow[genAPI::pos_bw[1]] + 0*genAPI::theta[0] * (pitch    - xnow[genAPI::pos_ang[1]]);
+    _xnew[genAPI::pos_bw[2]] = xnow[genAPI::pos_bw[2]] + 0*genAPI::theta[0] * (yaw      - xnow[genAPI::pos_ang[2]]);
 
     // angular velocity
     _xnew[genAPI::pos_w[0]] = xnow[genAPI::pos_w[0]];

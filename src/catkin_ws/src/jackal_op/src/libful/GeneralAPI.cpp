@@ -416,9 +416,9 @@ std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector
     xdot[genAPI::pos_a[2]] = genAPI::alpha * (u[2] - x[genAPI::pos_a[2]]);
 
     // integrate angular position
-    xdot[genAPI::pos_ang[0]] = x[genAPI::pos_w[0]];
-    xdot[genAPI::pos_ang[1]] = x[genAPI::pos_w[1]];
-    xdot[genAPI::pos_ang[2]] = x[genAPI::pos_w[2]];
+    xdot[genAPI::pos_ang[0]] = x[genAPI::pos_w[0]] - x[genAPI::pos_bw[0]];
+    xdot[genAPI::pos_ang[1]] = x[genAPI::pos_w[1]] - x[genAPI::pos_bw[1]];
+    xdot[genAPI::pos_ang[2]] = x[genAPI::pos_w[2]] - x[genAPI::pos_bw[2]];
 
     // integrate angular velocity bias
     xdot[genAPI::pos_bw[0]] = 0.0;
