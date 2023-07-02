@@ -23,10 +23,6 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Ceres REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
-# install package
-set(MY_LIBRARY_PATH /home/ros/workspace/Vicon/ViconDataStreamSDK_1.12/Linux64)
-link_directories(${MY_LIBRARY_PATH})
-
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -197,19 +193,6 @@ ceres
 armadillo
 optim
 alglib
-)
-
-# Vicon
-add_executable(jack_vicon src/cpp/jack_vicon.cpp)
-target_link_libraries(jack_vicon
-${catkin_LIBRARIES}
-melodicAPI
-generalAPI
-ceres
-armadillo
-optim
-alglib
-ViconDataStreamSDK_CPP
 )
 
 ## Add cmake target dependencies of the library
