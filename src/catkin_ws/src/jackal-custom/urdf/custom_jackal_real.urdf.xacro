@@ -29,7 +29,7 @@
             <geometry>
                 <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
             </geometry>
-            <material>
+            <material name="right_tag_color">
                 <color rgba="200 0 0 0"/>
             </material>
         </visual>
@@ -60,7 +60,7 @@
             <geometry>
                 <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
             </geometry>
-            <material>
+            <material name="left_tag_color">
                 <color rgba="0 200 0 0"/>
             </material>
         </visual>
@@ -92,7 +92,7 @@
             <geometry>
                 <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
             </geometry>
-            <material>
+            <material name="rear_tag_color">
                 <color rgba="0 0 200 0"/>
             </material>
         </visual>
