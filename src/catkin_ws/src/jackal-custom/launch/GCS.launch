@@ -33,7 +33,7 @@
   </node>
 
   <!-- ###### GROUND TRUTH ######-->
-  <node name="vicon" pkg="vicon" type="jack_vicon">
-  </node>
+  <!--node name="vicon" pkg="vicon" type="jack_vicon">
+  </node-->
 
 </launch>

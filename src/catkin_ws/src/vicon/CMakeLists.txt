@@ -21,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 # install package
-set(VICON_LIBRARY_PATH /home/ros/workspace/Vicon/ViconDataStreamSDK_1.12/Linux64/source/ViconDataStreamSDKSourceLinux64-source/bin/Debug)
+set(VICON_LIBRARY_PATH /home/ros/workspace/Vicon/Source/bin/Debug)
 link_directories(${VICON_LIBRARY_PATH})
 
 ## System dependencies are found with CMake's conventions
@@ -81,7 +81,7 @@ catkin_package(
 ## Build ##
 ###########
 set(VICON_INCLUDE_DIR
-/home/ros/workspace/Vicon/ViconDataStreamSDK_1.12/Linux64/source/ViconDataStreamSDKSourceLinux64-source/Vicon/CrossMarket/DataStream/ViconDataStreamSDK_CPP
+/home/ros/workspace/Vicon/Source/Vicon/CrossMarket/DataStream/ViconDataStreamSDK_CPP
 )
 
 # include
