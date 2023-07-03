@@ -9,6 +9,7 @@ lib/
 *pdf
 video/
 videos/
+Vicon/
 *.gv
 jackal/
 test/
