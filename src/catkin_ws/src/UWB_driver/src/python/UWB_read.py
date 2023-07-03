@@ -219,6 +219,11 @@ def talker():
                 tmpMarker.pose.position.y = float(A[1][i])
                 tmpMarker.pose.position.z = float(A[2][i])
 
+                tmpMarker.pose.orientation.w = 1
+                tmpMarker.pose.orientation.x = 0
+                tmpMarker.pose.orientation.y = 0
+                tmpMarker.pose.orientation.z = 0
+
                 msgA.markers.pop(0)
                 msgA.markers.append(tmpMarker)
 
