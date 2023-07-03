@@ -88,6 +88,7 @@ int main(int argc, char** argv) {
 
   // translation
   Output_GetSegmentGlobalTranslation OutputTransl;
+  Output_GetSegmentGlobalRotationQuaternion OutputQuat;
 
   // publishers
   ros::Publisher ViconPub = np.advertise<nav_msgs::Odometry>("ground_truth/state", 1000);
@@ -119,6 +120,7 @@ int main(int argc, char** argv) {
 
       // translation
       OutputTransl =  MyClient.GetSegmentGlobalTranslation(Name, Root);
+      OutputQuat = MyClient.GetSegmentGlobalRotationQuaternion(Name, Root);
 
       // check
       // ROS_WARN("TEST Frame: %s", Root.c_str());
@@ -131,6 +133,10 @@ int main(int argc, char** argv) {
       ViconMsg.pose.pose.position.x = OutputTransl.Translation[0]/1000;
       ViconMsg.pose.pose.position.y = OutputTransl.Translation[1]/1000;
       ViconMsg.pose.pose.position.z = OutputTransl.Translation[2]/1000;
+      ViconMsg.pose.pose.orientation.x = OutputQuat.Rotation[0];
+      ViconMsg.pose.pose.orientation.y = OutputQuat.Rotation[1];
+      ViconMsg.pose.pose.orientation.z = OutputQuat.Rotation[2];
+      ViconMsg.pose.pose.orientation.w = OutputQuat.Rotation[3];
       ViconPub.publish(ViconMsg);
 
       //spin
