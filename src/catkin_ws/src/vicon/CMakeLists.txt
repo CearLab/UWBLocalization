@@ -14,7 +14,10 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  tf2_ros
   std_msgs
+  geometry_msgs
+  tf2_geometry_msgs
   nav_msgs
   message_filters
   message_generation
@@ -56,6 +59,7 @@ link_directories(${VICON_LIBRARY_PATH})
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
   nav_msgs
 )
 

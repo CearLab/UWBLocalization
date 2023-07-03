@@ -10,6 +10,13 @@
     <xacro:property name="right" value="$(arg right_id)" />
     <xacro:property name="left" value="$(arg left_id)" />
 
+    <link name="vicon_link"></link>
+    <joint name="vicon_link_joint" type="fixed">
+      <origin xyz="0 0 0.184" rpy="0 0 0" />
+      <parent link="base_link"/>
+      <child link="vicon_link" />
+    </joint>
+
     <!-- -->
     <link name="right_tag">
         <inertial>

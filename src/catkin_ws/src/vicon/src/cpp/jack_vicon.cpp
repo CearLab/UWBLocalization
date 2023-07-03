@@ -2,6 +2,12 @@
 #include "ros/ros.h"
 #include <nav_msgs/Odometry.h>
 
+// tf msgs
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include "geometry_msgs/TransformStamped.h"
+
 #include "DataStreamClient.h"
 #include <sstream>
 
@@ -96,6 +102,22 @@ int main(int argc, char** argv) {
   // msg
   nav_msgs::Odometry ViconMsg;
 
+  // stuff
+  bool isFramePresent;
+
+  // init buffer and listener
+  static tf2_ros::Buffer tfBuffer; // problem line
+  tf2_ros::TransformListener tfListener(tfBuffer);
+  geometry_msgs::TransformStamped Transform;
+
+  // transforms
+  tf2::Quaternion quatPos, quatRot, quatStart, quatEnd;
+  double roll = 0.0;
+  double pitch = 0.0; 
+  double yaw = M_PI/2;
+  tf2::Matrix3x3 RPos;
+  tf2::Vector3 PosOld, PosNew, delta;
+      
   // spin with loop rate
   while (ros::ok()) {
 
@@ -130,13 +152,42 @@ int main(int argc, char** argv) {
       ViconMsg.header.stamp = ros::Time::now();
       ViconMsg.header.frame_id = "world";
       ViconMsg.child_frame_id = "base_link";
-      ViconMsg.pose.pose.position.x = OutputTransl.Translation[0]/1000;
-      ViconMsg.pose.pose.position.y = OutputTransl.Translation[1]/1000;
-      ViconMsg.pose.pose.position.z = OutputTransl.Translation[2]/1000;
-      ViconMsg.pose.pose.orientation.x = OutputQuat.Rotation[0];
-      ViconMsg.pose.pose.orientation.y = OutputQuat.Rotation[1];
-      ViconMsg.pose.pose.orientation.z = OutputQuat.Rotation[2];
-      ViconMsg.pose.pose.orientation.w = OutputQuat.Rotation[3];
+
+      // position
+      isFramePresent = (tfBuffer._frameExists("base_link") && tfBuffer._frameExists("vicon_link"));
+      if (isFramePresent){
+          Transform = tfBuffer.lookupTransform("vicon_link","base_link",ros::Time(0));
+      }
+      quatPos.setW(Transform.transform.rotation.w);
+      quatPos.setX(Transform.transform.rotation.x);
+      quatPos.setY(Transform.transform.rotation.y);
+      quatPos.setZ(Transform.transform.rotation.z);
+      RPos.setRotation(quatPos);
+      PosOld[0] = OutputTransl.Translation[0]/1000;
+      PosOld[1] = OutputTransl.Translation[1]/1000;
+      PosOld[2] = OutputTransl.Translation[2]/1000;
+      delta[0] = Transform.transform.translation.x;
+      delta[1] = Transform.transform.translation.y;
+      delta[2] = Transform.transform.translation.z;
+      PosNew = RPos*PosOld + delta;
+
+      ViconMsg.pose.pose.position.x = PosNew[0];
+      ViconMsg.pose.pose.position.y = PosNew[1];
+      ViconMsg.pose.pose.position.z = PosNew[2];
+
+      // orientation
+      // get RPY
+      quatRot.setRPY(roll, pitch, yaw);
+      quatStart.setX(OutputQuat.Rotation[0]);
+      quatStart.setY(OutputQuat.Rotation[1]);
+      quatStart.setZ(OutputQuat.Rotation[2]);
+      quatStart.setW(OutputQuat.Rotation[3]);
+      quatEnd = quatStart*quatRot;
+
+      ViconMsg.pose.pose.orientation.x = quatEnd.getX();
+      ViconMsg.pose.pose.orientation.y = quatEnd.getY();
+      ViconMsg.pose.pose.orientation.z = quatEnd.getZ();
+      ViconMsg.pose.pose.orientation.w = quatEnd.getW();
       ViconPub.publish(ViconMsg);
 
       //spin
