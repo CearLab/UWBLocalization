@@ -497,7 +497,7 @@ void jackAPI::ChatterCallbackAtrue(const ros::TimerEvent& event){
         idx = 3*i;
 
         // set anchor header
-        _AtrueMsg.markers[i].header.seq = 0;
+        _AtrueMsg.markers[i].header.seq += 1;
         _AtrueMsg.markers[i].header.stamp = ros::Time::now();
         _AtrueMsg.markers[i].header.frame_id = "world";
         _AtrueMsg.markers[i].id = i;
