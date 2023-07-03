@@ -224,9 +224,9 @@ def talker():
                 tmpMarker.pose.orientation.y = 0
                 tmpMarker.pose.orientation.z = 0
 
-                tmpMarker.scale.x = 1
-                tmpMarker.scale.y = 1
-                tmpMarker.scale.z = 1
+                tmpMarker.scale.x = 0.05
+                tmpMarker.scale.y = 0.05
+                tmpMarker.scale.z = 0.05
 
                 tmpMarker.color.r = 200
                 tmpMarker.color.g = 0
