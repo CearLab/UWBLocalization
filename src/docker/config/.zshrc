@@ -171,12 +171,16 @@ elif echo "$USER" | grep -q 'nx'; then
 fi
 source /opt/ros/melodic/setup.zsh
 
+# functions
+matlab() {
+    #do things with parameters like $1 such as
+    "/home/ros/MATLAB/R"$1"/bin/matlab"
+}
+
+
 # pyenv
 #export PATH="$HOME/.pyenv/bin:$PATH"
 #eval "$(pyenv init -)"
 #eval "$(pyenv virtualenv-init -)"
 source /opt/ros/melodic/setup.zsh
-export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib
-source /opt/ros/melodic/setup.zsh
-export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib
-export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib
+export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib
