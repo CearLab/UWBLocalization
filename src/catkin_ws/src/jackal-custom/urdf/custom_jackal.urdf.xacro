@@ -10,6 +10,13 @@
     <xacro:property name="right" value="$(arg right_id)" />
     <xacro:property name="left" value="$(arg left_id)" />
 
+    <link name="vicon_link"></link>
+    <joint name="vicon_link_joint" type="fixed">
+      <origin xyz="0 0 0.184" rpy="0 0 0" />
+      <parent link="base_link"/>
+      <child link="vicon_link" />
+    </joint>
+
     <!-- -->
     <link name="right_tag">
         <inertial>
@@ -25,15 +32,18 @@
             </geometry>
         </collision>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
             <geometry>
                 <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
             </geometry>
+            <!--material name="right_tag_color">
+                <color rgba="200 0 0 0"/>
+            </material-->
         </visual>
     </link>
 
     <joint name="right_tag_joint" type="fixed">
-        <origin xyz="0 -0.5 0.184" rpy="0 0 0"/>
+        <origin xyz="0.19 -0.35 0.184" rpy="0 0 0"/>
         <parent link="base_link"/>
         <child link="right_tag"/>
     </joint>
@@ -62,15 +72,18 @@
             </geometry>
         </collision>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 3.14159265359"/>
+            <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
             <geometry>
                 <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
             </geometry>
+            <!--material name="left_tag_color">
+                <color rgba="0 200 0 0"/>
+            </material-->
         </visual>
     </link>
 
     <joint name="left_tag_joint" type="fixed">
-        <origin xyz="0 0.5 0.184" rpy="0 0 0"/>
+        <origin xyz="0.19 0.35 0.184" rpy="0 0 0"/>
         <parent link="base_link"/>
         <child link="left_tag"/>
     </joint>
@@ -99,15 +112,18 @@
             </geometry>
         </collision>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 -1.57"/>
+            <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
             <geometry>
                 <mesh filename="package://jackal-custom/models/DecaWave/meshes/Decawave.stl"/>
             </geometry>
+            <!--material name="rear_tag_color">
+                <color rgba="0 0 200 0"/>
+            </material-->
         </visual>
     </link>
 
     <joint name="rear_tag_joint" type="fixed">
-        <origin xyz="-0.5 0 0.184" rpy="0 0 0"/>
+        <origin xyz="-0.18 0.0 0.184" rpy="0 0 0"/>
         <parent link="base_link"/>
         <child link="rear_tag"/>
     </joint>

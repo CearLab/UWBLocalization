@@ -60,6 +60,7 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate)
     for (i=0;i<genAPI::stateDim;i++){
         _xnew.push_back(0.0);
     }     
+    _xnew[genAPI::pos_ang[3]] = 1.0;
 
     // create transform
     if (_tagID == 0){
@@ -210,7 +211,7 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
     int i, j;
 
     //init with current estimate
-    p0 = _p;
+    // p0 = _p;
 
     try {
 
@@ -313,11 +314,18 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
             // check some workarounds, as in this case:
             // mean over the 2 xy symmetric, and remove the common
             // offset on z.
-            TEST.col(0) = W.col(1);
-            TEST.col(1) = W.col(2);
-            Pwo = arma::mean(TEST,1);
-            Pwo(2) = Pwo(2) - O.col(0)(2);
-            Pwo = -Pwo;
+            // TEST.col(0) = W.col(1);
+            // TEST.col(1) = W.col(2);
+            // Pwo = arma::mean(TEST,1);
+            // Pwo(0) = Pwo(0) - O.col(1)(0);
+            // Pwo(1) = Pwo(1);
+            // Pwo(2) = Pwo(2) - O.col(0)(2);
+            // ROS_WARN("Test: %g %g %g", Pwo(0), Pwo(1), Pwo(2));
+            // Pwo = -Pwo;
+
+            // just take the centroid, remove Z and who cares
+            Pwo = -arma::mean(W,1);
+            Pwo(2) = Pwo(2) + O.col(0)(2);
                 
             // remove translation from WORLD coordinates:
             // R*(W - T) = O --> R*DELTA = O
@@ -541,32 +549,21 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     _xnew[genAPI::pos_a[2]] = xnow[genAPI::pos_a[2]];
 
     // get orientation from msg
-    _G.N[0] = msg.pose.pose.orientation.w;
-    _G.N[1] = msg.pose.pose.orientation.x;
-    _G.N[2] = msg.pose.pose.orientation.y;
-    _G.N[3] = msg.pose.pose.orientation.z;
-
-    // set quaternion
-    tf2::Quaternion quat;
-    quat.setW(_G.N[0]);
-    quat.setX(_G.N[1]);
-    quat.setY(_G.N[2]);
-    quat.setZ(_G.N[3]);
-
-    // get RPY
-    tf2::Matrix3x3 mat(quat);
-    double roll, pitch, yaw;
-    mat.getRPY(roll, pitch, yaw);
+    _G.N[0] = msg.pose.pose.orientation.x;
+    _G.N[1] = msg.pose.pose.orientation.y;
+    _G.N[2] = msg.pose.pose.orientation.z;
+    _G.N[3] = msg.pose.pose.orientation.w;
 
     // orientation
-    _xnew[genAPI::pos_ang[0]] = xnow[genAPI::pos_ang[0]] + genAPI::theta[0] * (roll     - xnow[genAPI::pos_ang[0]]);
-    _xnew[genAPI::pos_ang[1]] = xnow[genAPI::pos_ang[1]] + genAPI::theta[0] * (pitch    - xnow[genAPI::pos_ang[1]]);
-    _xnew[genAPI::pos_ang[2]] = xnow[genAPI::pos_ang[2]] + genAPI::theta[0] * (yaw      - xnow[genAPI::pos_ang[2]]);
+    _xnew[genAPI::pos_ang[0]] = xnow[genAPI::pos_ang[0]] + genAPI::gamma[0] * (msg.pose.pose.orientation.x - xnow[genAPI::pos_ang[0]] );
+    _xnew[genAPI::pos_ang[1]] = xnow[genAPI::pos_ang[1]] + genAPI::gamma[0] * (msg.pose.pose.orientation.y - xnow[genAPI::pos_ang[1]] );
+    _xnew[genAPI::pos_ang[2]] = xnow[genAPI::pos_ang[2]] + genAPI::gamma[0] * (msg.pose.pose.orientation.z - xnow[genAPI::pos_ang[2]] );
+    _xnew[genAPI::pos_ang[3]] = xnow[genAPI::pos_ang[3]] + genAPI::gamma[0] * (msg.pose.pose.orientation.w - xnow[genAPI::pos_ang[3]] );
 
     // angular velocity bias
-    _xnew[genAPI::pos_bw[0]] = 0*xnow[genAPI::pos_bw[0]] + 0*genAPI::theta[0] * (roll     - xnow[genAPI::pos_ang[0]]);
-    _xnew[genAPI::pos_bw[1]] = 0*xnow[genAPI::pos_bw[1]] + 0*genAPI::theta[0] * (pitch    - xnow[genAPI::pos_ang[1]]);
-    _xnew[genAPI::pos_bw[2]] = 0*xnow[genAPI::pos_bw[2]] + 0*genAPI::theta[0] * (yaw      - xnow[genAPI::pos_ang[2]]);
+    _xnew[genAPI::pos_bw[0]] = 0*xnow[genAPI::pos_bw[0]];
+    _xnew[genAPI::pos_bw[1]] = 0*xnow[genAPI::pos_bw[1]];
+    _xnew[genAPI::pos_bw[2]] = 0*xnow[genAPI::pos_bw[2]];
 
     // angular velocity
     _xnew[genAPI::pos_w[0]] = xnow[genAPI::pos_w[0]];
@@ -586,22 +583,22 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
 
     // init omega meas
     std::vector<_Float64> OMEGA(3, 0.0);
-    OMEGA[0] = msg.angular_velocity.x;
-    OMEGA[1] = msg.angular_velocity.y;
-    OMEGA[2] = msg.angular_velocity.z;
+    OMEGA[0] = -msg.angular_velocity.x;
+    OMEGA[1] = -msg.angular_velocity.y;
+    OMEGA[2] = -msg.angular_velocity.z;
 
     // input vector
     std::vector<_Float64> U = {IMU[0], IMU[1], IMU[2], OMEGA[0], OMEGA[1], OMEGA[2]};
 
     // transform from imu_link to base_link
     // set quaternion from the rotation
-    tf2::Quaternion quat;
-    quat.setW(_transformStamped.transforms[_Ntags].transform.rotation.w);
-    quat.setX(_transformStamped.transforms[_Ntags].transform.rotation.x);
-    quat.setY(_transformStamped.transforms[_Ntags].transform.rotation.y);
-    quat.setZ(_transformStamped.transforms[_Ntags].transform.rotation.z);
+    tf2::Quaternion quatO;
+    quatO.setW(_transformStamped.transforms[_Ntags].transform.rotation.w);
+    quatO.setX(_transformStamped.transforms[_Ntags].transform.rotation.x);
+    quatO.setY(_transformStamped.transforms[_Ntags].transform.rotation.y);
+    quatO.setZ(_transformStamped.transforms[_Ntags].transform.rotation.z);
     // change frame for angular velocity
-    tf2::Matrix3x3 R(quat);
+    tf2::Matrix3x3 R(quatO);
     tf2::Vector3 omegaold = {OMEGA[0], OMEGA[1], OMEGA[2]};
     tf2::Vector3 delta = {_transformStamped.transforms[_Ntags].transform.translation.x, 
                           _transformStamped.transforms[_Ntags].transform.translation.y,
@@ -609,11 +606,31 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     tf2::Vector3 omeganew;
     omeganew = R*omegaold + delta;
 
-    //ROS_INFO("IMU meas: %g %g %g", IMU[0], IMU[1], IMU[2])z
-    //ROS_INFO("dt: %g", _dt)z
+    // ROS_WARN("test: %g %g %g", delta[0], delta[1], delta[2]);
+    // ROS_WARN("test: %g %g %g", R[0][0], R[0][1], R[0][2]);
+    // ROS_WARN("test: %g %g %g", R[1][0], R[1][1], R[1][2]);
+    // ROS_WARN("test: %g %g %g", R[2][0], R[2][1], R[2][2]);
+    // ROS_WARN("test: %g %g %g", delta[0], delta[1], delta[2]);
+    // ROS_WARN("test: %g %g %g", omegaold[0], omegaold[1], omegaold[2]);
+    // ROS_WARN("test: %g %g %g", omeganew[0], omeganew[1], omeganew[2]);
+
+    //ROS_INFO("IMU meas: %g %g %g", IMU[0], IMU[1], IMU[2]);
+    //ROS_INFO("dt: %g", _dt);
 
     // integrate
     _xnew = genAPI::odeEuler(_xnew, U, _dt);
+
+    // normalize quaternion
+    tf2::Quaternion quat;
+    quat.setX(_xnew[genAPI::pos_ang[0]]);
+    quat.setY(_xnew[genAPI::pos_ang[1]]);
+    quat.setZ(_xnew[genAPI::pos_ang[2]]);
+    quat.setW(_xnew[genAPI::pos_ang[3]]);
+    double qnorm = std::sqrt(quat.getX()*quat.getX() + quat.getY()*quat.getY() + quat.getZ()*quat.getZ() + quat.getW()*quat.getW());
+    _xnew[genAPI::pos_ang[0]] = _xnew[genAPI::pos_ang[0]]/qnorm;
+    _xnew[genAPI::pos_ang[1]] = _xnew[genAPI::pos_ang[1]]/qnorm;
+    _xnew[genAPI::pos_ang[2]] = _xnew[genAPI::pos_ang[2]]/qnorm;
+    _xnew[genAPI::pos_ang[3]] = _xnew[genAPI::pos_ang[3]]/qnorm;
 
     //ROS_INFO("Xnew: %g %g %g", _xnew[genAPI::pos_p[0]], _xnew[genAPI::pos_p[1]], _xnew[genAPI::pos_p[2]]);
 
@@ -628,11 +645,10 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     _Godom.pose.pose.position.z = _xnew[genAPI::pos_p[2]];
 
     // orientation
-    quat.setRPY(_xnew[genAPI::pos_ang[0]], _xnew[genAPI::pos_ang[1]], _xnew[genAPI::pos_ang[2]]);
-    _Godom.pose.pose.orientation.w = quat.getW();
-    _Godom.pose.pose.orientation.x = quat.getX();
-    _Godom.pose.pose.orientation.y = quat.getY();
-    _Godom.pose.pose.orientation.z = quat.getZ();
+    _Godom.pose.pose.orientation.x = _xnew[genAPI::pos_ang[0]];
+    _Godom.pose.pose.orientation.y = _xnew[genAPI::pos_ang[1]];
+    _Godom.pose.pose.orientation.z = _xnew[genAPI::pos_ang[2]];
+    _Godom.pose.pose.orientation.w = _xnew[genAPI::pos_ang[3]];
 
     // velocity - linear
     _Godom.twist.twist.linear.x = _xnew[genAPI::pos_v[0]];

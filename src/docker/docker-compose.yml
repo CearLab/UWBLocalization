@@ -126,7 +126,6 @@ services:
       args:
         TARGET: nvidia
     image: dockoly/jackal:melodic-dev-nvidia
-    network_mode: "host"
     runtime: nvidia
     environment:
       TERM: xterm-256color
@@ -146,6 +145,8 @@ services:
         "-c",
         "trap 'exit 0' TERM; sleep infinity & wait"
       ]
+    networks:
+      - customnetwork
     volumes:
       - /dev:/dev
       - /sys:/sys
@@ -164,3 +165,9 @@ services:
       - type: bind
         source: ../
         target: /home/ros/workspace
+
+networks:
+  customnetwork:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

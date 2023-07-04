@@ -49,6 +49,7 @@
       </inertial>
     </link>
 
+    <!-- should be continuous but in rviz it bounces a lot -->
     <joint name="${prefix}_wheel" type="fixed">
       <parent link="chassis_link"/>
       <child link="${prefix}_wheel_link" />

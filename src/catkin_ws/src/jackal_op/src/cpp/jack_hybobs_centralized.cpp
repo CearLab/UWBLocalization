@@ -127,9 +127,9 @@ int main(int argc, char **argv)
         while (ros::ok()) {
 
             // from odom to world
-            isFramePresent = (tfBuffer._frameExists("odom") && tfBuffer._frameExists("imu_link"));
+            isFramePresent = (tfBuffer._frameExists("base_link") && tfBuffer._frameExists("imu_link"));
             if (isFramePresent){
-                jackNode._transformStamped.transforms[jackNode._Ntags] = tfBuffer.lookupTransform("odom","imu_link",ros::Time(0));
+                jackNode._transformStamped.transforms[jackNode._Ntags] = tfBuffer.lookupTransform("base_link","imu_link",ros::Time(0));
             }
 
             //spin

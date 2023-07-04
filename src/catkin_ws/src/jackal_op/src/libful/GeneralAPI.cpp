@@ -87,7 +87,7 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
 
     // options
     Solver::Options options;
-    options.max_num_iterations = 1000;
+    options.max_num_iterations = 10000;
     options.minimizer_progress_to_stdout = false;
 
     // minimizer - trust region
@@ -415,10 +415,28 @@ std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector
     xdot[genAPI::pos_a[1]] = genAPI::alpha * (u[1] - x[genAPI::pos_a[1]]);
     xdot[genAPI::pos_a[2]] = genAPI::alpha * (u[2] - x[genAPI::pos_a[2]]);
 
-    // integrate angular position
-    xdot[genAPI::pos_ang[0]] = x[genAPI::pos_w[0]] - x[genAPI::pos_bw[0]];
-    xdot[genAPI::pos_ang[1]] = x[genAPI::pos_w[1]] - x[genAPI::pos_bw[1]];
-    xdot[genAPI::pos_ang[2]] = x[genAPI::pos_w[2]] - x[genAPI::pos_bw[2]];
+    // integrate angular position - quaternion
+    arma::vec q = arma::zeros(4,1);
+    arma::vec qdot = arma::zeros(4,1);
+    q[0] = x[genAPI::pos_ang[0]];
+    q[1] = x[genAPI::pos_ang[1]];
+    q[2] = x[genAPI::pos_ang[2]];
+    q[3] = x[genAPI::pos_ang[3]];
+    arma::vec w = arma::zeros(3,1);
+    w[0] = x[genAPI::pos_w[0]] - x[genAPI::pos_bw[0]];
+    w[1] = x[genAPI::pos_w[1]] - x[genAPI::pos_bw[1]];
+    w[2] = x[genAPI::pos_w[2]] - x[genAPI::pos_bw[2]];
+    arma::mat44 S = {0    ,  -w(2),   +w(1),    w(0),
+                     +w(2),  0    ,   -w(0),    w(1),
+                     -w(1),  +w(0),   0,        w(2),
+                     -w(0),  -w(1),   -w(2),    0};
+    qdot = 0.5*S*q;
+    xdot[genAPI::pos_ang[0]] = qdot[0];
+    xdot[genAPI::pos_ang[1]] = qdot[1];
+    xdot[genAPI::pos_ang[2]] = qdot[2];
+    xdot[genAPI::pos_ang[3]] = qdot[3];
+
+    // ROS_WARN("q: %g %g %g %g", q[0], q[1], q[2], q[3]);
 
     // integrate angular velocity bias
     xdot[genAPI::pos_bw[0]] = 0.0;
