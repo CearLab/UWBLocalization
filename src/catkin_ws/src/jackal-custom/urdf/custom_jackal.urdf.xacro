@@ -43,8 +43,8 @@
     </link>
 
     <joint name="right_tag_joint" type="fixed">
-        <origin xyz="0.19 -0.35 0.184" rpy="0 0 0"/>
-        <parent link="base_link"/>
+        <origin xyz="0.095 0.164 0.184" rpy="0 0 0"/>
+        <parent link="chassis_link"/>
         <child link="right_tag"/>
     </joint>
 
@@ -83,8 +83,8 @@
     </link>
 
     <joint name="left_tag_joint" type="fixed">
-        <origin xyz="0.19 0.35 0.184" rpy="0 0 0"/>
-        <parent link="base_link"/>
+        <origin xyz="0.095 -0.164 0.184" rpy="0 0 0"/>
+        <parent link="chassis_link"/>
         <child link="left_tag"/>
     </joint>
 
@@ -123,8 +123,8 @@
     </link>
 
     <joint name="rear_tag_joint" type="fixed">
-        <origin xyz="-0.18 0.0 0.184" rpy="0 0 0"/>
-        <parent link="base_link"/>
+        <origin xyz="-0.19 0.0 0.184" rpy="0 0 0"/>
+        <parent link="chassis_link"/>
         <child link="rear_tag"/>
     </joint>
 

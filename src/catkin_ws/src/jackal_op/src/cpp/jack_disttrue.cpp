@@ -1,9 +1,33 @@
 // node creating and publishing the true distances
 #include "MelodicAPI.hpp"
 
+// service for ground truth
+#include <gazebo_msgs/LinkStates.h>
+#include <gazebo_msgs/ModelStates.h>
+#include <gazebo_msgs/GetModelState.h>
+
+// Messages for getting model and link poses
+geometry_msgs::Pose model_pose;
+
 void DummyCallback(const std_msgs::String::ConstPtr& msg)
 {
   ROS_INFO("ARARMAX");
+}
+
+int getIndex(std::vector<std::string> v, std::string value)
+{
+    for(int i = 0; i < v.size(); i++)
+    {
+        if(v[i].compare(value) == 0)
+            return i;
+    }
+    return -1;
+}
+
+void model_states_callback(gazebo_msgs::ModelStates model_states)
+{
+    int ball_model_index = getIndex(model_states.name, "jackal");
+    model_pose = model_states.pose[ball_model_index];
 }
 
 /**
@@ -121,6 +145,15 @@ int main(int argc, char **argv)
         // timer callaback for publishing anchors
         ros::Timer TimerAnchors = np.createTimer(ros::Duration(1.0), &jackAPI::ChatterCallbackAtrue, &jackNode);
 
+        // code to publish the ground truth taking it from gazebo
+        // Service client for getting model poses
+        ros::ServiceClient get_model_state_client;
+
+        // Create suvsvribers for Gazebo model and link states
+        ros::Subscriber model_states_subscriber = np.subscribe("/gazebo/model_states", 100, model_states_callback);
+        ros::Publisher ground_truth_publisher = np.advertise<nav_msgs::Odometry>("/ground_truth/state", 1000);
+        nav_msgs::Odometry ground_truth;
+
         // spin
         ROS_INFO("Spinning");
 
@@ -150,6 +183,21 @@ int main(int argc, char **argv)
                     ROS_WARN("ARARMAX DISTTRUE: %s",ex.what());
                 }
             }
+
+            // show the ground truth
+            // ROS_WARN("GT: %g %g %g", model_pose.position.x, model_pose.position.y, model_pose.position.z);
+            // ground_truth.header.seq += ground_truth.header.seq;
+            // ground_truth.header.stamp = ros::Time::now();
+            // ground_truth.header.frame_id = "world";
+            // ground_truth.child_frame_id = "base_link";
+            // ground_truth.pose.pose.position.x = model_pose.position.x;
+            // ground_truth.pose.pose.position.y = model_pose.position.y;
+            // ground_truth.pose.pose.position.z = model_pose.position.z;
+            // ground_truth.pose.pose.orientation.w = model_pose.orientation.w;
+            // ground_truth.pose.pose.orientation.x = model_pose.orientation.x;
+            // ground_truth.pose.pose.orientation.y = model_pose.orientation.y;
+            // ground_truth.pose.pose.orientation.z = model_pose.orientation.z;
+            // ground_truth_publisher.publish(ground_truth);
 
             // sleep
             loop_rate.sleep();
