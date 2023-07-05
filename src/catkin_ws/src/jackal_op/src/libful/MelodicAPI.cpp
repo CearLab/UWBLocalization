@@ -563,6 +563,8 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     _G.N[2] = msg.pose.pose.orientation.z;
     _G.N[3] = msg.pose.pose.orientation.w;
 
+    // ROS_WARN("_G.N: %g %g %g %g", _G.N[0], _G.N[1], _G.N[2], _G.N[3]);
+
     // orientation
     _xnew[genAPI::pos_ang[0]] = xnow[genAPI::pos_ang[0]] + genAPI::gamma[0] * (msg.pose.pose.orientation.x - xnow[genAPI::pos_ang[0]] );
     _xnew[genAPI::pos_ang[1]] = xnow[genAPI::pos_ang[1]] + genAPI::gamma[0] * (msg.pose.pose.orientation.y - xnow[genAPI::pos_ang[1]] );
@@ -641,6 +643,7 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     _xnew[genAPI::pos_ang[2]] = _xnew[genAPI::pos_ang[2]]/qnorm;
     _xnew[genAPI::pos_ang[3]] = _xnew[genAPI::pos_ang[3]]/qnorm;
 
+    // ROS_WARN("Xnew: %g %g %g %g", _xnew[genAPI::pos_ang[0]], _xnew[genAPI::pos_ang[1]], _xnew[genAPI::pos_ang[2]], _xnew[genAPI::pos_ang[3]]);
     //ROS_INFO("Xnew: %g %g %g", _xnew[genAPI::pos_p[0]], _xnew[genAPI::pos_p[1]], _xnew[genAPI::pos_p[2]]);
 
     // fill message and publish - odometry
