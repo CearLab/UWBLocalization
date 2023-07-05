@@ -314,18 +314,18 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
             // check some workarounds, as in this case:
             // mean over the 2 xy symmetric, and remove the common
             // offset on z.
-            // TEST.col(0) = W.col(1);
-            // TEST.col(1) = W.col(2);
-            // Pwo = arma::mean(TEST,1);
+            TEST.col(0) = W.col(1);
+            TEST.col(1) = W.col(2);
+            Pwo = arma::mean(TEST,1);
             // Pwo(0) = Pwo(0) - O.col(1)(0);
             // Pwo(1) = Pwo(1);
             // Pwo(2) = Pwo(2) - O.col(0)(2);
             // ROS_WARN("Test: %g %g %g", Pwo(0), Pwo(1), Pwo(2));
-            // Pwo = -Pwo;
+            Pwo = -Pwo;
 
             // just take the centroid, remove Z and who cares
-            Pwo = -arma::mean(W,1);
-            Pwo(2) = Pwo(2) + O.col(0)(2);
+            // Pwo = -arma::mean(W,1);
+            // Pwo(2) = Pwo(2) + O.col(0)(2);
                 
             // remove translation from WORLD coordinates:
             // R*(W - T) = O --> R*DELTA = O
