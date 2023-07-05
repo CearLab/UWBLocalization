@@ -276,11 +276,11 @@
       <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
           <alwaysOn>true</alwaysOn>
           <updateRate>50.0</updateRate>
-          <bodyName>base_link</bodyName>
+          <bodyName>odom</bodyName>
           <frameName>world</frameName>
           <topicName>ground_truth/state</topicName>
           <gaussianNoise>0.0</gaussianNoise>          
-          <xyzOffsets>0 0 0</xyzOffsets>
+          <xyzOffsets>0 0 -0.24</xyzOffsets>
           <rpyOffsets>0 0 0</rpyOffsets>
       </plugin>
   </gazebo>

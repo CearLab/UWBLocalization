@@ -187,19 +187,19 @@ void jackAPI::GetFrames(std::string& child, std::string& base, int tagID){
     // create transform
     if (tagID == 0){
         child = "rear_tag";
-        base = "odom";      
+        base = "base_link";      
     }
     else if (tagID == 1){
         child = "right_tag";
-        base = "odom";  
+        base = "base_link";  
     }
     else if (tagID == 2){
         child  = "left_tag";
-        base = "odom";  
+        base = "base_link";  
     }
     else {
         child  =  "imu_link";
-        base = "odom";  
+        base = "base_link";  
     }
 
 }
@@ -314,18 +314,11 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
             // check some workarounds, as in this case:
             // mean over the 2 xy symmetric, and remove the common
             // offset on z.
-            // TEST.col(0) = W.col(1);
-            // TEST.col(1) = W.col(2);
-            // Pwo = arma::mean(TEST,1);
-            // Pwo(0) = Pwo(0) - O.col(1)(0);
-            // Pwo(1) = Pwo(1);
-            // Pwo(2) = Pwo(2) - O.col(0)(2);
-            // ROS_WARN("Test: %g %g %g", Pwo(0), Pwo(1), Pwo(2));
-            // Pwo = -Pwo;
 
             // just take the centroid, remove Z and who cares
             Pwo = -arma::mean(W,1);
             Pwo(2) = Pwo(2) + O.col(0)(2);
+            // ROS_WARN("Test: %g %g %g", Pwo(0), Pwo(1), Pwo(2));
                 
             // remove translation from WORLD coordinates:
             // R*(W - T) = O --> R*DELTA = O
@@ -514,6 +507,22 @@ void jackAPI::ChatterCallbackAtrue(const ros::TimerEvent& event){
         _AtrueMsg.markers[i].pose.position.x = genAPI::Anchors[idx];
         _AtrueMsg.markers[i].pose.position.y = genAPI::Anchors[idx+1];
         _AtrueMsg.markers[i].pose.position.z = genAPI::Anchors[idx+2];
+
+        // set anchor orientation
+        _AtrueMsg.markers[i].pose.orientation.w = 1;
+        _AtrueMsg.markers[i].pose.orientation.x = 0;
+        _AtrueMsg.markers[i].pose.orientation.y = 0;
+        _AtrueMsg.markers[i].pose.orientation.z = 0;
+
+        // set color and scale
+        _AtrueMsg.markers[i].scale.x = 0.05;
+        _AtrueMsg.markers[i].scale.y = 0.05;
+        _AtrueMsg.markers[i].scale.z = 0.05;
+
+        _AtrueMsg.markers[i].color.r = 200;
+        _AtrueMsg.markers[i].color.g = 0;
+        _AtrueMsg.markers[i].color.b = 0;
+        _AtrueMsg.markers[i].color.a = 1;
     }
 
     _jack_disthandle_PA.publish(_AtrueMsg);

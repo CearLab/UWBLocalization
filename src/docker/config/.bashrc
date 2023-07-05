@@ -145,3 +145,5 @@ export VARIANTmatlab=matlabLNUexport USAGE=cloud
 export VARIANTmatlab=matlabLNU
 export USAGE=cloud
 export VARIANTmatlab=matlabLNU
+export USAGE=cloud
+export VARIANTmatlab=matlabLNU
