@@ -317,7 +317,7 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
 
             // just take the centroid, remove Z and who cares
             Pwo = -arma::mean(W,1);
-            Pwo(2) = Pwo(2) + O.col(0)(2);
+            Pwo(2) = Pwo(2) + 1*O.col(0)(2);
             // ROS_WARN("Test: %g %g %g", Pwo(0), Pwo(1), Pwo(2));
                 
             // remove translation from WORLD coordinates:

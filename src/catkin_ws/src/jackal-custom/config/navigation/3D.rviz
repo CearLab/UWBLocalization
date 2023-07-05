@@ -224,7 +224,7 @@ Visualization Manager:
           Scale: 1
           Value: false
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 100
       Name: EKF
       Position Tolerance: 0.10000000149011612
