@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
   tf2::Quaternion quatPos, quatRot, quatStart, quatEnd;
   double roll = 0.0;
   double pitch = 0.0; 
-  double yaw = M_PI/2;
+  double yaw = 0*M_PI/2;
   tf2::Matrix3x3 RPos;
   tf2::Vector3 PosOld, PosNew, delta;
       
