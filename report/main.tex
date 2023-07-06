@@ -1,10 +1,5 @@
-\makeatletter
-\def\input@path{{cvpr}}
-\makeatother
-
-
 \documentclass[10pt]{article}
-\usepackage{cvpr}
+\usepackage{cvpr/cvpr}
 \usepackage[table,dvipsnames]{xcolor}
 \usepackage{diagbox}
 \usepackage{ctex}
@@ -58,7 +53,7 @@
 {(#3)}% Right rule
 }
 \usepackage{datenumber}
-\usepackage{emoji}
+\usepackage{emoji/emoji}
 \setemojifont{TwemojiMozilla}
 \usepackage{url}
 \graphicspath{{figs/}}
@@ -109,7 +104,7 @@
 
 \title{Visiting project - progress report}
 \author{Federico Oliva(lvofrc95@outlook.it)}
-        
+
 \maketitle
 \renewcommand*\contentsname{{}}
 \input{cvpr/notation}
@@ -121,7 +116,7 @@
 
 \newpage
 {\small
-\bibliographystyle{ieee_fullname.bst}
-\bibliography{ref}
+	\bibliographystyle{ieee_fullname.bst}
+	\bibliography{ref}
 }
 \end{document}
