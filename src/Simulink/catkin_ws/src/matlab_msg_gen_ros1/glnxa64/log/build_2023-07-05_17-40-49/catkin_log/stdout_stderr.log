@@ -1,0 +1,130 @@
+-- Using CATKIN_DEVEL_PREFIX: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/devel
+-- Using CMAKE_PREFIX_PATH: /opt/matlab/R2023a/sys/ros1/glnxa64/ros1;/opt/matlab/R2023a/toolbox/ros/mlroscpp/custom_messages;/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install
+-- This workspace overlays: /opt/matlab/R2023a/sys/ros1/glnxa64/ros1;/opt/matlab/R2023a/toolbox/ros/mlroscpp/custom_messages;/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install
+-- Using PYTHON_EXECUTABLE: /home/ros/.matlab/R2023a/ros1/glnxa64/venv/bin/python3
+-- Using Debian Python package layout
+-- Using empy: /home/ros/.matlab/R2023a/ros1/glnxa64/venv/lib/python3.8/site-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: off
+-- catkin 0.8.10
+-- BUILD_SHARED_LIBS is on
+-- BUILD_SHARED_LIBS is on
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- ~~  traversing 1 packages in topological order:
+-- ~~  - jackal_op
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- +++ processing catkin package: 'jackal_op'
+-- ==> add_subdirectory(jackal_op)
+CMake Warning at /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsg-extras.cmake:49 (message):
+  Unknown message generator specified in ROS_LANG_DISABLE: geneus
+Call Stack (most recent call first):
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsgConfig.cmake:222 (include)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/gencpp/cmake/gencppConfig.cmake:197 (find_package)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/message_generation/cmake/message_generationConfig.cmake:197 (find_package)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/catkin/cmake/catkinConfig.cmake:76 (find_package)
+  jackal_op/CMakeLists.txt:20 (find_package)
+
+
+CMake Warning at /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsg-extras.cmake:49 (message):
+  Unknown message generator specified in ROS_LANG_DISABLE: genlisp
+Call Stack (most recent call first):
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsgConfig.cmake:222 (include)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/gencpp/cmake/gencppConfig.cmake:197 (find_package)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/message_generation/cmake/message_generationConfig.cmake:197 (find_package)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/catkin/cmake/catkinConfig.cmake:76 (find_package)
+  jackal_op/CMakeLists.txt:20 (find_package)
+
+
+CMake Warning at /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsg-extras.cmake:49 (message):
+  Unknown message generator specified in ROS_LANG_DISABLE: gennodejs
+Call Stack (most recent call first):
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsgConfig.cmake:222 (include)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/gencpp/cmake/gencppConfig.cmake:197 (find_package)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/message_generation/cmake/message_generationConfig.cmake:197 (find_package)
+  /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/catkin/cmake/catkinConfig.cmake:76 (find_package)
+  jackal_op/CMakeLists.txt:20 (find_package)
+
+
+-- Using these message generators: gencpp;genpy
+-- jackal_op: 4 messages, 0 services
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build
+[1/5] cd /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/jackal_op && /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/catkin_generated/env_cached.sh /home/ros/.matlab/R2023a/ros1/glnxa64/venv/bin/python3 /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py jackal_op /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/src/jackal_op/msg/TransformArray.msg geometry_msgs/TransformStamped:geometry_msgs/Transform:geometry_msgs/Vector3:geometry_msgs/Quaternion:std_msgs/Header
+[2/5] cd /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/jackal_op && /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/catkin_generated/env_cached.sh /home/ros/.matlab/R2023a/ros1/glnxa64/venv/bin/python3 /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py jackal_op /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/src/jackal_op/msg/GradientDescent.msg std_msgs/Header
+[3/5] cd /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/jackal_op && /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/catkin_generated/env_cached.sh /home/ros/.matlab/R2023a/ros1/glnxa64/venv/bin/python3 /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py jackal_op /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/src/jackal_op/msg/MeshUWBCentral.msg std_msgs/Header
+[4/5] cd /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/jackal_op && /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build/catkin_generated/env_cached.sh /home/ros/.matlab/R2023a/ros1/glnxa64/venv/bin/python3 /opt/matlab/R2023a/sys/ros1/glnxa64/ros1/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py jackal_op /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/src/jackal_op/msg/MeshUWB.msg std_msgs/Header
+[4/5] Install the project...
+-- Install configuration: "Release"
+-- Installing: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/_setup_util.py
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/env.sh
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/setup.bash
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/local_setup.bash
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/setup.sh
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/local_setup.sh
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/setup.zsh
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/local_setup.zsh
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/.rosinstall
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/msg/GradientDescent.msg
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/msg/MeshUWB.msg
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/msg/MeshUWBCentral.msg
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/msg/TransformArray.msg
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/cmake/jackal_op-msg-paths.cmake
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include/jackal_op
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include/jackal_op/GradientDescent.h
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include/jackal_op/MeshUWB.h
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include/jackal_op/TransformArray.h
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include/jackal_op/MeshUWBCentral.h
+Listing '/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/devel/lib/python3/dist-packages/jackal_op'...
+Listing '/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/devel/lib/python3/dist-packages/jackal_op/msg'...
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/_TransformArray.py
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/_MeshUWB.py
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/_GradientDescent.py
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/_MeshUWBCentral.py
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/__pycache__
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/__pycache__/_MeshUWBCentral.cpython-38.pyc
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/__pycache__/_MeshUWB.cpython-38.pyc
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/__pycache__/_TransformArray.cpython-38.pyc
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/__pycache__/_GradientDescent.cpython-38.pyc
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/__pycache__/__init__.cpython-38.pyc
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/msg/__init__.py
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/__pycache__
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/__pycache__/__init__.cpython-38.pyc
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/jackal_op/__init__.py
+-- Installing: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/pkgconfig/jackal_op.pc
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/cmake/jackal_op-msg-extras.cmake
+-- Installing: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/cmake/jackal_opConfig.cmake
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/cmake/jackal_opConfig-version.cmake
+-- Installing: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/share/jackal_op/package.xml
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include/jackal_op
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/include/jackal_op/visibility_control.h
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/lib/libjackal_op_matlab.so
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m/
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages/+jackal_op
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages/+jackal_op/meshUWB.m
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages/+jackal_op/meshUWBCentral.m
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages/+jackal_op/transformArray.m
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages/+jackal_op/gradientDescent.m
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen/+jackal_op
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen/+jackal_op/MeshUWB.m
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen/+jackal_op/TransformArray.m
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen/+jackal_op/GradientDescent.m
+-- Up-to-date: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen/+jackal_op/MeshUWBCentral.m
+Base path: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64
+Source space: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/src
+Build space: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build
+Devel space: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/devel
+Install space: /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install
+####
+#### Running command: "cmake /home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/src -DALIAS_ROS1_CLASS_LOADER=1 -DBoost_NAMESPACE=mwboost -DCATKIN_ENABLE_TESTING=off -DCMAKE_PREFIX_PATH=/opt/matlab/R2023a/sys/ros1/glnxa64/ros1;/opt/matlab/R2023a/toolbox/ros/mlroscpp/custom_messages;/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE=-O0 -DCATKIN_DEVEL_PREFIX=/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/devel -DCMAKE_INSTALL_PREFIX=/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/install -G Ninja" in "/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build"
+####
+####
+#### Running command: "ninja install install -j16 -l16" in "/home/ros/workspace/Simulink/catkin_ws/src/matlab_msg_gen_ros1/glnxa64/build"
+####
