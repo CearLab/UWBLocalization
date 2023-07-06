@@ -48,7 +48,6 @@ services:
       - /sys:/sys
       - ~/.Xauthority:/home/ros/.Xauthority:rw
       - ~/.ssh:/home/ros/.ssh
-      - ~/Documents/MATLAB:/home/ros/MATLAB:rwx
       - ./config/.aliases.sh:/home/ros/.aliases.sh:rw
       - ./config/.p10k.zsh:/home/ros/.p10k.zsh:rw
       - ./config/.ros2_cmds.sh:/home/ros/.ros2_cmds.sh:rw
