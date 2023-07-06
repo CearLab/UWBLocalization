@@ -1,0 +1,255 @@
+# Technion project base Ubuntu 18.04 environment container.
+# For x86 systems.
+#
+# Federico Oliva <lvofrc95@outlook.it>
+#
+# April 3, 2023
+
+# BUILD THIS WITH:
+# --network host
+
+# Start from a focal image for linux/amd64
+FROM mathworks/matlab:r2023a
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Copy mirrored sources list
+COPY sources_focal.list /etc/apt/sources.list
+
+USER root
+
+# Install basic utilities
+RUN sudo apt-get update && apt-get install -y --no-install-recommends \
+    apt-utils \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    iproute2 \
+    lsb-core \
+    lsb-release \
+    openssh-client \
+    python3 \
+    python3-pip \
+    software-properties-common \
+    sudo && \
+    sudo add-apt-repository universe && \
+    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+
+# Install language and locales
+RUN sudo apt-get update && apt-get install -y --no-install-recommends \
+    locales && \
+    locale-gen en_US.UTF-8 && \
+    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+ENV LANG en_US.UTF-8
+
+# Install Python dependencies
+RUN yes | pip3 install --upgrade pip setuptools
+RUN yes | pip3 install -U \
+    argcomplete \
+    argparse \
+    cerberus \
+    coverage \
+    empy \
+    flake8 \
+    flake8-blind-except \
+    flake8-builtins \
+    flake8-class-newline \
+    flake8-comprehensions \
+    flake8-deprecated \
+    flake8-docstrings \
+    flake8-import-order \
+    flake8-quotes \
+    jinja2 \
+    matplotlib \
+    numpy \
+    nunavut \
+    packaging \
+    pandas \
+    pkgconfig \
+    pymavlink \
+    pyros-genmsg \
+    pyserial \
+    pytest \
+    pytest-cov \
+    python-dateutil \
+    pytest-repeat \
+    pytest-runner \
+    pytest-rerunfailures \
+    pyulog \
+    pyyaml \
+    requests \    
+    six \
+    testresources \
+    toml \
+    transitions \
+    wheel
+
+# Install development tools and other dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    astyle \
+    build-essential \
+    ccache \
+    cmake \
+    cppcheck \
+    file \
+    g++ \
+    gcc \
+    gdb \
+    gedit \
+    git \
+    htop \
+    less \
+    lcov \
+    make \
+    manpages-posix-dev \
+    minicom \
+    nano \
+    neofetch \
+    ninja-build \
+    pylint3 \
+    screen \
+    shellcheck \
+    tree \
+    uncrustify \
+    unzip \
+    vim \
+    wget \
+    xclip \
+    zip && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+
+# Install Java 11
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ant \
+    openjdk-11-jre \
+    openjdk-11-jdk \
+    libvecmath-java && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/* && \
+    update-alternatives --set java $(update-alternatives --list java | grep "java-11")
+
+# Install Zsh
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    zsh \
+    zsh-doc \
+    chroma && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+
+# Install Pangolin dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    libavdevice-dev \
+    libglew-dev \
+    libpython2.7-dev && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+
+# Install OpenCV dependencies
+RUN add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libavcodec-dev \
+    libavformat-dev \
+    libdc1394-22-dev \
+    libgtk2.0-dev \
+    libjasper1 \
+    libjasper-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libswscale-dev \
+    libtbb2 \
+    libtbb-dev \
+    libtiff-dev \
+    pkg-config \
+    python-dev \
+    python-numpy \
+    python3-numpy && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+
+# Install Boost C++ libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libboost-all-dev && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+
+# Cleanup
+RUN apt-get update && apt-get remove -y modemmanager && \
+    apt-get autoremove -y && \
+    apt-get autoclean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*
+
+WORKDIR /opt
+
+# Nvidia GPU architecture version (default: GeForce RTX 3000 series)
+# NOTE: You may have to configure this at build time!
+ARG CUDA_ARCH_BIN=8.6
+
+# Env vars for the nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES \
+    ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES \
+    ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+ENV QT_X11_NO_MITSHM 1
+
+# shouldn't be necesary (only for docker-nvidia1)
+# LABEL com.nvidia.volumes.needed="nvidia_driver"
+# ENV PATH /usr/local/nvidia/bin:${PATH}
+# ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+
+# NVIDIA DEPENDENCIES
+RUN \
+    if [ "$TARGET" = "nvidia" ]; then \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libegl1 \
+    libglvnd0 \
+    libgl1 \
+    libglx0 \
+    libxext6 \
+    libx11-6 && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*/apt/lists/*; \
+    fi
+
+# Add new user to system groups
+RUN usermod -aG adm matlab && \
+    usermod -aG dialout matlab && \
+    usermod -aG plugdev matlab && \
+    usermod -aG sudo matlab && \
+    usermod -aG tty matlab && \
+    usermod -aG video matlab
+
+ARG USER_UID=1005
+
+# Create a non-root sudo user with Zsh as shell
+RUN useradd -s /bin/bash --uid $USER_UID -m ros && \
+    echo ros ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/ros && \
+    chmod 0440 /etc/sudoers.d/ros
+ENV HOME=/home/ros
+RUN chsh -s /usr/bin/zsh ros
+
+# Add new user to system groups
+RUN usermod -aG adm ros && \
+    usermod -aG dialout ros && \
+    usermod -aG plugdev ros && \
+    usermod -aG sudo ros && \
+    usermod -aG tty ros && \
+    usermod -aG video ros
+
+# Create workspace directory: host workspaces will be mounted here
+RUN mkdir $HOME/workspace && \
+    chown ros $HOME/workspace
+
+# Create shell history and SSH directory for user
+RUN mkdir $HOME/zsh_history && \
+    chown ros $HOME/zsh_history
+RUN mkdir $HOME/.ssh
+USER matlab
+WORKDIR $HOME
+
+ENV DEBIAN_FRONTEND=dialog
+
+# Add image information
+LABEL author.name="Federico Oliva"
+LABEL author.email="lvofrc95@outlook.it"
+LABEL organization="Intelligent Systems Lab"
+LABEL description="MATLAB 2023 environment container for x86 systems"
+LABEL platform="linux/amd64"
+
+# Start shell in container
+CMD ["bash"]

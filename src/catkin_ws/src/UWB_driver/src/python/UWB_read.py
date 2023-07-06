@@ -196,23 +196,42 @@ def talker():
     for i in range(int(Nanchors)):
         msgA.markers.append(tmpMarker)
 
+    cnt = 0
+
     # loop
     while not rospy.is_shutdown():
         try:
             # get measurement
             A, D = serialRead(myserial, stopTime, D, A)
 
+            cnt = cnt +1
+
             # fill anchors and publish
             for i in range(int(Nanchors)):
 
                 tmpMarker = Marker()
-                tmpMarker.header.seq = 0
-                tmpMarker.header.stamp = rospy.get_rostime()            
+                tmpMarker.header.seq = cnt
+                tmpMarker.header.stamp = rospy.get_rostime()   
+                tmpMarker.header.frame_id = "world"         
                 tmpMarker.id = i
 
                 tmpMarker.pose.position.x = float(A[0][i])
                 tmpMarker.pose.position.y = float(A[1][i])
                 tmpMarker.pose.position.z = float(A[2][i])
+
+                tmpMarker.pose.orientation.w = 1
+                tmpMarker.pose.orientation.x = 0
+                tmpMarker.pose.orientation.y = 0
+                tmpMarker.pose.orientation.z = 0
+
+                tmpMarker.scale.x = 0.05
+                tmpMarker.scale.y = 0.05
+                tmpMarker.scale.z = 0.05
+
+                tmpMarker.color.r = 200
+                tmpMarker.color.g = 0
+                tmpMarker.color.b = 0
+                tmpMarker.color.a = 1
 
                 msgA.markers.pop(0)
                 msgA.markers.append(tmpMarker)

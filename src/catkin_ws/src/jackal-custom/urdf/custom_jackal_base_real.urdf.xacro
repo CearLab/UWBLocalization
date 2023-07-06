@@ -49,6 +49,7 @@
       </inertial>
     </link>
 
+    <!-- should be continuous but in rviz it bounces a lot -->
     <joint name="${prefix}_wheel" type="fixed">
       <parent link="chassis_link"/>
       <child link="${prefix}_wheel_link" />
@@ -56,13 +57,11 @@
     </joint>
   </xacro:macro>
 
-  <!---->
   <link name="world"></link>
   <joint name="world_joint" type="continuous">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="world"/>
-    <child link="odom" />
-    <update_rate value="50" />
+    <child link="world" />
     <axis xyz="0 1 0" />
   </joint>
 
@@ -72,7 +71,6 @@
     <parent link="odom"/>
     <child link="base_link" />
   </joint>
-  
   
   <link name="base_link"></link>
   <joint name="base_link_joint" type="fixed">
@@ -133,12 +131,6 @@
     </link>
   </xacro:unless>
 
-  <joint name="front_fender_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <parent link="chassis_link" />
-    <child link="front_fender_link" />
-  </joint>
-
   <xacro:if value="$(optenv JACKAL_FRONT_ACCESSORY_FENDER 0)">
     <link name="front_fender_link">
       <visual>
@@ -157,6 +149,12 @@
     </joint>
   </xacro:if>
 
+  <joint name="front_fender_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="chassis_link" />
+    <child link="front_fender_link" />
+  </joint>
+
   <xacro:unless value="$(optenv JACKAL_REAR_ACCESSORY_FENDER 0)">
     <link name="rear_fender_link">
       <visual>
@@ -167,12 +165,6 @@
       </visual>
     </link>
   </xacro:unless>
-
-  <joint name="rear_fender_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 ${PI}"/>
-    <parent link="chassis_link" />
-    <child link="rear_fender_link" />
-  </joint>
 
   <xacro:if value="$(optenv JACKAL_REAR_ACCESSORY_FENDER 0)">
     <link name="rear_fender_link">
@@ -191,6 +183,12 @@
       <child link="rear_fender_accessory_link" />
     </joint>
   </xacro:if>
+
+  <joint name="rear_fender_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 ${PI}"/>
+    <parent link="chassis_link" />
+    <child link="rear_fender_link" />
+  </joint>
 
 
   <!-- IMU LINK -->
@@ -247,7 +245,7 @@
   <!-- Optional standard accessories, including their simulation data. The rendering
        of these into the final description is controlled by optenv variables, which
        default each one to off.-->
-  <xacro:include filename="$(find jackal_description)/urdf/accessories.urdf.xacro" />
+  <!--xacro:include filename="$(find jackal_description)/urdf/accessories.urdf.xacro" /-->
 
   <!-- Optional custom includes. -->
   <xacro:include filename="$(optenv JACKAL_URDF_EXTRAS empty.urdf)" />

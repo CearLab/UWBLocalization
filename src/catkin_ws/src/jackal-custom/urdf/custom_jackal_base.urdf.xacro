@@ -79,7 +79,6 @@
     </transmission>
   </xacro:macro>
 
-  
   <link name="world"></link>
   <joint name="world_joint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
@@ -267,7 +266,7 @@
   <!-- Optional standard accessories, including their simulation data. The rendering
        of these into the final description is controlled by optenv variables, which
        default each one to off.-->
-  <xacro:include filename="$(find jackal_description)/urdf/accessories.urdf.xacro" />
+  <!--xacro:include filename="$(find jackal_description)/urdf/accessories.urdf.xacro" /-->
 
   <!-- Optional custom includes. -->
   <xacro:include filename="$(optenv JACKAL_URDF_EXTRAS empty.urdf)" />
@@ -277,11 +276,11 @@
       <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
           <alwaysOn>true</alwaysOn>
           <updateRate>50.0</updateRate>
-          <bodyName>base_link</bodyName>
+          <bodyName>odom</bodyName>
           <frameName>world</frameName>
           <topicName>ground_truth/state</topicName>
           <gaussianNoise>0.0</gaussianNoise>          
-          <xyzOffsets>0 0 0</xyzOffsets>
+          <xyzOffsets>0 0 -0.24</xyzOffsets>
           <rpyOffsets>0 0 0</rpyOffsets>
       </plugin>
   </gazebo>

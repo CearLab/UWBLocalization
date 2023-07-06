@@ -7,5 +7,4 @@ jack_disthandle_pubGrad: "/DT5/gradient"
 jackAPIName: "DT5API"
 NanchorMesh: 4
 Ntags: 3
-TagDists: [0.0]
 UWBrate: 5

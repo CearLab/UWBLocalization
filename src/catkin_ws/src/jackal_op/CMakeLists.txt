@@ -112,6 +112,9 @@ set(CERES_INCLUDE_DIR
 /usr/local/include/ceres 
 /usr/local/include/ceres/internal
 )
+set(VICON_INCLUDE_DIR
+/home/ros/workspace/Vicon/ViconDataStreamSDK_1.12/Linux64
+)
 
 # include
 include_directories(
@@ -119,6 +122,7 @@ include_directories(
   ${ALGLIBCPP_INCLUDE_DIR}
   ${OPTIM_INCLUDE_DIR}
   ${CERES_INCLUDE_DIR}
+  ${VICON_INCLUDE_DIR}
   ${LIBFUL_INCLUDE_DIR}
 )
 

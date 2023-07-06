@@ -24,12 +24,26 @@
     <arg name="enable_ekf" value="true" />
   </include>
 
+  <!-- Start navigation -->
+  <!--include file="$(find jackal-custom)/launch/control/Navigation.launch">
+  </include-->
+
 
   <!-- ###### REAL MEASUREMENTS ######-->
   <!-- UWB Distance measurement node  T0 -->
-  <!--node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
+  <node name="UWB_read_T0" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T0 0">
       <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T0.yaml"/>
-  </node-->
+  </node>
+
+  <!-- UWB Distance measurement node  T0 -->
+  <node name="UWB_read_T1" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T1 1">
+      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T1.yaml"/>
+  </node>
+
+  <!-- UWB Distance measurement node  T0 -->
+  <node name="UWB_read_T2" pkg="UWB_driver" type="UWB_read.py" args="UWB_read_T2 2">
+      <rosparam command="load" file="$(find UWB_driver)/config/UWB_driver_read_T2.yaml"/>
+  </node>
 
   <!-- Microstrain IMU measurements -->
   <!--include file="$(find jackal-custom)/launch/sensors/imu.launch">

@@ -9,7 +9,12 @@ lib/
 *pdf
 video/
 videos/
+Vicon/
+#vicon/
 *.gv
 jackal/
 test/
 src/catkin_ws/src/gtec/
+Simulink/catkin_ws/
+Simulink/fig/
+Simulink/test/

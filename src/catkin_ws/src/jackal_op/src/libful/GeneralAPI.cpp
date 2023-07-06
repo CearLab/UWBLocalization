@@ -87,7 +87,7 @@ ceresAPI::Result ceresAPI::solveSmall(arma::vec& p_arma, void* tag){
 
     // options
     Solver::Options options;
-    options.max_num_iterations = 100;
+    options.max_num_iterations = 10000;
     options.minimizer_progress_to_stdout = false;
 
     // minimizer - trust region
@@ -294,7 +294,7 @@ _Float64 genAPI::J(double* p, double* grad_out, double* A, double D){
     double norm = sqrt( pow((p[0]-A[0]),2) + pow((p[1]-A[1]),2) + pow((p[2]-A[2]),2));
 
     // compute J
-    //J = norm - D;
+    // J = norm - D;
     J = pow(norm,2) - pow(D,2);   
 
     // compute gradient
@@ -400,7 +400,7 @@ std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector
     xdot[genAPI::pos_p[1]] = x[genAPI::pos_v[1]];
     xdot[genAPI::pos_p[2]] = x[genAPI::pos_v[2]];
 
-    // integrate position
+    // integrate velocity
     xdot[genAPI::pos_v[0]] = x[genAPI::pos_a[0]] - x[genAPI::pos_b[0]];
     xdot[genAPI::pos_v[1]] = x[genAPI::pos_a[1]] - x[genAPI::pos_b[1]];
     xdot[genAPI::pos_v[2]] = x[genAPI::pos_a[2]] - x[genAPI::pos_b[2]];
@@ -414,6 +414,39 @@ std::vector<_Float64> genAPI::modelObserver(std::vector<_Float64> x, std::vector
     xdot[genAPI::pos_a[0]] = genAPI::alpha * (u[0] - x[genAPI::pos_a[0]]);
     xdot[genAPI::pos_a[1]] = genAPI::alpha * (u[1] - x[genAPI::pos_a[1]]);
     xdot[genAPI::pos_a[2]] = genAPI::alpha * (u[2] - x[genAPI::pos_a[2]]);
+
+    // integrate angular position - quaternion
+    arma::vec q = arma::zeros(4,1);
+    arma::vec qdot = arma::zeros(4,1);
+    q[0] = x[genAPI::pos_ang[0]];
+    q[1] = x[genAPI::pos_ang[1]];
+    q[2] = x[genAPI::pos_ang[2]];
+    q[3] = x[genAPI::pos_ang[3]];
+    arma::vec w = arma::zeros(3,1);
+    w[0] = x[genAPI::pos_w[0]] - x[genAPI::pos_bw[0]];
+    w[1] = x[genAPI::pos_w[1]] - x[genAPI::pos_bw[1]];
+    w[2] = x[genAPI::pos_w[2]] - x[genAPI::pos_bw[2]];
+    arma::mat44 S = {0    ,  -w(2),   +w(1),    w(0),
+                     +w(2),  0    ,   -w(0),    w(1),
+                     -w(1),  +w(0),   0,        w(2),
+                     -w(0),  -w(1),   -w(2),    0};
+    qdot = 0.5*S*q;
+    xdot[genAPI::pos_ang[0]] = qdot[0];
+    xdot[genAPI::pos_ang[1]] = qdot[1];
+    xdot[genAPI::pos_ang[2]] = qdot[2];
+    xdot[genAPI::pos_ang[3]] = qdot[3];
+
+    // ROS_WARN("q: %g %g %g %g", q[0], q[1], q[2], q[3]);
+
+    // integrate angular velocity bias
+    xdot[genAPI::pos_bw[0]] = 0.0;
+    xdot[genAPI::pos_bw[1]] = 0.0;
+    xdot[genAPI::pos_bw[2]] = 0.0;
+
+    // filter angular velocity
+    xdot[genAPI::pos_w[0]] = genAPI::alpha * (u[3] - x[genAPI::pos_w[0]]);
+    xdot[genAPI::pos_w[1]] = genAPI::alpha * (u[4] - x[genAPI::pos_w[1]]);
+    xdot[genAPI::pos_w[2]] = genAPI::alpha * (u[5] - x[genAPI::pos_w[2]]);
 
 
     return xdot;
@@ -436,4 +469,60 @@ std::vector<_Float64> genAPI::odeEuler(std::vector<_Float64> x, std::vector<_Flo
     std::transform(x.begin(), x.end(), xstep.begin(), xnew.begin(), std::plus<float>());
 
     return xnew;
+}
+
+// Gram-Schmidt
+arma::mat genAPI::gramschmidt(arma::mat U){
+
+    // define vars
+    arma::vec u = arma::zeros(3,1);
+    arma::vec v = arma::zeros(3,1);
+    arma::mat V = arma::zeros(3,3);
+    int i;
+
+    // start process - 3 dim for now
+    // see: https://math.hmc.edu/calculus/hmc-mathematics-calculus-online-tutorials/linear-algebra/gram-schmidt-method/
+    V.col(0) = U.col(0);
+    V.col(1) = U.col(1) - arma::dot(U.col(1),V.col(0))*V.col(0)/arma::norm(V.col(0));
+    V.col(2) = U.col(2) - arma::dot(U.col(2),V.col(0))*V.col(0)/arma::norm(V.col(0)) - arma::dot(U.col(2),V.col(1))*V.col(1)/arma::norm(V.col(1));
+
+    // normalization
+    for (i=0;i<3;i++){
+        V.col(i) = arma::normalise(V.col(i));
+    }
+
+    // test
+    // ROS_WARN("test: %g %g %g %g %g %g %g %g %g", U(0,0),U(1,0), U(2,0), U(0,1),U(1,1), U(2,1), U(0,2),U(1,2), U(2,2));
+    // ROS_WARN("test: %g %g %g %g %g %g %g %g %g", V(0,0),V(1,0), V(2,0), V(0,1),V(1,1), V(2,1), V(0,2),V(1,2), V(2,2));
+    // ROS_WARN("test dotprod: %g %g %g", arma::dot(V.col(0),V.col(1)), arma::dot(V.col(0),V.col(2)), arma::dot(V.col(1),V.col(2)));
+    // ROS_WARN("test norm: %g %g %g", arma::norm(V.col(0)), arma::norm(V.col(1)), arma::norm(V.col(2)));
+    
+    return V;
+}
+
+// Procustes
+arma::mat genAPI::procustes(arma::mat Cw, arma::mat Co){
+
+    // each column of W is a vector in the world frame
+    // each column of U is a vector in the odom frame
+    // we want to solve Oi = R*Wi forall i, with R orthogonal
+    // check (21/06) solution at: https://simonensemble.github.io/posts/2018-10-27-orthogonal
+    // -procrustes/#:~:text=The%20orthogonal%20Procrustes%20problem%20is,molecular%20modeling%2C%20and%20speech%20translation.
+
+    // variables
+    arma::mat R = arma::zeros(3,3);
+
+    // SVD variables
+    arma::mat U = arma::zeros(3,3);
+    arma::mat V = arma::zeros(3,3);
+    arma::vec omega = arma::zeros(3,1);
+
+    // compute singular value decomposition
+    arma::svd(U,omega,V,Cw*Co.t());
+
+    // compute result
+    R = V*U.t();
+
+    return R;
+
 }

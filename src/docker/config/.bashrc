@@ -4,6 +4,8 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+source /etc/bash_completion.d/git-prompt
+
 # NuttX toolchain location (for development containers)
 if ! echo "$BOARD" | grep -q 'up' && ! echo "$BOARD" | grep -q 'nx'; then
   export PATH=/opt/gcc-arm-none-eabi-9-2020-q2-update/bin:$PATH
@@ -135,10 +137,13 @@ fi
 # Favorite program choices
 EDITOR=/usr/bin/nano
 
-# pyenv
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-source /opt/ros/melodic/setup.bash
+# stuff
+source /opt/ros/noetic/setup.bash
 export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib
-export LD_LIBRARY_PATH=/opt/ros/melodic/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib:/usr/lib:/usr/local/lib
+export USAGE=cloud
+export VARIANTmatlab=matlabLNUexport USAGE=cloud
+export VARIANTmatlab=matlabLNU
+export USAGE=cloud
+export VARIANTmatlab=matlabLNU
+export USAGE=cloud
+export VARIANTmatlab=matlabLNU

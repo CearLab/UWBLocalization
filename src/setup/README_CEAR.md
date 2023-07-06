@@ -151,7 +151,7 @@
 # export path
 # $ export ARMA_INCLUDE_PATH=/usr/lib
 # $ cd ..
-# ARMADILLO: general matrix computations and optimization (check link: 30/05/2023 - following README)
+# OPTIMLIB: general matrix computations and optimization (check link: 30/05/2023 - following README)
 # $ git clone --recurse-submodules git@github.com:kthohr/optim.git
 # $ cd optim
 # $ ./configure -i "/usr/local" -l arma -p

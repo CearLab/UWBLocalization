@@ -25,6 +25,7 @@ int main(int argc, char **argv)
     int cnt = 0;
     int rate = 100;
     int tagID = 5;
+    bool isFramePresent;
     std::string ID;
 
     // get tagID - default 5
@@ -48,7 +49,6 @@ int main(int argc, char **argv)
      * Then create handle for subscribing.
      */
     std::string subNameIMU, subNameOdom, pubNameOdom, pubNameIMU, pubNameBias, jackName;
-    std::vector<_Float64> TagDists;
     int Nanchors, Ntags; 
 
     // check params
@@ -70,8 +70,6 @@ int main(int argc, char **argv)
     flags.push_back(np.hasParam(tmp));
     tmp = "/DT" + std::to_string(tagID) + "/Ntags";
     flags.push_back(np.hasParam(tmp));
-    tmp = "/DT" + std::to_string(tagID) + "/TagDists";
-    flags.push_back(np.hasParam(tmp));
 
     // init rate for the node
     tmp = "/" + ID + "/HYBrate";
@@ -84,7 +82,7 @@ int main(int argc, char **argv)
     if (std::all_of(std::begin(flags), std::end(flags),[](bool b){return b;})) {
 
         // params found
-        ROS_INFO("Params found");
+        ROS_WARN("Params found");
 
         // get topics and init data
         tmp = "/" + ID + "/jack_hybobs_subIMU";
@@ -103,12 +101,14 @@ int main(int argc, char **argv)
         np.getParam(tmp, Nanchors); 
         tmp = "/DT" + std::to_string(tagID) + "/Ntags";
         np.getParam(tmp, Ntags);  
-        tmp = "/DT" + std::to_string(tagID) + "/TagDists";
-        np.getParam(tmp, TagDists);
 
         // instance of a class - tagID 7 
-        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, TagDists, rate);
-        ROS_INFO("jackAPI - Class instance created");
+        jackAPI jackNode = jackAPI(jackName, Nanchors, tagID, Ntags, rate);
+        ROS_WARN("jackAPI - Class instance created");
+
+        // init buffer and listener
+        static tf2_ros::Buffer tfBuffer; // problem line
+        tf2_ros::TransformListener tfListener(tfBuffer);
 
         // subscribe
         jackNode._jack_disthandle_SIMU = np.subscribe(subNameIMU, 1000, &jackAPI::ChatterCallbackHybCont, &jackNode);
@@ -125,6 +125,12 @@ int main(int argc, char **argv)
 
         // spin with loop rate
         while (ros::ok()) {
+
+            // from odom to world
+            isFramePresent = (tfBuffer._frameExists("base_link") && tfBuffer._frameExists("imu_link"));
+            if (isFramePresent){
+                jackNode._transformStamped.transforms[jackNode._Ntags] = tfBuffer.lookupTransform("base_link","imu_link",ros::Time(0));
+            }
 
             //spin
             ros::spinOnce();
