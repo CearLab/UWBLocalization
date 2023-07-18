@@ -2,8 +2,9 @@
 #include "MelodicAPI.hpp"
 
 /** **** CONSTRUCTOR **** */
-jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate) 
-: _gen(std::random_device{}()), _distribution(0.0,0.0){
+jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate)
+    : _gen(std::random_device{}()), _distribution(0.0, 0.05)
+{
 
     // counters
     int i, j, k;
@@ -21,7 +22,7 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate)
     _tagID = tagID;
 
     ROS_WARN("ID init: %d", _tagID);
-    
+
     // dimensions of mesh
     _Nanchors = Nanchors;
     _Ntags = Ntags;
@@ -30,7 +31,8 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate)
 
     // push back TagSet
     genAPI::Tag TagZero = genAPI::TagInit(Nanchors);
-    for (i=0; i<_Ntags; i++){
+    for (i = 0; i < _Ntags; i++)
+    {
         _TagSet.Tags.push_back(TagZero);
     }
 
@@ -38,221 +40,238 @@ jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate)
     geometry_msgs::TransformStamped TransZero;
     // use it for pushbacks
     // for each tag I want the child-odom and I also want the odom-world transform
-    for (i=0; i<_Ntags+1; i++){
+    for (i = 0; i < _Ntags + 1; i++)
+    {
         _transformStamped.transforms.push_back(TransZero);
     }
 
     // setup Tag set
-    _TagSet.Ntags =_Ntags;
-    for (i=0; i<_Ntags; i++){
+    _TagSet.Ntags = _Ntags;
+    for (i = 0; i < _Ntags; i++)
+    {
         _TagSet.Tags[i].Nanchors = _Nanchors;
     }
     _TagSet.Npairs = 0; // there is no need to put theta in the optimization rn
     _TagSet.Nanchors = _Nanchors;
-    
+
     // counter
     _cnt = 0;
 
     // integration rate
-    _dt = (float)1/rate;
+    _dt = (float)1 / rate;
 
     // observer state
-    for (i=0;i<genAPI::stateDim;i++){
+    for (i = 0; i < genAPI::stateDim; i++)
+    {
         _xnew.push_back(0.0);
-    }     
+    }
     _xnew[genAPI::pos_ang[3]] = 1.0;
 
     // create transform
-    if (_tagID == 0){
+    if (_tagID == 0)
+    {
         _Godom.child_frame_id = "rear_tag";
-        _Godom.header.frame_id = "base_link";      
+        _Godom.header.frame_id = "base_link";
     }
-    else if (_tagID == 1){
+    else if (_tagID == 1)
+    {
         _Godom.child_frame_id = "right_tag";
-        _Godom.header.frame_id = "base_link"; 
+        _Godom.header.frame_id = "base_link";
     }
-    else if (_tagID == 2){
+    else if (_tagID == 2)
+    {
         _Godom.child_frame_id = "left_tag";
         _Godom.header.frame_id = "base_link";
     }
-    else {
+    else
+    {
         _Godom.child_frame_id = "imu_link";
         _Godom.header.frame_id = "base_link";
     }
 
     // set covariance
-    _Godom.pose.covariance = 
-    {
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0 
-    };
-    _Godom.twist.covariance = 
-    {
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0 
-    };
-    _Gimu.angular_velocity_covariance = 
-    {
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0
-    };
-    _Gimu.linear_acceleration_covariance = 
-    {
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0
-    };
-    _Gbias.angular_velocity_covariance = 
-    {
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0
-    };
-    _Gbias.linear_acceleration_covariance = 
-    {
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0
-    };
+    _Godom.pose.covariance =
+        {
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    _Godom.twist.covariance =
+        {
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    _Gimu.angular_velocity_covariance =
+        {
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0};
+    _Gimu.linear_acceleration_covariance =
+        {
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0};
+    _Gbias.angular_velocity_covariance =
+        {
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0};
+    _Gbias.linear_acceleration_covariance =
+        {
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0};
 
     // init J, GJ, HJ
     _G.J = 0;
-    for (i=0; i<3; i++) {
+    for (i = 0; i < 3; i++)
+    {
         _G.GJ.push_back(0.0);
     }
-    for (i=0; i<9; i++) {
+    for (i = 0; i < 9; i++)
+    {
         _G.HJ.push_back(0.0);
     }
 
     // quaternion
-    for (i=0; i<3; i++) {
+    for (i = 0; i < 3; i++)
+    {
         _G.N.push_back(0.0);
     }
-    
+
     // init p
-    std::vector<_Float64> p(_Ntags*3 + _Npairs, 0.0);
+    std::vector<_Float64> p(_Ntags * 3 + _Npairs, 0.0);
     _p = p;
-    for (i=0; i<_Ntags; i++){
+    for (i = 0; i < _Ntags; i++)
+    {
         _TagSet.Tags[i].p = _p;
     }
-    
+
     // init distance vectors
-    for (i=0; i<_Nanchors; i++) {
+    for (i = 0; i < _Nanchors; i++)
+    {
 
         // init distances - class
         _DT.push_back(0.0);
 
-        for (j=0; j<_Ntags; j++){
+        for (j = 0; j < _Ntags; j++)
+        {
 
             _DoptCentral.push_back(0.0);
             _DTmsgCentral.DC.push_back(0.0);
 
             _G.p.push_back(0.0);
             _G.pg.push_back(0.0);
-
         }
 
         // init markerarray
         _AtrueMsg.markers.push_back(zeroMark);
-        
-        // init Anchors position
-        for (j=0; j<3; j++){
 
-            for (k=0; k<_Ntags; k++){
-            _A.push_back(0.0);
-            _G.A.push_back(0.0);
-            _TagSet.Tags[k].A.push_back(0.0);
+        // init Anchors position
+        for (j = 0; j < 3; j++)
+        {
+
+            for (k = 0; k < _Ntags; k++)
+            {
+                _A.push_back(0.0);
+                _G.A.push_back(0.0);
+                _TagSet.Tags[k].A.push_back(0.0);
             }
         }
     }
 
-    //ROS_INFO("Consructor: ok");
-
+    // ROS_INFO("Consructor: ok");
 }
 
 /** **** METHODS **** */
 
 // set links
-void jackAPI::GetFrames(std::string& child, std::string& base, int tagID){
+void jackAPI::GetFrames(std::string &child, std::string &base, int tagID)
+{
 
     // create transform
-    if (tagID == 0){
+    if (tagID == 0)
+    {
         child = "rear_tag";
-        base = "base_link";      
+        base = "base_link";
     }
-    else if (tagID == 1){
+    else if (tagID == 1)
+    {
         child = "right_tag";
-        base = "base_link";  
+        base = "base_link";
     }
-    else if (tagID == 2){
-        child  = "left_tag";
-        base = "base_link";  
+    else if (tagID == 2)
+    {
+        child = "left_tag";
+        base = "base_link";
     }
-    else {
-        child  =  "imu_link";
-        base = "base_link";  
+    else
+    {
+        child = "imu_link";
+        base = "base_link";
     }
-
 }
 
 // subscriber callback - centralized
-void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
+void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging &msg)
+{
 
     std::vector<_Float64> p0(_p.size(), 0.0);
     int i, j;
 
-    //init with current estimate
-    // p0 = _p;
+    // init with current estimate
+    //  p0 = _p;
 
-    try {
+    try
+    {
 
         // save distance read from tag
-        _DT[msg.anchorId] = (double)msg.range/1000;
+        _DT[msg.anchorId] = (double)msg.range / 1000;
 
         // populate correct tag in the UWB message
-        if (msg.tagId < _Ntags){            
-              
-            // set distance used to optimize
-            _DoptCentral[_Nanchors*msg.tagId  + msg.anchorId] = _DT[msg.anchorId];
+        if (msg.tagId < _Ntags)
+        {
 
+            // set distance used to optimize
+            _DoptCentral[_Nanchors * msg.tagId + msg.anchorId] = _DT[msg.anchorId];
         }
-        else {
+        else
+        {
             ROS_ERROR("WRONG ID - ChatterCallback: tag %d Ntag %d", msg.tagId, _Ntags);
         }
     }
-    catch(...){
+    catch (...)
+    {
         ROS_INFO("WRONG tag ID");
     }
 
     // set the message
-    _DTmsgCentral.DC = _DoptCentral; 
-        
+    _DTmsgCentral.DC = _DoptCentral;
+
     //_get time
     _DTmsgCentral.header.stamp = _begin.now();
 
     // publish the distance wrapper
     _jack_disthandle_P.publish(_DTmsgCentral);
 
-    //ROS_INFO("Published distances");
+    // ROS_INFO("Published distances");
 
     // call newton raphson
-    try {
+    try
+    {
 
         // copy anchors
-        for (i=0;i<_Ntags;i++){
+        for (i = 0; i < _Ntags; i++)
+        {
             _TagSet.Tags[i].A = _A;
         }
-        
-        //optimize
+
+        // optimize
         int success = 0;
         auto t1 = std::chrono::high_resolution_clock::now();
         // success = genAPI::OptimMin(p0, _DoptCentral, &_TagSet);
@@ -266,77 +285,81 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         std::chrono::duration<double, std::milli> ms_double = t2 - t1;
 
         // info
-        //ROS_WARN("Optim exec time: %g", (_Float64)ms_double.count());
+        // ROS_WARN("Optim exec time: %g", (_Float64)ms_double.count());
 
         // get final cumulative position
-        for (i=0;i<_Ntags;i++){
-            p0[3*i] = _TagSet.Tags[i].p[0];
-            p0[3*i + 1] = _TagSet.Tags[i].p[1];
-            p0[3*i + 2] = _TagSet.Tags[i].p[2];
+        for (i = 0; i < _Ntags; i++)
+        {
+            p0[3 * i] = _TagSet.Tags[i].p[0];
+            p0[3 * i + 1] = _TagSet.Tags[i].p[1];
+            p0[3 * i + 2] = _TagSet.Tags[i].p[2];
         }
 
         // if orientation is computed ok, otherwise unused
-        arma::mat W = arma::zeros(3,_Ntags);
-        arma::mat O = arma::zeros(3,_Ntags);
-        arma::mat DELTA = arma::zeros(3,_Ntags);
-        arma::mat R = arma::zeros(3,3);
-        arma::vec Pwo = arma::zeros(3,1);
-        arma::vec delta = arma::zeros(3,1);
+        arma::mat W = arma::zeros(3, _Ntags);
+        arma::mat O = arma::zeros(3, _Ntags);
+        arma::mat DELTA = arma::zeros(3, _Ntags);
+        arma::mat R = arma::zeros(3, 3);
+        arma::vec Pwo = arma::zeros(3, 1);
+        arma::vec delta = arma::zeros(3, 1);
 
         // test vectors
-        arma::mat TEST = arma::zeros(3,2);
-        arma::vec test = arma::zeros(3,1);
+        arma::mat TEST = arma::zeros(3, 2);
+        arma::vec test = arma::zeros(3, 1);
 
         // now we get the orientation
-        if (_Ntags == 3){
+        if (_Ntags == 3)
+        {
 
             // fill matrix W with the WORLD coordinates
-            // these coordinates have been obtained with 
+            // these coordinates have been obtained with
             // the optimization process
-            for (i=0;i<_Ntags;i++){
-                W.col(i) = {p0[3*i+0], p0[3*i+1], p0[3*i+2]};
+            for (i = 0; i < _Ntags; i++)
+            {
+                W.col(i) = {p0[3 * i + 0], p0[3 * i + 1], p0[3 * i + 2]};
             }
-            
+
             // fill matrix O with the Tags coordinates with
-            // respect to the ODOM reference frame. They are 
+            // respect to the ODOM reference frame. They are
             // gathered form the _transform array
-            for (i=0;i<_Ntags;i++){
+            for (i = 0; i < _Ntags; i++)
+            {
                 O.col(i) = {-_transformStamped.transforms[i].transform.translation.x,
                             -_transformStamped.transforms[i].transform.translation.y,
                             -_transformStamped.transforms[i].transform.translation.z};
             }
-        
+
             // get the translation vector:
-            // fromn the outcome of the optimization we 
+            // fromn the outcome of the optimization we
             // can get an estimate of the ODOM frame.
             // If the tags were perfectly symmetric wr2
-            // ODOM, we could just take the mean. If not, 
+            // ODOM, we could just take the mean. If not,
             // check some workarounds, as in this case:
             // mean over the 2 xy symmetric, and remove the common
             // offset on z.
 
             // just take the centroid, remove Z and who cares
-            Pwo = -arma::mean(W,1);
-            Pwo(2) = Pwo(2) + 1*O.col(0)(2);
+            Pwo = -arma::mean(W, 1);
+            Pwo(2) = Pwo(2) + 1 * O.col(0)(2);
             // ROS_WARN("Test: %g %g %g", Pwo(0), Pwo(1), Pwo(2));
-                
+
             // remove translation from WORLD coordinates:
             // R*(W - T) = O --> R*DELTA = O
-            for (i=0;i<3;i++){
+            for (i = 0; i < 3; i++)
+            {
                 DELTA.col(i) = W.col(i) + Pwo;
             }
-            
-            // compute Rotation matrix: 
+
+            // compute Rotation matrix:
             // Solve analytically R*DELTA = O
             // This is indeed Rwo
-            R = genAPI::procustes(DELTA,O);
-
+            R = genAPI::procustes(DELTA, O);
         }
         else
         {
             // solution with 1 tag only - no orientation
-            Pwo = {p0[0], 
-                   p0[1], 
+            Pwo = {p0[0],
+                   p0[1],
                    p0[2]};
             Pwo = -Pwo;
         }
@@ -350,14 +373,14 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         _G.header.stamp = _begin.now();
 
         // gradient odom
-        _Godom.header.stamp = _G.header.stamp; 
+        _Godom.header.stamp = _G.header.stamp;
 
         // RESET ESTIMATE (we want odom-world)
-        // This uses Pow = -Pwo as a current estimate of 
+        // This uses Pow = -Pwo as a current estimate of
         // ODOM reference frame
         _Godom.pose.pose.position.x = -Pwo(0);
         _Godom.pose.pose.position.y = -Pwo(1);
-        _Godom.pose.pose.position.z = -Pwo(2);   
+        _Godom.pose.pose.position.z = -Pwo(2);
 
         // assign orientation from Rwo
         tf2::Quaternion quat;
@@ -365,9 +388,9 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         // first: I want Row = Rwo.t()
         R = R.t();
         // set to tf2 var
-        Mat.setValue(R(0,0), R(0,1), R(0,2),
-                     R(1,0), R(1,1), R(1,2),
-                     R(2,0), R(2,1), R(2,2));
+        Mat.setValue(R(0, 0), R(0, 1), R(0, 2),
+                     R(1, 0), R(1, 1), R(1, 2),
+                     R(2, 0), R(2, 1), R(2, 2));
         // get quaternion
         Mat.getRotation(quat);
         // assign quaternion
@@ -375,47 +398,48 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging& msg){
         _Godom.pose.pose.orientation.x = quat.getX();
         _Godom.pose.pose.orientation.y = quat.getY();
         _Godom.pose.pose.orientation.z = quat.getZ();
-        
+
         // publish
         _jack_trilateration_P.publish(_G);
         _jack_odometry_P.publish(_Godom);
 
-        //ROS_INFO("Published gradient");
+        // ROS_INFO("Published gradient");
     }
-    catch(...){
+    catch (...)
+    {
         ROS_INFO("Failed Optim + Transform");
     }
-    
+
     // DEBUG
     _cnt++;
-
 }
 
 // subscriber callback - used to get the position of the anchors
-void jackAPI::ChatterCallbackA(const visualization_msgs::MarkerArray& msg) {
+void jackAPI::ChatterCallbackA(const visualization_msgs::MarkerArray &msg)
+{
 
     // init
     int id = 0;
 
     // store anchors positions
-    for (int i=0;i<_Nanchors;i++){
+    for (int i = 0; i < _Nanchors; i++)
+    {
 
         id = (i)*3;
         _A[id] = msg.markers[i].pose.position.x;
-        _A[id+1] = msg.markers[i].pose.position.y;
-        _A[id+2] = msg.markers[i].pose.position.z;
+        _A[id + 1] = msg.markers[i].pose.position.y;
+        _A[id + 2] = msg.markers[i].pose.position.z;
+    }
 
-    }    
-
-    //ROS_INFO("Anchors received");
-
+    // ROS_INFO("Anchors received");
 }
 
 // subscriber callback - used to create synthetic true distances from ptrue
-void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
+void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry &msg)
+{
 
     // define position
-    std::vector<_Float64> ptrue(3,0.0);
+    std::vector<_Float64> ptrue(3, 0.0);
 
     // random noise
 
@@ -440,7 +464,7 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
 
     // orientation
     tf2::Quaternion quaternion;
-    quaternion.setW(input.pose.orientation.w);  
+    quaternion.setW(input.pose.orientation.w);
     quaternion.setX(input.pose.orientation.x);
     quaternion.setY(input.pose.orientation.y);
     quaternion.setZ(input.pose.orientation.z);
@@ -453,49 +477,51 @@ void jackAPI::ChatterCallbackDtrue(const nav_msgs::Odometry& msg){
     tf2::Vector3 p1;
 
     // rotation + translation of array
-    p1 = matrix*(delta) + p0;
+    p1 = matrix * (delta) + p0;
 
     // final
-    _Float64 x,y,z;
+    _Float64 x, y, z;
     x = p1[0];
     y = p1[1];
     z = p1[2];
 
     // get true distances
-    for (i=0;i<_Nanchors;i++){
+    for (i = 0; i < _Nanchors; i++)
+    {
 
         // get index
-        idA = 3*i;  
+        idA = 3 * i;
 
         // noise
         noise = _distribution(_gen);
 
-        // compute true distance      
-        _DT[i] = sqrt( pow((x -_A[idA]),2) + 
-                       pow((y -_A[idA+1]),2) + 
-                       pow((z -_A[idA+2]),2)) + noise;
+        // compute true distance
+        _DT[i] = sqrt(pow((x - _A[idA]), 2) +
+                      pow((y - _A[idA + 1]), 2) +
+                      pow((z - _A[idA + 2]), 2)) +
+                 noise;
 
         // set other data in the messages
         _DTrueMsg.anchorId = i;
         _DTrueMsg.tagId = _tagID;
-        _DTrueMsg.range = (int)(_DT[i]*1000);
+        _DTrueMsg.range = (int)(_DT[i] * 1000);
 
         // publish on topic
         _jack_disthandle_P.publish(_DTrueMsg);
-    }     
-
+    }
 }
 
 // callback for the true anchors publishing
-void jackAPI::ChatterCallbackAtrue(const ros::TimerEvent& event){
-
+void jackAPI::ChatterCallbackAtrue(const ros::TimerEvent &event)
+{
 
     int i, idx;
 
-    for (i=0;i<_Nanchors;i++) {
+    for (i = 0; i < _Nanchors; i++)
+    {
 
         // index for x,y,z
-        idx = 3*i;
+        idx = 3 * i;
 
         // set anchor header
         _AtrueMsg.markers[i].header.seq += 1;
@@ -505,8 +531,8 @@ void jackAPI::ChatterCallbackAtrue(const ros::TimerEvent& event){
 
         // set anchor position (ith)
         _AtrueMsg.markers[i].pose.position.x = genAPI::Anchors[idx];
-        _AtrueMsg.markers[i].pose.position.y = genAPI::Anchors[idx+1];
-        _AtrueMsg.markers[i].pose.position.z = genAPI::Anchors[idx+2];
+        _AtrueMsg.markers[i].pose.position.y = genAPI::Anchors[idx + 1];
+        _AtrueMsg.markers[i].pose.position.z = genAPI::Anchors[idx + 2];
 
         // set anchor orientation
         _AtrueMsg.markers[i].pose.orientation.w = 1;
@@ -526,12 +552,11 @@ void jackAPI::ChatterCallbackAtrue(const ros::TimerEvent& event){
     }
 
     _jack_disthandle_PA.publish(_AtrueMsg);
-
-
 }
 
 // subscriber callback - implements th jump map of the hybrid observer
-void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
+void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry &msg)
+{
 
     // update the _xnew with the jump map
     std::vector<_Float64> xnow(genAPI::stateDim, 0.0);
@@ -543,14 +568,14 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     _xnew[genAPI::pos_p[2]] = xnow[genAPI::pos_p[2]] + genAPI::theta[0] * (msg.pose.pose.position.z - xnow[genAPI::pos_p[2]]);
 
     // velocity
-    _xnew[genAPI::pos_v[0]] = xnow[genAPI::pos_v[0]] + genAPI::theta[1] * (msg.pose.pose.position.x - xnow[genAPI::pos_p[0]] );
-    _xnew[genAPI::pos_v[1]] = xnow[genAPI::pos_v[1]] + genAPI::theta[1] * (msg.pose.pose.position.y - xnow[genAPI::pos_p[1]] );
-    _xnew[genAPI::pos_v[2]] = xnow[genAPI::pos_v[2]] + genAPI::theta[1] * (msg.pose.pose.position.z - xnow[genAPI::pos_p[2]] );
+    _xnew[genAPI::pos_v[0]] = xnow[genAPI::pos_v[0]] + genAPI::theta[1] * (msg.pose.pose.position.x - xnow[genAPI::pos_p[0]]);
+    _xnew[genAPI::pos_v[1]] = xnow[genAPI::pos_v[1]] + genAPI::theta[1] * (msg.pose.pose.position.y - xnow[genAPI::pos_p[1]]);
+    _xnew[genAPI::pos_v[2]] = xnow[genAPI::pos_v[2]] + genAPI::theta[1] * (msg.pose.pose.position.z - xnow[genAPI::pos_p[2]]);
 
     // bias
-    _xnew[genAPI::pos_b[0]] = xnow[genAPI::pos_b[0]] + genAPI::theta[2] * (msg.pose.pose.position.x - xnow[genAPI::pos_p[0]] );
-    _xnew[genAPI::pos_b[1]] = xnow[genAPI::pos_b[1]] + genAPI::theta[2] * (msg.pose.pose.position.y - xnow[genAPI::pos_p[1]] );
-    _xnew[genAPI::pos_b[2]] = xnow[genAPI::pos_b[2]] + genAPI::theta[2] * (msg.pose.pose.position.z - xnow[genAPI::pos_p[2]] );
+    _xnew[genAPI::pos_b[0]] = xnow[genAPI::pos_b[0]] + genAPI::theta[2] * (msg.pose.pose.position.x - xnow[genAPI::pos_p[0]]);
+    _xnew[genAPI::pos_b[1]] = xnow[genAPI::pos_b[1]] + genAPI::theta[2] * (msg.pose.pose.position.y - xnow[genAPI::pos_p[1]]);
+    _xnew[genAPI::pos_b[2]] = xnow[genAPI::pos_b[2]] + genAPI::theta[2] * (msg.pose.pose.position.z - xnow[genAPI::pos_p[2]]);
 
     // acceleration
     _xnew[genAPI::pos_a[0]] = xnow[genAPI::pos_a[0]];
@@ -566,25 +591,25 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry& msg){
     // ROS_WARN("_G.N: %g %g %g %g", _G.N[0], _G.N[1], _G.N[2], _G.N[3]);
 
     // orientation
-    _xnew[genAPI::pos_ang[0]] = xnow[genAPI::pos_ang[0]] + genAPI::gamma[0] * (msg.pose.pose.orientation.x - xnow[genAPI::pos_ang[0]] );
-    _xnew[genAPI::pos_ang[1]] = xnow[genAPI::pos_ang[1]] + genAPI::gamma[0] * (msg.pose.pose.orientation.y - xnow[genAPI::pos_ang[1]] );
-    _xnew[genAPI::pos_ang[2]] = xnow[genAPI::pos_ang[2]] + genAPI::gamma[0] * (msg.pose.pose.orientation.z - xnow[genAPI::pos_ang[2]] );
-    _xnew[genAPI::pos_ang[3]] = xnow[genAPI::pos_ang[3]] + genAPI::gamma[0] * (msg.pose.pose.orientation.w - xnow[genAPI::pos_ang[3]] );
+    _xnew[genAPI::pos_ang[0]] = xnow[genAPI::pos_ang[0]] + genAPI::gamma[0] * (msg.pose.pose.orientation.x - xnow[genAPI::pos_ang[0]]);
+    _xnew[genAPI::pos_ang[1]] = xnow[genAPI::pos_ang[1]] + genAPI::gamma[0] * (msg.pose.pose.orientation.y - xnow[genAPI::pos_ang[1]]);
+    _xnew[genAPI::pos_ang[2]] = xnow[genAPI::pos_ang[2]] + genAPI::gamma[0] * (msg.pose.pose.orientation.z - xnow[genAPI::pos_ang[2]]);
+    _xnew[genAPI::pos_ang[3]] = xnow[genAPI::pos_ang[3]] + genAPI::gamma[0] * (msg.pose.pose.orientation.w - xnow[genAPI::pos_ang[3]]);
 
     // angular velocity bias
-    _xnew[genAPI::pos_bw[0]] = 0*xnow[genAPI::pos_bw[0]];
-    _xnew[genAPI::pos_bw[1]] = 0*xnow[genAPI::pos_bw[1]];
-    _xnew[genAPI::pos_bw[2]] = 0*xnow[genAPI::pos_bw[2]];
+    _xnew[genAPI::pos_bw[0]] = 0 * xnow[genAPI::pos_bw[0]];
+    _xnew[genAPI::pos_bw[1]] = 0 * xnow[genAPI::pos_bw[1]];
+    _xnew[genAPI::pos_bw[2]] = 0 * xnow[genAPI::pos_bw[2]];
 
     // angular velocity
     _xnew[genAPI::pos_w[0]] = xnow[genAPI::pos_w[0]];
     _xnew[genAPI::pos_w[1]] = xnow[genAPI::pos_w[1]];
     _xnew[genAPI::pos_w[2]] = xnow[genAPI::pos_w[2]];
-
 }
 
 // subscriber callback - implements th jump map of the hybrid observer
-void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
+void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu &msg)
+{
 
     // init IMU meas
     std::vector<_Float64> IMU(3, 0.0);
@@ -611,11 +636,11 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     // change frame for angular velocity
     tf2::Matrix3x3 R(quatO);
     tf2::Vector3 omegaold = {OMEGA[0], OMEGA[1], OMEGA[2]};
-    tf2::Vector3 delta = {_transformStamped.transforms[_Ntags].transform.translation.x, 
+    tf2::Vector3 delta = {_transformStamped.transforms[_Ntags].transform.translation.x,
                           _transformStamped.transforms[_Ntags].transform.translation.y,
                           _transformStamped.transforms[_Ntags].transform.translation.z};
     tf2::Vector3 omeganew;
-    omeganew = R*omegaold + delta;
+    omeganew = R * omegaold + delta;
 
     // ROS_WARN("test: %g %g %g", delta[0], delta[1], delta[2]);
     // ROS_WARN("test: %g %g %g", R[0][0], R[0][1], R[0][2]);
@@ -625,8 +650,8 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     // ROS_WARN("test: %g %g %g", omegaold[0], omegaold[1], omegaold[2]);
     // ROS_WARN("test: %g %g %g", omeganew[0], omeganew[1], omeganew[2]);
 
-    //ROS_INFO("IMU meas: %g %g %g", IMU[0], IMU[1], IMU[2]);
-    //ROS_INFO("dt: %g", _dt);
+    // ROS_INFO("IMU meas: %g %g %g", IMU[0], IMU[1], IMU[2]);
+    // ROS_INFO("dt: %g", _dt);
 
     // integrate
     _xnew = genAPI::odeEuler(_xnew, U, _dt);
@@ -637,14 +662,14 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
     quat.setY(_xnew[genAPI::pos_ang[1]]);
     quat.setZ(_xnew[genAPI::pos_ang[2]]);
     quat.setW(_xnew[genAPI::pos_ang[3]]);
-    double qnorm = std::sqrt(quat.getX()*quat.getX() + quat.getY()*quat.getY() + quat.getZ()*quat.getZ() + quat.getW()*quat.getW());
-    _xnew[genAPI::pos_ang[0]] = _xnew[genAPI::pos_ang[0]]/qnorm;
-    _xnew[genAPI::pos_ang[1]] = _xnew[genAPI::pos_ang[1]]/qnorm;
-    _xnew[genAPI::pos_ang[2]] = _xnew[genAPI::pos_ang[2]]/qnorm;
-    _xnew[genAPI::pos_ang[3]] = _xnew[genAPI::pos_ang[3]]/qnorm;
+    double qnorm = std::sqrt(quat.getX() * quat.getX() + quat.getY() * quat.getY() + quat.getZ() * quat.getZ() + quat.getW() * quat.getW());
+    _xnew[genAPI::pos_ang[0]] = _xnew[genAPI::pos_ang[0]] / qnorm;
+    _xnew[genAPI::pos_ang[1]] = _xnew[genAPI::pos_ang[1]] / qnorm;
+    _xnew[genAPI::pos_ang[2]] = _xnew[genAPI::pos_ang[2]] / qnorm;
+    _xnew[genAPI::pos_ang[3]] = _xnew[genAPI::pos_ang[3]] / qnorm;
 
     // ROS_WARN("Xnew: %g %g %g %g", _xnew[genAPI::pos_ang[0]], _xnew[genAPI::pos_ang[1]], _xnew[genAPI::pos_ang[2]], _xnew[genAPI::pos_ang[3]]);
-    //ROS_INFO("Xnew: %g %g %g", _xnew[genAPI::pos_p[0]], _xnew[genAPI::pos_p[1]], _xnew[genAPI::pos_p[2]]);
+    // ROS_INFO("Xnew: %g %g %g", _xnew[genAPI::pos_p[0]], _xnew[genAPI::pos_p[1]], _xnew[genAPI::pos_p[2]]);
 
     // fill message and publish - odometry
     _Godom.header = msg.header;
@@ -677,7 +702,7 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
 
     // fill message and publish - IMU
     _Gimu.header = msg.header;
-    
+
     // acceleration - linear
     _Gimu.linear_acceleration.x = _xnew[genAPI::pos_a[0]] - _xnew[genAPI::pos_b[0]];
     _Gimu.linear_acceleration.y = _xnew[genAPI::pos_a[1]] - _xnew[genAPI::pos_b[1]];
@@ -693,7 +718,7 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
 
     // fill message and publish - bias
     _Gbias.header = msg.header;
-    
+
     // acceleration - linear
     _Gbias.linear_acceleration.x = _xnew[genAPI::pos_b[0]];
     _Gbias.linear_acceleration.y = _xnew[genAPI::pos_b[1]];
@@ -706,14 +731,13 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu& msg){
 
     // publish
     _jack_Bias_P.publish(_Gbias);
-
 }
 
 // callback to remap odometry to another frame
-void jackAPI::ChatterCallbackRemap(const nav_msgs::Odometry& msg){
+void jackAPI::ChatterCallbackRemap(const nav_msgs::Odometry &msg)
+{
 
     // copy the msg - very dummy
     // ROS_WARN("startFrame IN: %s", msg.header.frame_id.c_str());
     _Godom = msg;
 }
-

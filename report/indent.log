@@ -1,0 +1,22 @@
+INFO: latexindent version 3.7.1, 2019-09-07, a script to indent .tex files
+      latexindent lives here: /usr/share/texlive/texmf-dist/scripts/latexindent/
+      Tue Jul 18 12:21:40 2023
+      Filename: /home/latex/workspace/sections/__latexindent_temp_problem_statement.tex
+INFO: Processing switches:
+      -c|--cruft: cruft directory
+INFO: Directory for backup files and /home/latex/workspace/indent.log: /home/latex/workspace/
+INFO: YAML settings read: defaultSettings.yaml
+      Reading defaultSettings.yaml from /usr/share/texlive/texmf-dist/scripts/latexindent/defaultSettings.yaml
+INFO: YAML settings read: indentconfig.yaml or .indentconfig.yaml
+      Home directory is /home/latex (didn't find either indentconfig.yaml or .indentconfig.yaml)
+      To specify user settings you would put indentconfig.yaml here: /home/latex/indentconfig.yaml
+      Alternatively, you can use the hidden file .indentconfig.yaml as: /home/latex/.indentconfig.yaml
+INFO: Phase 1: searching for objects
+INFO: Phase 2: finding surrounding indentation
+INFO: Phase 3: indenting objects
+INFO: Phase 4: final indentation check
+INFO: Output routine:
+      Not outputting to file; see -w and -o switches for more options.
+      --------------
+INFO: Please direct all communication/issues to:
+      https://github.com/cmhughes/latexindent.pl

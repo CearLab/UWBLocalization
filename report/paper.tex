@@ -1,9 +1,6 @@
 \documentclass[10pt]{article}
-\usepackage{cvpr/cvpr}
 \usepackage[table,dvipsnames]{xcolor}
 \usepackage{diagbox}
-\usepackage{ctex}
-\usepackage{CJKutf8}
 \usepackage{epsfig}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -36,7 +33,7 @@
 \titleformat{\subsection}
   {\normalfont\large\bfseries}{}{0em}{}
 \titleformat{\subsubsection}
-  {\normalfont\bfseries}{}{1em}{}  
+  {\normalfont\bfseries}{}{1em}{}
 \setcounter{tocdepth}{2}
 \titlecontents{section}
   [1.5em] {\large\bfseries}{}{}
@@ -53,8 +50,6 @@
 {(#3)}% Right rule
 }
 \usepackage{datenumber}
-\usepackage{emoji/emoji}
-\setemojifont{TwemojiMozilla}
 \usepackage{url}
 \graphicspath{{figs/}}
 \newcommand\paperurl[1]{{\footnotesize{\color{blue}{\url{#1}}}}}
@@ -102,21 +97,25 @@
 
 \setlength\parindent{0pt}
 
-\title{Visiting project - progress report}
-\author{Federico Oliva(lvofrc95@outlook.it)}
+\title{Jackal localization}
+\author{Federico Oliva(federico.oliva.it@gmail.com)}
 
 \maketitle
 \renewcommand*\contentsname{{}}
 \input{cvpr/notation}
 \tableofcontents
 
-\input{secs/1-logs}
-\input{secs/2-notes}
-\input{secs/3-experiments}
+\input{sections/introduction.tex}
+\input{sections/problem_statement.tex}
+\input{sections/observer_design.tex}
+\input{sections/experimental_setup.tex}
+\input{sections/results.tex}
+\input{sections/conclusions.tex}
 
 \newpage
 {\small
 	\bibliographystyle{ieee_fullname.bst}
 	\bibliography{ref}
 }
+
 \end{document}
