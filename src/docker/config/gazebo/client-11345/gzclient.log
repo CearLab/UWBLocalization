@@ -1,7 +1,0 @@
-Gazebo multi-robot simulator, version 9.0.0
-Copyright (C) 2012 Open Source Robotics Foundation.
-Released under the Apache 2 License.
-http://gazebosim.org
-
-
-(1688549995 212072309) [Wrn] [GuiIface.cc:199] g/gui-plugin is really loading a SystemPlugin. To load a GUI plugin please use --gui-client-plugin 
