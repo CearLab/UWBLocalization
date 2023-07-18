@@ -1,0 +1,121 @@
+\documentclass[10pt]{article}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage{diagbox}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{csquotes}
+\usepackage[super]{nth}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{subfigure}
+\usepackage{lipsum}
+\usepackage{dsfont}
+\usepackage{pifont}
+\usepackage{epigraph}
+\usepackage{amsfonts} % for mathbb
+\usepackage{booktabs} % for multi table
+\usepackage{verbatim} % for //
+\usepackage{titlesec}
+\usepackage{titletoc}
+
+% tikz
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,shadows,positioning,calc,math}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{backgrounds}
+\usepackage[siunitx]{circuitikz}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries}{}{-1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}{}{0em}{}
+\titleformat{\subsubsection}
+  {\normalfont\bfseries}{}{1em}{}
+\setcounter{tocdepth}{2}
+\titlecontents{section}
+  [1.5em] {\large\bfseries}{}{}
+  {\titlerule*[1em]{\tiny.}\contentspage}
+\titlecontents{subsection}
+  [4em] {}{}{}
+  {\titlerule*[1em]{\tiny.}\contentspage}
+  
+\usepackage{xcolor}
+
+\newcommand*{\myrulefill}[4][]{%
+  #1%
+  \textbf{{#4}} \hfill% Left rule
+{(#3)}% Right rule
+}
+\usepackage{datenumber}
+\usepackage{url}
+\graphicspath{{figs/}}
+\newcommand\paperurl[1]{{\footnotesize{\color{blue}{\url{#1}}}}}
+
+\usepackage[linktoc=all,pagebackref=true,linkcolor=black,breaklinks=true,letterpaper=true,colorlinks,bookmarks=true]{hyperref}
+\usepackage{calc}
+
+% my packages
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{bm}
+\usepackage{cleveref}
+
+\newcounter{datetoday}
+\newcounter{diffyears}
+\newcounter{diffmonths}
+\newcounter{diffdays}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{theorem}{Theorem}
+
+
+\newcommand{\difftoday}[3]{%
+      \setmydatenumber{datetoday}{\the\year}{\the\month}{\the\day}%
+      \setmydatenumber{diffdays}{#1}{#2}{#3}%
+      \addtocounter{diffdays}{-\thedatetoday}%
+      \ifnum\value{diffdays}>0
+        \def\diffbefore{in }%
+        \def\diffafter{}%
+      \else
+        \def\diffbefore{}%
+        \def\diffafter{already}%
+        \setcounter{diffdays}{-\value{diffdays}}%
+      \fi
+      \diffbefore
+      \thediffdays\space Days
+      \diffafter
+}
+
+\newcommand\zhCN[1]{\begin{CJK}{UTF8}{gkai}{#1}\end{CJK}}
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+\begin{document}
+
+\setlength\parindent{0pt}
+
+\title{Jackal localization}
+\author{Federico Oliva(federico.oliva.it@gmail.com)}
+
+\maketitle
+\renewcommand*\contentsname{{}}
+\input{cvpr/notation}
+\tableofcontents
+
+\input{sections/introduction.tex}
+\input{sections/problem_statement.tex}
+\input{sections/observer_design.tex}
+\input{sections/experimental_setup.tex}
+\input{sections/results.tex}
+\input{sections/conclusions.tex}
+
+\newpage
+{\small
+	\bibliographystyle{ieee_fullname.bst}
+	\bibliography{ref}
+}
+
+\end{document}
