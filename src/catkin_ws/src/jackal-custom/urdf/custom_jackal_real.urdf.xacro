@@ -43,7 +43,7 @@
     </link>
 
     <joint name="right_tag_joint" type="fixed">
-        <origin xyz="0.15 0.25 0.184" rpy="0 0 0"/>
+        <origin xyz="0.15 -0.25 0.184" rpy="0 0 0"/>
         <parent link="chassis_link"/>
         <child link="right_tag"/>
     </joint>
@@ -74,7 +74,7 @@
     </link>
 
     <joint name="left_tag_joint" type="fixed">
-        <origin xyz="0.15 -0.25 0.184" rpy="0 0 0"/>
+        <origin xyz="0.15 0.25 0.184" rpy="0 0 0"/>
         <parent link="chassis_link"/>
         <child link="left_tag"/>
     </joint>
