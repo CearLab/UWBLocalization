@@ -55,8 +55,9 @@ However, the benefits of this approach could be the followings:
 \end{itemize}
 
 \myrulefill{.5\linewidth}{\textit{November, 29}}{\noindent Hybrid observer}
+\label{par:hyb_obs}
 \newline
-We are currently working on a hybrid observer to exploit measurements with consistently different sampling times (it's still in an early stage). Consider the following setup: 
+We are currently working on a hybrid observer to exploit measurements with consistently different sampling times (it's still in an early stage). Consider the following setup, where the plant describes for instance a rover's dynamics: 
 
 \begin{equation}
     \label{eqn:multirate_ss}
@@ -64,11 +65,11 @@ We are currently working on a hybrid observer to exploit measurements with consi
     \begin{cases}
         x_t &= f(x_{t-1},u_t) + \omega_t \\
         z_t &= h(x_t) + e_t \\
-        y_{t} &= g(x_{t-K-1},u_{t-K}) + v_t
+        d_{t} &= g(x_{t-K-1},u_{t-K}) + v_t
     \end{cases}
 \end{equation}
 
-where $x_t\in\mathbb{R^n}$ is the state vector, $z_t\in\mathbb{R}^p$ is a measurement vector available at a high sampling rate, namely the same rate used to integrate the system. Instead, $y_t\in\mathbb{R}^l$ is a measurement vector whose sampling rate is lower than the previous one, i.e., it is acquired every $K$ samples. Lastly, $\omega_t$ the process noise, and $(e_t,v_t)$ are the measurement noise. Let's consider $||e_t|| \geq ||v_t||$ as a general assumption. Thus, low-frequency measurements are considered more reliable than high-frequency ones. We consider these assumptions as we are developing this solution for a case study in which we have the following sensors available: 
+where $x_t\in\mathbb{R^n}$ is the state vector, and more specifically $p$ is the rover position, and $v$ the velocity. $z_t\in\mathbb{R}^p$ is a vector of IMU measurements available at a high sampling rate, namely the same rate used to integrate the system. Instead, $d_t\in\mathbb{R}^l$ is a vector of relative distances whose sampling rate is lower than the previous one, i.e., it is acquired every $K$ samples. Lastly, $\omega_t$ is the process noise, and $(e_t,v_t)$ are the measurement noise. Let's consider $||e_t|| \geq ||v_t||$ as a general assumption. Thus, low-frequency measurements are considered more reliable than high-frequency ones. In the current framework, i.e. the rover, we consider the following sensors available: 
 
 \begin{itemize}
     \item IMU: providing acceleration at high frequency but with high noise and drifting issues.
@@ -83,54 +84,107 @@ The idea is to design an observer in the following form:
     \mathcal{O} \text{ : }
     \begin{cases}
         \xi_t &= f_o(\xi_{t-1},\theta,u_t,z_t) \\
-        \theta &= j^{+}(y_t) \\
+        \theta &= j^{+}(\tilde{p}_t) \\
         \hat{x}_t &= \gamma(\xi_t,u_t) 
     \end{cases}
 \end{equation}
 
-where $\xi_t\in\mathbb{R}^o$ is the observer state, $\hat{x}_t\in\mathbb{R}^n$ is the observer output (i.e. the state estimation), and $\theta\in\mathbb{R}^h$ is a set of parameters determined by a jump-map $j^{+}$. Such map is responsible for a discrete state-reset event on $\xi_t$. This reset aims to exploit the more reliable information from the low-frequency measurements to improve the estimation performance on $\hat{x}_t$. The main idea is depicted in \cref{fig:hyb}, where $(z_t^*,y_t^*)$ are $\mathcal{P}$ measurements without noise, and the control input $u$ is assumed zero to ease the notation. Note that an event trigger \textbf{E} is included in the scheme as the jump map $j^+$ acts on the observer state only when the low-frequency measurement $y_t$ is collected.
+where $\xi_t\in\mathbb{R}^o$ is the observer state, $\hat{x}_t\in\mathbb{R}^n$ is the observer output (i.e. the state estimation), and $\theta\in\mathbb{R}^h$ is a set of parameters determined by a jump-map $j^{+}$. Such map is responsible for a discrete state-reset event on $\xi_t$, and exploits information gathered from the UWB measurments. Currently, we are performing a gradient-like optimization on the rover position by using $d_t$ measurements. The main idea is depicted in \cref{fig:hyb}, where $(z_t^*,d_t^*)$ are $\mathcal{P}$ measurements without noise, and the control input $u$ is assumed zero to ease the notation. Note that an event trigger \textbf{E} is included in the scheme as the jump map $j^+$ acts on the observer state only when the low-frequency measurement $d_t$ is collected. In \cref{fig:hyb} the output of the optimization process is referred to as $\tilde{p}_t$, and it is provided to the jump map $j^+$ instead of the raw measurements $d_t$.
 
-\begin{figure}[h!]
-        \label{fig:hyb}
+\medskip
+The reset performed by $j^+$, aims to exploit the more reliable information from the low-frequency measurements to improve the estimation performance on $\hat{x}_t$. 
+
+%%
+
+\begin{figure}[h!]        
 	\centering
 	\begin{tikzpicture}[
 			squarednode_black/.style={rectangle, draw=black!60, fill=black!5, very thick},
 			circlenode/.style={circle, draw=black!60, fill=black!5, very thick},
-			node distance=2.5cm]
+			node distance=3cm]
 			
 		%Nodes
+            % Plant
 		\node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm] (P) {$\bm{\mathcal{P}}$};
+            % Observer
 		\node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm] (O) [xshift=-0cm,below=of P] {$f_o$};
-            \node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm](J) [right=of O] {$j^+$};
-            \node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm] (UWB) [right=of J] {UWB};       
-            %\node[squarednode_black,minimum width = 1cm,minimum height = 1cm] (E) [xshift=-2.3cm,yshift=-1.5cm,above=of J] {E};       
-            % circles
+            % jump
+            \node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm](J) [right=of O] {$j^+$};                     
+            % S1
             \node[draw,circle,minimum size=0.5cm,inner sep=0pt] (S1) [yshift=1.5cm,below=of P] {$+$};
-            \node[draw,circle,minimum size=0.5cm,inner sep=0pt] (S2) [xshift=1.5cm,left=of UWB] {$+$};
+            % S2
+            \node[draw,circle,minimum size=0.5cm,inner sep=0pt] (S2) [xshift=1cm,right=of P] {$+$};
+            % Gradient
+            \node[squarednode_black,minimum width = 2.5cm,minimum height = 1cm] (OPT) [yshift=2cm,below=of S2] {OPT};
 		
 		
 
 		%Lines
             % Plant
-		\draw[black, ultra thick, ->] (P.east) -- ([xshift=8.8cm]P.east) node [xshift=-3cm,above] (TextNode) {$x_t$} -- (UWB.north);
+		\draw[black, ultra thick, ->] (P.east) -- ([xshift=2cm]P.east) node [xshift=0cm,above] (TextNode) {$d_t^*$} -- (S2.west);
             % z meas            
             \draw[black, ultra thick, ->] (P.south) -- (S1.north) node [yshift=0.5cm,right] (TextNode) {$z^*_t$};
             \draw[black, ultra thick, ->] ([xshift=1cm]S1.east) -- (S1.east) node [xshift=0.5cm,above] (TextNode) {$e_t$};
             \draw[black, ultra thick, ->] (S1.south) -- (O.north) node [yshift=0.5cm,right] (TextNode) {$z_t$};
-            % y meas
-            \draw[black, ultra thick, ->] (UWB.west) -- (S2.east) node [xshift=0.5cm,above] (TextNode) {$y^*_t$};
+            % y meas            
             \draw[black, ultra thick, ->] ([yshift=1cm]S2.north) -- (S2.north) node [yshift=0.5cm,right] (TextNode) {$v_t$};
-            \draw[black, ultra thick, ->] (S2.west) -- (J.east) node [xshift=0.5cm,above] (TextNode) {$y_t$};
+            \draw[black, ultra thick, ->] (S2.south) -- ([yshift=-0.5cm]S2.south) node [right] (TextNode) {$d_t$} -- (OPT.north);
             % theta and switch
+            \draw[black, ultra thick,->] (OPT.south) -- (J.north) node [yshift=0.7cm,right] (TextNode) {$\tilde{p}_t$};
             \draw[black, ultra thick,] (J.west) -- ([xshift=1.5cm]O.east) node [xshift=0.5cm,above] (TextNode) {$\theta$};
             \draw[black, ultra thick,] ([yshift=0.5cm,xshift=1.5cm]O.east) node [xshift=0cm,above] (TextNode) {\textbf{E}} -- ([xshift=1cm]O.east) -- (O.east);
             %\draw[black, ultra thick,] (E.south) --([yshift=0.5cm,xshift=1.5cm]O.east);
             
             % xhat
-            \draw[black, ultra thick, ->] (O.west) -- ([xshift=-1cm]O.west) node [xshift=0.5cm,above] (TextNode) {$\hat{x}_t$};
+            \draw[black, ultra thick, ->] (O.west) -- ([xshift=-1.5cm]O.west) node [xshift=0.7cm,above] (TextNode) {$[\hat{p}_t,\hat{v}_t]$} -- ([yshift=-1.5cm,xshift=-1.5cm]O.west) -- ([yshift=-1.5cm,xshift=9cm]O.west) --([xshift=2.2cm]OPT.center) --(OPT.east);
 		
 		
 		
 	\end{tikzpicture}	
-	\caption{\centering Hybrid observer}
+	\caption{\label{fig:hyb}\centering Hybrid observer}
 \end{figure}
+
+\myrulefill{.5\linewidth}{\textit{January, 9}}{\noindent Hybrid observer - rover example}
+
+The Hybrid Observer from \cref{par:hyb_obs} has been developed, and the main characteristics of the framework are detailed here. 
+
+\begin{itemize}
+    \item Plant $\mathcal{P}$: the model of the rover is the following
+
+    \begin{equation}
+        \label{eqn:P_rover}
+        \mathcal{P} \ : \ 
+        \begin{cases}
+            \dot{x}_1 &= x_2 \\
+            \dot{x}_2 &= u_x \\    
+            \dot{x}_3 &= x_4 \\
+            \dot{x}_4 &= u_y \\                        
+        \end{cases},
+    \end{equation}
+    
+    where $[x_1,x_2,x_3,x_4] = [p_x,v_x,p_y,v_y]$, and the dynamics are modeled as a simple double integrator. The model input on the two dimensions is $\bm{u} = [u_x,u_y] \in \mathbb{R}^2$. As far as the measurements are concerned, the following holds: 
+
+    \begin{itemize}
+        \item IMU measure: 
+        \begin{equation}
+            \label{eqn:IMU}
+            z = 
+            \begin{bmatrix}
+                \dot{x_2} & \dot{x}_4
+            \end{bmatrix}
+            + e \in \mathbb{R}^2.
+        \end{equation} 
+        The IMU error model is additive and yields $e = \mathcal{N}(0,1) \ [m/s^2]$.
+        \item UWB measure: consider a set of $N$ anchors, with positions $\bm{p_{a_i}} = [p_{a_i,x} \ p_{a_i,y}] \in \mathbb{R}^2$. The UWB sensors provide a set of distances 
+
+        \begin{equation}
+            \label{eqn:UWB_meas}
+            \bm{d} = [d_1,\dots,d_n] + v \ \in\mathbb{R}^N,
+        \end{equation}        
+        with $v \in \mathcal{N}(0.07,0.2) \ [m]$ and
+        \begin{equation}
+            \label{eqn:UWB_dist_def}
+            d_i \triangleq \sqrt{(x_1-p_{a_i,x})^2 + (x_3-p_{a_i,y})^2}.
+        \end{equation}        
+    \end{itemize}
+\end{itemize}
