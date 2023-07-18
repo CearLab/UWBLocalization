@@ -1,9 +1,0 @@
-[submodule "src/catkin_ws/src/gtec/rosmsgs"]
-	path = src/catkin_ws/src/gtec/rosmsgs
-	url = https://github.com/valentinbarral/rosmsgs
-#[submodule "src/catkin_ws/src/robot_localization_custom"]
-#	path = src/catkin_ws/src/robot_localization_custom
-#	url = git@github.com:fedeoli/robot_localization_custom.git
-#[submodule "src/catkin_ws/src/imu_3dm_gx4"]
-#	path = src/catkin_ws/src/imu_3dm_gx4
-#	url = git@github.com:KumarRobotics/imu_3dm_gx4.git

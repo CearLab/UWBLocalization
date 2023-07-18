@@ -1,6 +1,0 @@
-# Ignore everything Gazebo might create in this folder
-*
-
-# Except our stuff
-!.gitignore
-!models/

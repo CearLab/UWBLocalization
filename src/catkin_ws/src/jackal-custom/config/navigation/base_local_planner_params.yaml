@@ -1,5 +1,0 @@
-TrajectoryPlannerROS:
-
-  # Robot Configuration Parameters
-  holonomic_robot: false
-
