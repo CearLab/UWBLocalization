@@ -3,7 +3,7 @@
 
 /** **** CONSTRUCTOR **** */
 jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate)
-    : _gen(std::random_device{}()), _distribution(0.0, 0.05)
+    : _gen(std::random_device{}()), _distribution(0.0, 0.00)
 {
 
     // counters
