@@ -48,10 +48,12 @@ function data = plotBag(out,plotF)
             % labels
             set(gca,'fontsize', fontsize)         
             ylabel(['p_',num2str(i)])
+            ylim([-3 3]);
         end
         %linkaxes(ax);
         legend('Pos')   
-        xlabel('time [s]') 
+        xlabel('time [s]')
+        xlim('auto');
     end
 
     %% position estimation error
@@ -74,10 +76,12 @@ function data = plotBag(out,plotF)
             % labels
             set(gca,'fontsize', fontsize)         
             ylabel(['e_',num2str(i)])
+            ylim([-3 3]);
         end
         %linkaxes(ax);
         legend('Err')   
         xlabel('time [s]') 
+        xlim('auto');
     end
 
     %% pose estimation
