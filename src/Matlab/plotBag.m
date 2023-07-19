@@ -110,15 +110,18 @@ function data = plotBag(out,plotF)
     data.q(:,1) = x;
     data.qhat(:,1) = xhat;
 
+    data.q = quatnormalize(data.q);
+    data.qhat = quatnormalize(data.qhat);
+
     [pitch, roll, yaw] = quat2angle( data.q, 'YXZ' );
-    data.RPY(:,1) = wrapToPi(roll);
-    data.RPY(:,2) = wrapToPi(pitch);
-    data.RPY(:,3) = wrapToPi(yaw);
+    data.RPY(:,1) = roll;
+    data.RPY(:,2) = pitch;
+    data.RPY(:,3) = yaw;
 
     [pitch, roll, yaw] = quat2angle( data.qhat, 'YXZ' );
-    data.RPYhat(:,1) = wrapToPi(roll);
-    data.RPYhat(:,2) = wrapToPi(pitch);
-    data.RPYhat(:,3) = wrapToPi(yaw);
+    data.RPYhat(:,1) = roll;
+    data.RPYhat(:,2) = pitch;
+    data.RPYhat(:,3) = yaw;
 
     if plotF
         for i=1:3
@@ -134,6 +137,25 @@ function data = plotBag(out,plotF)
         end
         %linkaxes(ax);
         legend('Ang')   
+        xlabel('time [s]') 
+    end
+
+    if plotF
+        fig_count = fig_count +1;
+        figure(fig_count)
+        for i=1:4
+            subplot(4,1,i);
+            box on
+            hold on
+            grid on
+            plot(time,data.q(:,i),'b','LineWidth',2);
+            plot(time,data.qhat(:,i),'r','LineWidth',2);
+            % labels
+            set(gca,'fontsize', fontsize)         
+            ylabel(['e_',num2str(i)])
+        end
+        %linkaxes(ax);
+        legend('Quat')   
         xlabel('time [s]') 
     end
 
@@ -159,7 +181,33 @@ function data = plotBag(out,plotF)
             ylabel(['e_',num2str(i)])
         end
         %linkaxes(ax);
-        legend('Err')   
+        legend('Ang Err')   
+        xlabel('time [s]') 
+    end
+
+    %% quaternion estimation error
+    if plotF
+        fig_count = fig_count +1;
+        figure(fig_count)
+    end
+
+    data.equat = quatmultiply(data.q,data.qhat);
+    data.eangMean = mean(data.equat(startpos:endpos,:),1);
+    data.eangSigma = std(data.equat(startpos:endpos,:),0,1);
+
+    if plotF
+        for i=1:4
+            subplot(4,1,i);
+            box on
+            hold on
+            grid on
+            plot(time,data.equat(:,i),'b','LineWidth',2);
+            % labels
+            set(gca,'fontsize', fontsize)         
+            ylabel(['e_',num2str(i)])
+        end
+        %linkaxes(ax);
+        legend('Quat Err')   
         xlabel('time [s]') 
     end
    
