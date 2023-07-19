@@ -1,0 +1,11 @@
+#Configuation for robot odometry EKF
+#
+jack_hybobs_subIMU: "/imu/data"
+jack_hybobs_subOdom: "/DT5/gradientOdom"
+jack_hybobs_pubOdom: "/HYB5/Odom"
+jack_hybobs_pubIMU: "/HYB5/IMU"
+jack_hybobs_pubBias: "/HYB5/Bias"
+DistjackAPIName: "HYB5API"
+NanchorMesh: 4
+Ntags: 3
+HYBrate: 100

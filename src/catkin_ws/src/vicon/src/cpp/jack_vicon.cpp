@@ -157,6 +157,7 @@ int main(int argc, char** argv) {
       isFramePresent = (tfBuffer._frameExists("base_link") && tfBuffer._frameExists("vicon_link"));
       if (isFramePresent){
           Transform = tfBuffer.lookupTransform("vicon_link","base_link",ros::Time(0));
+          // Transform = tfBuffer.lookupTransform("base_link","vicon_link",ros::Time(0));
       }
       quatPos.setW(Transform.transform.rotation.w);
       quatPos.setX(Transform.transform.rotation.x);
@@ -170,6 +171,7 @@ int main(int argc, char** argv) {
       delta[1] = Transform.transform.translation.y;
       delta[2] = Transform.transform.translation.z;
       PosNew = RPos*PosOld + delta;
+      // PosNew = PosOld;
 
       ViconMsg.pose.pose.position.x = PosNew[0];
       ViconMsg.pose.pose.position.y = PosNew[1];
