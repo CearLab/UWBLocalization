@@ -107,26 +107,26 @@ imu0_config: [false, false, false,
 imu0_differential: false
 imu0_remove_gravitational_acceleration: true
 
-#imu1: /HYB5/IMU
-#imu1_config: [false, false, false,
-#              false, false, false,
-#              false, false, false,
-#              false, false, false,
-#              true, true, true]
-#imu1_differential: false
-#imu1_remove_gravitational_acceleration: false
-#imu1_config_variance: [0.0, 0.0, 0.0,
-#                       0.0, 0.0, 0.0,
-#                       0.0, 0.0, 0.0,
-#                       0.0, 0.0, 0.0,
-#                       0.01, 0.01, 0.01]
+imu1: /HYB5/IMU
+imu1_config: [false, false, false,
+              false, false, false,
+              false, false, false,
+              false, false, false,
+              true, true, true]
+imu1_differential: false
+imu1_remove_gravitational_acceleration: false
+imu1_config_variance: [0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0,
+                       0.01, 0.01, 0.01]
 
 # initial state
-initial_state: [10.0, 10.0, 10.0
-                10.0, 10.0, 10.0,
-                10.0, 10.0, 10.0,
-                10.0, 10.0, 10.0,
-                10.0, 10.0, 10.0]
+initial_state: [0.0, 0.0, 0.0
+                0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0]
 
 # process covariance gains
 #                         x      y     z     R     P     Y     xdot  ydot  zdot    Rdot  Pdot  Ydot  xddot yddot zddot  
