@@ -10,6 +10,7 @@ function data = plotBag(out,plotF)
     % define time ofr gorund truth and estimation
     time = out.vicon.MessageList.Time - out.vicon.StartTime;
     timehat = out.EKF.MessageList.Time - out.EKF.StartTime;
+    data.time = time;
     startpos = floor(numel(time)/2);
     endpos = numel(time)-1;
 
@@ -214,6 +215,66 @@ function data = plotBag(out,plotF)
         legend('Quat Err')   
         xlabel('time [s]') 
     end
+
+    %% distances
+
+    if plotF
+        fig_count = fig_count +1;
+        figure(fig_count)
+    end
+
+    xhat = zeros(12,length(out.UWBData));
+    xhat = cell2mat(cellfun(@(m) double(m.DC),out.UWBData,'UniformOutput',false));
+    xhat = reshape(xhat,12,length(out.UWBData))';
+    for i=1:size(xhat,2)
+        tmp(:,i) = resample(xhat(:,i),numel(x),size(xhat,1));
+    end
+    xhat = tmp;
+    data.UWB = xhat;
+
+    if plotF
+        sgtitle('Tag distances')
+        ax = zeros(1,3);
+        for i=1:3
+            subplot(3,1,i);
+            hold on
+            grid on
+            box on
+    
+            % indicize axes        
+            ax(i)=subplot(3,1,i);     
+            
+            
+            plot(time,data.UWB(:,4*(i-1)+1),'LineWidth',2,'Color','r');
+            plot(time,data.UWB(:,4*(i-1)+2),'LineWidth',2,'Color','g');
+            plot(time,data.UWB(:,4*(i-1)+3),'LineWidth',2,'Color','b');
+            plot(time,data.UWB(:,4*(i-1)+4),'LineWidth',2,'Color','k');
+                
+            % labels
+            set(gca,'fontsize', fontsize)         
+            ylabel(['DT_',num2str(i)])
+        end
+        %linkaxes(ax);
+        legend('Meas')   
+        xlabel('time [s]') 
+    end
+
+    %% getIMU
+    data.IMU(:,1) = cellfun(@(m) double(m.LinearAcceleration.X),out.IMUData);
+    data.IMU(:,2) = cellfun(@(m) double(m.LinearAcceleration.Y),out.IMUData);
+    data.IMU(:,3) = cellfun(@(m) double(m.LinearAcceleration.Z),out.IMUData);
+    for i = 1:3
+        tmp(:,i) = resample(data.IMU(:,i),numel(x),size(data.IMU(:,i),1));
+    end
+    data.IMU = tmp;
+
+    data.W(:,1) = cellfun(@(m) double(m.AngularVelocity.X),out.IMUData);
+    data.W(:,2) = cellfun(@(m) double(m.AngularVelocity.Y),out.IMUData);
+    data.W(:,3) = cellfun(@(m) double(m.AngularVelocity.Z),out.IMUData);
+    for i = 1:3
+        tmp(:,i) = resample(data.W(:,i),numel(x),size(data.W(:,i),1));
+    end
+    data.W = tmp;
    
 
 end
