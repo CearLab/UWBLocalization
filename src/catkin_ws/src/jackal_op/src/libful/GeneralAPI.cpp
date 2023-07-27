@@ -506,8 +506,8 @@ arma::mat genAPI::procustes(arma::mat Cw, arma::mat Co){
     // each column of W is a vector in the world frame
     // each column of U is a vector in the odom frame
     // we want to solve Oi = R*Wi forall i, with R orthogonal
-    // check (21/06) solution at: https://simonensemble.github.io/posts/2018-10-27-orthogonal
-    // -procrustes/#:~:text=The%20orthogonal%20Procrustes%20problem%20is,molecular%20modeling%2C%20and%20speech%20translation.
+    // check (21/06) solution at: 
+    // https://simonensemble.github.io/posts/2018-10-27-orthogonal-procrustes/#:~:text=The%20orthogonal%20Procrustes%20problem%20is,molecular%20modeling%2C%20and%20speech%20translation.
 
     // variables
     arma::mat R = arma::zeros(3,3);

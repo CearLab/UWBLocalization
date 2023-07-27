@@ -12,5 +12,13 @@ function out = readBag(filename)
     out.UWBData = readMessages(out.UWB,'DataFormat','struct');
     out.IMU = select(out.bag,'Topic','/imu/data');
     out.IMUData = readMessages(out.IMU,'DataFormat','struct');
+    out.PJUMP = select(out.bag,'Topic','/DT5/gradientOdom');
+    out.PJUMPData = readMessages(out.PJUMP,'DataFormat','struct');
+    out.PHYB = select(out.bag,'Topic','/HYB5/Odom');
+    out.PHYBData = readMessages(out.PHYB,'DataFormat','struct');
+    out.IMUHYB = select(out.bag,'Topic','/HYB5/IMU');
+    out.IMUHYBData = readMessages(out.IMUHYB,'DataFormat','struct');
+    out.BiasHYB = select(out.bag,'Topic','/HYB5/Bias');
+    out.BiasHYBData = readMessages(out.BiasHYB,'DataFormat','struct');
 
 end
