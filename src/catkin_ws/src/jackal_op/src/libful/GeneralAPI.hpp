@@ -47,10 +47,11 @@ namespace genAPI
     const std::vector<int> pos_ang = {4, 11, 18, 21}; // this is the quaternion
     const std::vector<int> pos_bw = {5, 12, 19};
     const std::vector<int> pos_w = {6, 13, 20};
-    const std::vector<_Float64> gamma = {0.5, 0, 0};
+    // const std::vector<_Float64> gamma = {0.5, 0, 0};
+    const std::vector<_Float64> gamma = {1.8112, 0.6373, 1.0015};
     const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
     // const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
-    // const std::vector<_Float64> theta = {0.2, 0.1, -0.01};
+    // const std::vector<_Float64> theta = {1.1371, 0.1862, -0.0250};
 
     // env params
     const std::vector<_Float64> Anchors = {
@@ -83,6 +84,35 @@ namespace genAPI
         std::vector<genAPI::Tag> Tags;
     };
 
+    struct EKF{
+
+        double L;
+        double T = 0.01;
+        int stateDim = 22;
+        int measDim = 18;
+        int procDim = 9;
+        arma::mat Phat = 0.1*arma::eye<arma::mat>(stateDim, stateDim);
+        arma::vec4 q;
+        arma::vec3 p;
+        arma::vec3 w;
+        arma::vec3 MU;
+        arma::mat33 R;
+        arma::mat44 OMEGA;
+        arma::mat33 M1, M2, M3, M4;
+        arma::mat44 S1, S2, S3;
+        arma::mat GFX = arma::zeros(stateDim,stateDim);
+        arma::mat GFW = arma::zeros(stateDim,procDim);
+        arma::mat GHX = arma::zeros(measDim,stateDim);
+
+        // measure
+        arma::mat Rmeas = 0.01*arma::eye<arma::mat>(measDim, measDim);
+        arma::mat Qproc = 100*arma::eye<arma::mat>(procDim, procDim);
+
+
+    };
+
+    genAPI::EKF* _EKF;
+
     /** **** METHODS **** */
 
     // init Tag
@@ -111,6 +141,40 @@ namespace genAPI
 
     // Procustes
     arma::mat procustes(arma::mat W, arma::mat O);
+
+    // EKF //
+    // init EKF
+    int EKFInit();
+
+    // model EKF
+    std::vector<_Float64> modelEKF(std::vector<_Float64> x, std::vector<_Float64> u);
+
+    // R(q) 
+    int ROT();
+
+    // R(q) derivative
+    int M();
+
+    // P with anchor terms derivative
+    int MU(arma::mat33 TagPos, int i, int j);
+
+    // L with anchor term derivative
+    int L(arma::mat33 TagPos, int i, int j);
+
+    // OMEGA(w) 
+    int OMEGA();
+
+    // OMEGA(w) derivative
+    int S();
+
+    // Jacobian constructor
+    int G(arma::mat33 TagPos); 
+
+    // Euler integration - EKF
+    std::vector<_Float64> odeEulerEKF(std::vector<_Float64> x, std::vector<_Float64> u, _Float64 dt);
+
+    // EKF step
+    int EKF_step(std::vector<_Float64> X, std::vector<_Float64> Y, arma::mat33 TagPos, int full); 
 
 }
 

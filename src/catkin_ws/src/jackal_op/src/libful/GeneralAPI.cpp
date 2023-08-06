@@ -526,3 +526,465 @@ arma::mat genAPI::procustes(arma::mat Cw, arma::mat Co){
     return R;
 
 }
+
+// EKF STUFF
+
+// init EKF
+int genAPI::EKFInit(){
+
+    int sigmaD = 0.2;
+    int sigmaA = 0.01;
+    int sigmaW = 0.01;
+
+    int i;
+
+    // distances
+    for (i=0;i<12;i++){
+        _EKF->Rmeas(i,i) = sigmaD;
+    }
+
+    // accelerations
+    for (i=13;i<15;i++){
+        _EKF->Rmeas(i,i) = sigmaA;
+    }
+
+    // omega
+    for (i=16;i<18;i++){
+        _EKF->Rmeas(i,i) = sigmaW;
+    }
+
+    // proc
+    _EKF->Qproc(0,0) = 0;
+    _EKF->Qproc(1,1) = 0;
+    _EKF->Qproc(2,2) = 0;
+
+}
+
+// model EKF: remember that the input is null in this case
+std::vector<_Float64> genAPI::modelEKF(std::vector<_Float64> x, std::vector<_Float64> u){
+
+    std::vector<_Float64> xdot(genAPI::stateDim, 0.0);
+
+    // integrate position
+    xdot[genAPI::pos_p[0]] = x[genAPI::pos_v[0]];
+    xdot[genAPI::pos_p[1]] = x[genAPI::pos_v[1]];
+    xdot[genAPI::pos_p[2]] = x[genAPI::pos_v[2]];
+
+    // integrate velocity
+    xdot[genAPI::pos_v[0]] = x[genAPI::pos_a[0]];
+    xdot[genAPI::pos_v[1]] = x[genAPI::pos_a[1]];
+    xdot[genAPI::pos_v[2]] = x[genAPI::pos_a[2]];
+
+    // integrate bias
+    xdot[genAPI::pos_b[0]] = 0.0;
+    xdot[genAPI::pos_b[1]] = 0.0;
+    xdot[genAPI::pos_b[2]] = 0.0;
+
+    // filter acceleration
+    xdot[genAPI::pos_a[0]] = 0.0;
+    xdot[genAPI::pos_a[1]] = 0.0;
+    xdot[genAPI::pos_a[2]] = 0.0;
+
+    // integrate angular position - quaternion
+    arma::vec q = arma::zeros(4,1);
+    arma::vec qdot = arma::zeros(4,1);
+    q[0] = x[genAPI::pos_ang[0]];
+    q[1] = x[genAPI::pos_ang[1]];
+    q[2] = x[genAPI::pos_ang[2]];
+    q[3] = x[genAPI::pos_ang[3]];
+    arma::vec w = arma::zeros(3,1);
+    w[0] = x[genAPI::pos_w[0]];
+    w[1] = x[genAPI::pos_w[1]];
+    w[2] = x[genAPI::pos_w[2]];
+    arma::mat44 S = {0    ,  -w(2),   +w(1),    w(0),
+                     +w(2),  0    ,   -w(0),    w(1),
+                     -w(1),  +w(0),   0,        w(2),
+                     -w(0),  -w(1),   -w(2),    0};
+    qdot = 0.5*S*q;
+    xdot[genAPI::pos_ang[0]] = qdot[0];
+    xdot[genAPI::pos_ang[1]] = qdot[1];
+    xdot[genAPI::pos_ang[2]] = qdot[2];
+    xdot[genAPI::pos_ang[3]] = qdot[3];
+
+    // ROS_WARN("q: %g %g %g %g", q[0], q[1], q[2], q[3]);
+
+    // integrate angular velocity bias
+    xdot[genAPI::pos_bw[0]] = 0.0;
+    xdot[genAPI::pos_bw[1]] = 0.0;
+    xdot[genAPI::pos_bw[2]] = 0.0;
+
+    // filter angular velocity
+    xdot[genAPI::pos_w[0]] = 0.0;
+    xdot[genAPI::pos_w[1]] = 0.0;
+    xdot[genAPI::pos_w[2]] = 0.0;
+
+
+    return xdot;
+}
+
+// R(q) 
+int genAPI::ROT(){
+
+    // easy init
+    double q1, q2, q3, q4;
+    q1 = _EKF->q(0);
+    q2 = _EKF->q(1);
+    q3 = _EKF->q(2);
+    q4 = _EKF->q(3);
+
+    // first
+    _EKF->R(0,0) = q2*q2 - q3*q3 - q4*q4 + q1*q1;
+    _EKF->R(1,0) = 2*(q2*q3 - q4*q1);
+    _EKF->R(2,0) = 2*(q2*q4 + q3*q1);;
+
+    _EKF->R(0,1) = 2*(q2*q3 + q4*q1);
+    _EKF->R(1,1) = -q2*q2 + q3*q3 - q4*q4 + q1*q1;
+    _EKF->R(2,1) = 2*(q3*q4 - q2*q1);
+
+    _EKF->R(0,2) = 2*(q2*q4 - q3*q1);
+    _EKF->R(1,2) = 2*(q3*q4 + q2*q1);
+    _EKF->R(2,2) = -q2*q2 - q3*q3 + q4*q4 + q1*q1;
+
+    return 0;
+}
+
+// R(q) derivative
+int genAPI::M(){
+
+    // easy init
+    double q1, q2, q3, q4;
+    q1 = _EKF->q(0);
+    q2 = _EKF->q(1);
+    q3 = _EKF->q(2);
+    q4 = _EKF->q(3);
+
+    // first
+    _EKF->M1(0,0) = +q1;
+    _EKF->M1(1,0) = -q4;
+    _EKF->M1(2,0) = +q3;
+
+    _EKF->M1(0,1) = +q4;
+    _EKF->M1(1,1) = +q1;
+    _EKF->M1(2,1) = -q2;
+
+    _EKF->M1(0,2) = -q3;
+    _EKF->M1(1,2) = +q2;
+    _EKF->M1(2,2) = +q1;
+
+    // second
+    _EKF->M2(0,0) = +q2;
+    _EKF->M2(1,0) = +q3;
+    _EKF->M2(2,0) = +q4;
+
+    _EKF->M2(0,1) = +q3;
+    _EKF->M2(1,1) = -q2;
+    _EKF->M2(2,1) = -q1;
+
+    _EKF->M2(0,2) = +q4;
+    _EKF->M2(1,2) = +q1;
+    _EKF->M2(2,2) = -q2;
+
+    // third
+    _EKF->M3(0,0) = -q3;
+    _EKF->M3(1,0) = +q2;
+    _EKF->M3(2,0) = +q1;
+
+    _EKF->M3(0,1) = +q2;
+    _EKF->M3(1,1) = +q3;
+    _EKF->M3(2,1) = +q4;
+
+    _EKF->M3(0,2) = -q1;
+    _EKF->M3(1,2) = +q4;
+    _EKF->M3(2,2) = -q3;
+
+    // fourth
+    _EKF->M4(0,0) = -q4;
+    _EKF->M4(1,0) = -q1;
+    _EKF->M4(2,0) = +q2;
+
+    _EKF->M4(0,1) = +q1;
+    _EKF->M4(1,1) = -q4;
+    _EKF->M4(2,1) = +q3;
+
+    _EKF->M4(0,2) = +q2;
+    _EKF->M4(1,2) = +q3;
+    _EKF->M4(2,2) = +q4;
+
+    return 0;
+
+}
+
+// P with anchor terms derivative: i tag, j anchor
+int genAPI::MU(arma::mat33 TagPos, int i, int j){
+
+    arma::vec3 A;
+    A[0] = genAPI::Anchors[3*j+0];
+    A[1] = genAPI::Anchors[3*j+1];
+    A[2] = genAPI::Anchors[3*j+2];
+
+    // compute
+    _EKF->MU = _EKF->p + _EKF->R*TagPos.col(i) - A;
+
+    return 0;
+}
+
+// L with anchor term derivative
+int genAPI::L(arma::mat33 TagPos, int i, int j){
+
+    // compute
+    _EKF->L = sqrt(_EKF->MU[0]*_EKF->MU[0] + _EKF->MU[1]*_EKF->MU[1] + _EKF->MU[2]*_EKF->MU[2]);
+
+    return 0;
+}
+
+// OMEGA(w) 
+int genAPI::OMEGA(){
+
+    // easy init
+    double w1, w2, w3;
+    w1 = _EKF->w(0);
+    w2 = _EKF->w(1);
+    w3 = _EKF->w(2);
+
+    // assign
+    _EKF->OMEGA(0,0) = 0;
+    _EKF->OMEGA(0,1) = -w3;
+    _EKF->OMEGA(0,2) = +w2;
+    _EKF->OMEGA(0,3) = +w1;
+
+    _EKF->OMEGA(1,0) = +w3;
+    _EKF->OMEGA(1,1) = 0;
+    _EKF->OMEGA(1,2) = -w1;
+    _EKF->OMEGA(1,3) = +w2;
+
+    _EKF->OMEGA(2,0) = -w2;
+    _EKF->OMEGA(2,1) = +w1;
+    _EKF->OMEGA(2,2) = 0;
+    _EKF->OMEGA(2,3) = +w3;
+
+    _EKF->OMEGA(2,0) = -w1;
+    _EKF->OMEGA(2,1) = -w2;
+    _EKF->OMEGA(2,2) = -w3;
+    _EKF->OMEGA(2,3) = 0;
+   
+
+    return 0;
+
+}
+
+// OMEGA(w) derivative
+int genAPI::S(){
+
+    // first
+    _EKF->S1(0,0) = 0;
+    _EKF->S1(0,1) = 0;
+    _EKF->S1(0,2) = 0;
+    _EKF->S1(0,3) = +1;
+
+    _EKF->S1(1,0) = 0;
+    _EKF->S1(1,1) = 0;
+    _EKF->S1(1,2) = -1;
+    _EKF->S1(1,3) = 0;
+
+    _EKF->S1(2,0) = 0;
+    _EKF->S1(2,1) = +1;
+    _EKF->S1(2,2) = 0;
+    _EKF->S1(2,3) = 0;
+
+    _EKF->S1(2,0) = -1;
+    _EKF->S1(2,1) = 0;
+    _EKF->S1(2,2) = 0;
+    _EKF->S1(2,3) = 0;
+
+    // second
+    _EKF->S2(0,0) = 0;
+    _EKF->S2(0,1) = 0;
+    _EKF->S2(0,2) = +1;
+    _EKF->S2(0,3) = 0;
+
+    _EKF->S2(1,0) = 0;
+    _EKF->S2(1,1) = 0;
+    _EKF->S2(1,2) = 0;
+    _EKF->S2(1,3) = +1;
+
+    _EKF->S2(2,0) = -1;
+    _EKF->S2(2,1) = 0;
+    _EKF->S2(2,2) = 0;
+    _EKF->S2(2,3) = 0;
+
+    _EKF->S2(2,0) = 0;
+    _EKF->S2(2,1) = -1;
+    _EKF->S2(2,2) = 0;
+    _EKF->S2(2,3) = 0;
+
+    // third
+    _EKF->S3(0,0) = 0;
+    _EKF->S3(0,1) = -1;
+    _EKF->S3(0,2) = 0;
+    _EKF->S3(0,3) = 0;
+
+    _EKF->S3(1,0) = +1;
+    _EKF->S3(1,1) = 0;
+    _EKF->S3(1,2) = 0;
+    _EKF->S3(1,3) = 0;
+
+    _EKF->S3(2,0) = 0;
+    _EKF->S3(2,1) = 0;
+    _EKF->S3(2,2) = 0;
+    _EKF->S3(2,3) = +1;
+
+    _EKF->S3(2,0) = 0;
+    _EKF->S3(2,1) = 0;
+    _EKF->S3(2,2) = -1;
+    _EKF->S3(2,3) = 0;
+
+    return 0;
+}
+
+// Jacobian constructor
+int genAPI::G(arma::mat33 TagPos){
+
+    // iter
+    int i,j;
+
+    // stuff
+    arma::mat tmp = arma::zeros(4,3);
+    
+
+    ////// GFX //////
+
+    // dp/dv
+    _EKF->GFX(genAPI::pos_p[0],genAPI::pos_v[0]) = 1;
+    _EKF->GFX(genAPI::pos_p[1],genAPI::pos_v[1]) = 1;
+    _EKF->GFX(genAPI::pos_p[2],genAPI::pos_v[2]) = 1;
+    // dp/dv
+    _EKF->GFX(genAPI::pos_v[0],genAPI::pos_a[0]) = 1;
+    _EKF->GFX(genAPI::pos_v[1],genAPI::pos_a[1]) = 1;
+    _EKF->GFX(genAPI::pos_v[2],genAPI::pos_a[2]) = 1;
+    // dq/dq
+    for (i=0;i<4;i++){
+        for (j=0;i<4;i++){
+            _EKF->GFX(genAPI::pos_ang[i],genAPI::pos_ang[j]) = 0.5*_EKF->OMEGA(i,j);
+        }
+    }
+    // dq/dw
+    tmp.col(0) = 0.5*(_EKF->S1*_EKF->q);
+    tmp.col(1) = 0.5*(_EKF->S2*_EKF->q);
+    tmp.col(2) = 0.5*(_EKF->S3*_EKF->q);
+    for (i=0;i<4;i++){
+        for (j=0;i<3;i++){
+            _EKF->GFX(genAPI::pos_ang[i],genAPI::pos_w[j]) = tmp.col(j)(i);
+        }
+     }
+     // to discrete
+     arma::mat identity_matrix = arma::eye<arma::mat>(_EKF->stateDim, _EKF->stateDim);
+     _EKF->GFX = _EKF->GFX + _EKF->T*identity_matrix;
+
+     ////// GFW //////
+
+     _EKF->GFW(genAPI::pos_b[0],0) = 1;
+     _EKF->GFW(genAPI::pos_b[1],1) = 1;
+     _EKF->GFW(genAPI::pos_b[2],2) = 1;
+     _EKF->GFW(genAPI::pos_a[0],4) = 1;
+     _EKF->GFW(genAPI::pos_a[1],5) = 1;
+     _EKF->GFW(genAPI::pos_a[2],6) = 1;
+     _EKF->GFW(genAPI::pos_w[0],7) = 1;
+     _EKF->GFW(genAPI::pos_w[1],8) = 1;
+     _EKF->GFW(genAPI::pos_w[2],9) = 1;
+
+     ////// GHX //////
+
+     // dh/dp dh/dq
+     for (i=0;i<3;i++){
+        for (j=0;j<4;j++){
+
+            // L
+            genAPI::L(TagPos, i, j);
+
+            // MU
+            genAPI::MU(TagPos, i, j);
+
+            // dydij/dp
+            _EKF->GHX(4*(i) + j,genAPI::pos_p[0]) = _EKF->MU[0]/_EKF->L;
+            _EKF->GHX(4*(i) + j,genAPI::pos_p[1]) = _EKF->MU[1]/_EKF->L;
+            _EKF->GHX(4*(i) + j,genAPI::pos_p[2]) = _EKF->MU[2]/_EKF->L;
+
+            // dydij/dq
+            _EKF->GHX(4*(i) + j,genAPI::pos_ang[0]) = arma::dot(_EKF->MU.t(),_EKF->M1*TagPos.col(i))/_EKF->L;
+            _EKF->GHX(4*(i) + j,genAPI::pos_ang[1]) = arma::dot(_EKF->MU.t(),_EKF->M2*TagPos.col(i))/_EKF->L;
+            _EKF->GHX(4*(i) + j,genAPI::pos_ang[2]) = arma::dot(_EKF->MU.t(),_EKF->M3*TagPos.col(i))/_EKF->L;
+            _EKF->GHX(4*(i) + j,genAPI::pos_ang[3]) = arma::dot(_EKF->MU.t(),_EKF->M4*TagPos.col(i))/_EKF->L;
+
+
+        }
+     }
+     // dh/dba
+     _EKF->GHX(13,genAPI::pos_b[0]) = 1;
+     _EKF->GHX(14,genAPI::pos_b[1]) = 1;
+     _EKF->GHX(15,genAPI::pos_b[2]) = 1;
+     // dh/da
+     _EKF->GHX(13,genAPI::pos_a[0]) = 1;
+     _EKF->GHX(14,genAPI::pos_a[1]) = 1;
+     _EKF->GHX(15,genAPI::pos_a[2]) = 1;
+     // dh/dw
+     _EKF->GHX(16,genAPI::pos_w[0]) = 1;
+     _EKF->GHX(17,genAPI::pos_w[1]) = 1;
+     _EKF->GHX(18,genAPI::pos_w[2]) = 1;
+     
+     
+    return 0;
+}
+
+// Euler integration - EKF
+std::vector<_Float64> genAPI::odeEulerEKF(std::vector<_Float64> x, std::vector<_Float64> u, _Float64 dt){
+
+    // init
+    std::vector<_Float64> xdot(_EKF->stateDim, 0.0);
+    std::vector<_Float64> xnew(_EKF->stateDim, 0.0);
+    std::vector<_Float64> DT(_EKF->stateDim, dt);
+    std::vector<_Float64> xstep(_EKF->stateDim, 0.0);
+
+    // compute xdot
+    xdot = genAPI::modelEKF(x, u);
+
+    // integrate - forward 
+    std::transform(DT.begin(), DT.end(), xdot.begin(), xstep.begin(), std::multiplies<float>());
+    std::transform(x.begin(), x.end(), xstep.begin(), xnew.begin(), std::plus<float>());
+
+    return xnew;
+
+}
+
+// EKF step
+int genAPI::EKF_step(std::vector<_Float64> X, std::vector<_Float64> Y, arma::mat33 TagPos, int full){
+
+    // init input
+    std::vector<_Float64> U(6,1);
+
+    // init state
+    std::vector<_Float64> Xhat(_EKF->stateDim,1);
+
+    // kalman gain
+    arma::vec K = arma::zeros(_EKF->stateDim,1);
+
+    // integrate state
+    Xhat = genAPI::odeEuler(X, U, _EKF->T);
+
+    // set jacobians
+    genAPI::G(TagPos);
+
+    // prediction
+    _EKF->Phat = arma::dot(_EKF->GFX,_EKF->Phat*_EKF->GFX.t()) + arma::dot(_EKF->GFW,_EKF->Qproc*_EKF->GFW.t());
+
+    // correction
+    arma::mat tmp = arma::zeros(_EKF->measDim,_EKF->measDim);
+    tmp = arma::dot(_EKF->GHX,_EKF->Phat*_EKF->GHX.t() + _EKF->Rmeas);
+    K = _EKF->Phat*_EKF->GHX.t()*(arma::pinv(tmp));
+
+    // mismatch
+    // you need a function to measure the distances from phat.
+    
+
+
+    return 0;
+}

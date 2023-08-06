@@ -3,7 +3,7 @@
 
 /** **** CONSTRUCTOR **** */
 jackAPI::jackAPI(std::string name, int Nanchors, int tagID, int Ntags, int rate)
-    : _gen(std::random_device{}()), _distribution(0.0, 0.20)
+    : _gen(std::random_device{}()), _distribution(0.0, 0.0)
 {
 
     // counters
@@ -590,11 +590,25 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry &msg)
 
     // ROS_WARN("_G.N: %g %g %g %g", _G.N[0], _G.N[1], _G.N[2], _G.N[3]);
 
-    // orientation
-    _xnew[genAPI::pos_ang[0]] = xnow[genAPI::pos_ang[0]] + genAPI::gamma[0] * (msg.pose.pose.orientation.x - xnow[genAPI::pos_ang[0]]);
-    _xnew[genAPI::pos_ang[1]] = xnow[genAPI::pos_ang[1]] + genAPI::gamma[0] * (msg.pose.pose.orientation.y - xnow[genAPI::pos_ang[1]]);
-    _xnew[genAPI::pos_ang[2]] = xnow[genAPI::pos_ang[2]] + genAPI::gamma[0] * (msg.pose.pose.orientation.z - xnow[genAPI::pos_ang[2]]);
-    _xnew[genAPI::pos_ang[3]] = xnow[genAPI::pos_ang[3]] + genAPI::gamma[0] * (msg.pose.pose.orientation.w - xnow[genAPI::pos_ang[3]]);
+    // get RPY from quaternion and get error
+    tf2::Quaternion Qjump(_G.N[0], _G.N[1], _G.N[2], _G.N[3]);
+    tf2::Quaternion Qhat(xnow[genAPI::pos_ang[0]], xnow[genAPI::pos_ang[1]], xnow[genAPI::pos_ang[2]], xnow[genAPI::pos_ang[3]]);
+    tf2::Matrix3x3 Rjump(Qjump);
+    tf2::Matrix3x3 Rhat(Qhat);
+    double r, p, y, rhat, phat, yhat;
+    Rjump.getEulerYPR(y,p,r);
+    Rhat.getEulerYPR(yhat,phat,rhat);
+
+    // orientation 
+    rhat = rhat + genAPI::gamma[0]*(r - rhat);
+    phat = phat + genAPI::gamma[1]*(p - phat);
+    yhat = yhat + genAPI::gamma[2]*(y - yhat);
+    Qhat.setRPY(rhat, phat, yhat);
+    _xnew[genAPI::pos_ang[0]] = Qhat.getX();
+    _xnew[genAPI::pos_ang[1]] = Qhat.getY();
+    _xnew[genAPI::pos_ang[2]] = Qhat.getZ();
+    _xnew[genAPI::pos_ang[3]] = Qhat.getW();
+
 
     // angular velocity bias
     _xnew[genAPI::pos_bw[0]] = 0 * xnow[genAPI::pos_bw[0]];
