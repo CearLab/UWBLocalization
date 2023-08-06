@@ -38,7 +38,7 @@
 
   <!-- ROS bag-->
   <node pkg="rosbag" type="record" name="rosbag_record"
-    args="record -o /home/ros/workspace/results/bags/rosbag.bag /DT5/DT /ground_truth/state /odometry/filtered"> 
+    args="record -o /home/ros/workspace/results/bags/rosbag.bag /DT5/DT /ground_truth/state /odometry/filtered /imu/data /DT5/gradientOdom /HYB5/Odom /HYB5/IMU /HYB5/Bias"> 
   </node>
 
 
