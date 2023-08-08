@@ -18,5 +18,9 @@ src/catkin_ws/src/gtec/
 Simulink/catkin_ws/
 Simulink/fig/
 Simulink/test/
+<<<<<<< HEAD
+=======
+results/**
+>>>>>>> 6a4ac18ba4c3ffb97e88b722a61a08422e474134
 *.bag
 *.e57
