@@ -195,6 +195,33 @@
 # $ sudo apt install ros-melodic-tf2-web-republisher
 # $ sudo apt install ros-melodic-rosbridge-suite
 #
+# install the vicon SDK (c++)
+# go to https://www.vicon.com/software/datastream-sdk/?section=downloads and download the .zip
+# move the .zip in workspace/setup/lib
+# extract the .zip
+# remove the .zip and rename the folder in ViconAPI
+# rename the inner 20230413_145507h folder in F1
+# enter workspace/setup/lib/ViconAPI/F1/Release/Linux64
+# rename ViconDataStreamSDKSourceLinux64-source in Source
+# rename ViconDataStreamSDKSourceLinux64-thirdparty in ThirdParty
+# now, to be sure, we recompile viconAPI (sometimes it has been compiled with different glibC)
+# go to workspace/setup/lib/ViconAPI/F1/Release/Linux64/Source
+# edit the makefile as follows:
+# define these vars:
+# INCLUDES = -I/home/ros/workspace/setup/lib/boost_1_82_0/boost_install/include \
+# 		   -I/home/ros/workspace/setup/lib/ViconAPI/F1/Release/Linux64/Source/Vicon/CrossMarket/DataStream \
+# 		   -I/home/ros/workspace/setup/lib/ViconAPI/F1/Release/Linux64/Source/Vicon/CrossMarket
+# LDFLAGS = -L/home/ros/workspace/setup/lib/boost_1_82_0/boost_install/lib \
+# 		  -L/home/ros/workspace/setup/lib/ViconAPI/F1/Release/Linux64/ThirdParty/thirdparty/Boost/boost-1.75.0-linux-x64/lib \
+#		  -L/home/ros/workspace/setup/lib/ViconAPI/F1/Release/Linux64/Source/lib/Debug \
+#		  -L/home/ros/workspace/setup/lib/ViconAPI/F1/Release/Linux64/Source/bin/Debug
+# now add at the end of every make target the following: CXXFLAGS="$(INCLUDES)" CFLAGS="$(INCLUDES)" LDFLAGS="$(LDFLAGS)"
+# now, install boost 1.82 (https://www.boost.org/users/history/version_1_82_0.html) in 
+# /home/ros/workspace/setup/lib/boost_1_82_0/boost_install
+# now you can build ViconAPI in /home/ros/workspace/setup/lib/ViconAPI/F1/Release/Linux64/Source
+# run: $make clean
+# run: $make ViconDataStreamSDK_CPP
+#
 # now get ready for the catkin build
 # $ cd ~/workspace/catkin_ws
 # $ rospack profile

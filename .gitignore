@@ -18,3 +18,5 @@ src/catkin_ws/src/gtec/
 Simulink/catkin_ws/
 Simulink/fig/
 Simulink/test/
+*.bag
+*.e57
