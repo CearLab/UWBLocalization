@@ -295,7 +295,8 @@ void jackAPI::ChatterCallbackTCentral(const gtec_msgs::Ranging &msg)
             p0[3 * i + 2] = _TagSet.Tags[i].p[2];
         }
 
-        // if orientation is computed ok, otherwise unused
+        // ROS_WARN("OPT: %g %g %g %g %g %g %g %g %g", p0[0], p0[1], p0[2], p0[3], p0[4], p0[5], p0[6], p0[7], p0[8]);
+        //  if orientation is computed ok, otherwise unused
         arma::mat W = arma::zeros(3, _Ntags);
         arma::mat O = arma::zeros(3, _Ntags);
         arma::mat DELTA = arma::zeros(3, _Ntags);
@@ -596,19 +597,18 @@ void jackAPI::ChatterCallbackHybJump(const nav_msgs::Odometry &msg)
     tf2::Matrix3x3 Rjump(Qjump);
     tf2::Matrix3x3 Rhat(Qhat);
     double r, p, y, rhat, phat, yhat;
-    Rjump.getEulerYPR(y,p,r);
-    Rhat.getEulerYPR(yhat,phat,rhat);
+    Rjump.getEulerYPR(y, p, r);
+    Rhat.getEulerYPR(yhat, phat, rhat);
 
-    // orientation 
-    rhat = rhat + genAPI::gamma[0]*(r - rhat);
-    phat = phat + genAPI::gamma[1]*(p - phat);
-    yhat = yhat + genAPI::gamma[2]*(y - yhat);
+    // orientation
+    rhat = rhat + genAPI::gamma[0] * (r - rhat);
+    phat = phat + genAPI::gamma[1] * (p - phat);
+    yhat = yhat + genAPI::gamma[2] * (y - yhat);
     Qhat.setRPY(rhat, phat, yhat);
     _xnew[genAPI::pos_ang[0]] = Qhat.getX();
     _xnew[genAPI::pos_ang[1]] = Qhat.getY();
     _xnew[genAPI::pos_ang[2]] = Qhat.getZ();
     _xnew[genAPI::pos_ang[3]] = Qhat.getW();
-
 
     // angular velocity bias
     _xnew[genAPI::pos_bw[0]] = 0 * xnow[genAPI::pos_bw[0]];
