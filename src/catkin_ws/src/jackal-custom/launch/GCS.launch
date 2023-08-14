@@ -4,8 +4,8 @@
   <arg name="joy_dev" default="/dev/input/js0" />
 
   <!-- Rviz -->
-  <include file="$(find jackal-custom)/launch/descriptions/view_robot_real.launch">
-  </include>
+  <!--include file="$(find jackal-custom)/launch/descriptions/view_robot_real.launch">
+  </include-->
 
   <!-- Run Websocket. -->
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
