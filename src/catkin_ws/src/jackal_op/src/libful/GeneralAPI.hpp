@@ -59,11 +59,14 @@ namespace genAPI
         // 0, +4, 3.5,
         // 4, +4, 3.5,
         // 4, -4, 3.5
-        -0.40, +4.20, +2.0,
-        -0.40, -1.80, +2.0,
-        +2.48, -2.20, +2.0,
-        +2.80, +4.20, +2.0,
-    };
+        //-0.40, +4.20, +2.0,
+        //-0.40, -1.80, +2.0,
+        //+2.48, -2.20, +2.0,
+        //+2.80, +4.20, +2.0,
+        +0.0, +0.0, +3.3,
+        +0.0, +4.70, +3.3,
+        +7.0, +4.70, +3.3,
+        +7.0, +0.0, +3.3};
 
     struct Tag
     {
@@ -84,14 +87,15 @@ namespace genAPI
         std::vector<genAPI::Tag> Tags;
     };
 
-    struct EKF{
+    struct EKF
+    {
 
         double L;
         double T = 0.01;
         int stateDim = 22;
         int measDim = 18;
         int procDim = 9;
-        arma::mat Phat = 0.1*arma::eye<arma::mat>(stateDim, stateDim);
+        arma::mat Phat = 0.1 * arma::eye<arma::mat>(stateDim, stateDim);
         arma::vec4 q;
         arma::vec3 p;
         arma::vec3 w;
@@ -100,18 +104,16 @@ namespace genAPI
         arma::mat44 OMEGA;
         arma::mat33 M1, M2, M3, M4;
         arma::mat44 S1, S2, S3;
-        arma::mat GFX = arma::zeros(stateDim,stateDim);
-        arma::mat GFW = arma::zeros(stateDim,procDim);
-        arma::mat GHX = arma::zeros(measDim,stateDim);
+        arma::mat GFX = arma::zeros(stateDim, stateDim);
+        arma::mat GFW = arma::zeros(stateDim, procDim);
+        arma::mat GHX = arma::zeros(measDim, stateDim);
 
         // measure
-        arma::mat Rmeas = 0.01*arma::eye<arma::mat>(measDim, measDim);
-        arma::mat Qproc = 100*arma::eye<arma::mat>(procDim, procDim);
-
-
+        arma::mat Rmeas = 0.01 * arma::eye<arma::mat>(measDim, measDim);
+        arma::mat Qproc = 100 * arma::eye<arma::mat>(procDim, procDim);
     };
 
-    genAPI::EKF* _EKF;
+    genAPI::EKF *_EKF;
 
     /** **** METHODS **** */
 
@@ -149,7 +151,7 @@ namespace genAPI
     // model EKF
     std::vector<_Float64> modelEKF(std::vector<_Float64> x, std::vector<_Float64> u);
 
-    // R(q) 
+    // R(q)
     int ROT();
 
     // R(q) derivative
@@ -161,20 +163,20 @@ namespace genAPI
     // L with anchor term derivative
     int L(arma::mat33 TagPos, int i, int j);
 
-    // OMEGA(w) 
+    // OMEGA(w)
     int OMEGA();
 
     // OMEGA(w) derivative
     int S();
 
     // Jacobian constructor
-    int G(arma::mat33 TagPos); 
+    int G(arma::mat33 TagPos);
 
     // Euler integration - EKF
     std::vector<_Float64> odeEulerEKF(std::vector<_Float64> x, std::vector<_Float64> u, _Float64 dt);
 
     // EKF step
-    int EKF_step(std::vector<_Float64> X, std::vector<_Float64> Y, arma::mat33 TagPos, int full); 
+    int EKF_step(std::vector<_Float64> X, std::vector<_Float64> Y, arma::mat33 TagPos, int full);
 
 }
 
