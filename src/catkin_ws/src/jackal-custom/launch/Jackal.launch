@@ -1,6 +1,8 @@
 <launch>
 
   <param name="use_sim_time" value="false" />
+  <arg name="joystick" default="true" />
+  <arg name="joy_dev" default="/dev/input/js0" />
   
   <!-- Configuration of Jackal which you would like to simulate.
        See jackal_description for details. -->
