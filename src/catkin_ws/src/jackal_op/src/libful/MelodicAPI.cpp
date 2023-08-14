@@ -633,9 +633,9 @@ void jackAPI::ChatterCallbackHybCont(const sensor_msgs::Imu &msg)
 
     // init omega meas
     std::vector<_Float64> OMEGA(3, 0.0);
-    OMEGA[0] = -msg.angular_velocity.x;
-    OMEGA[1] = -msg.angular_velocity.y;
-    OMEGA[2] = -msg.angular_velocity.z;
+    OMEGA[0] = msg.angular_velocity.x;
+    OMEGA[1] = msg.angular_velocity.y;
+    OMEGA[2] = msg.angular_velocity.z;
 
     // input vector
     std::vector<_Float64> U = {IMU[0], IMU[1], IMU[2], OMEGA[0], OMEGA[1], OMEGA[2]};

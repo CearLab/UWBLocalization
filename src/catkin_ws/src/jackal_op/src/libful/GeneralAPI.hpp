@@ -47,8 +47,8 @@ namespace genAPI
     const std::vector<int> pos_ang = {4, 11, 18, 21}; // this is the quaternion
     const std::vector<int> pos_bw = {5, 12, 19};
     const std::vector<int> pos_w = {6, 13, 20};
-    // const std::vector<_Float64> gamma = {0.5, 0, 0};
-    const std::vector<_Float64> gamma = {1.8112, 0.6373, 1.0015};
+    const std::vector<_Float64> gamma = {0.5, 0.5, 0.5};
+    // const std::vector<_Float64> gamma = {1.8112, 0.6373, 1.0015};
     const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
     // const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
     // const std::vector<_Float64> theta = {0.8, 0.1862, -0.0250};
@@ -59,10 +59,15 @@ namespace genAPI
         // 0, +4, 3.5,
         // 4, +4, 3.5,
         // 4, -4, 3.5
-        +0.0, +0.0, +3.3,
-        +0.0, +4.70, +3.3,
-        +7.0, +4.70, +3.3,
-        +7.0, +0.0, +3.3};
+        -0.40, +4.20, +2.0,
+        -0.40, -1.80, +2.0,
+        +2.48, -2.20, +2.0,
+        +2.80, +4.20, +2.0
+        //+0.0, +0.0, +3.3,
+        //+0.0, +4.70, +3.3,
+        //+15.0, +4.70, +3.3,
+        //+15.0, +0.0, +3.3
+    };
 
     struct Tag
     {
@@ -173,7 +178,6 @@ namespace genAPI
 
     // EKF step
     int EKF_step(std::vector<_Float64> X, std::vector<_Float64> Y, arma::mat33 TagPos, int full);
-
 }
 
 namespace ceresAPI

@@ -3,12 +3,6 @@
   <arg name="joystick" default="true" />
   <arg name="joy_dev" default="/dev/input/js0" />
 
-  <!-- Teleop node  -->
-  <include file="$(find jackal-custom)/launch/control/teleop.launch">
-    <arg name="joystick" value="$(arg joystick)" />
-    <arg name="joy_dev" value="$(arg joy_dev)" />
-  </include>
-
   <!-- Rviz -->
   <include file="$(find jackal-custom)/launch/descriptions/view_robot_real.launch">
   </include>
@@ -23,12 +17,17 @@
   </node>
 
   <!-- ###### GROUND TRUTH ######-->
-  <!--node name="vicon" pkg="vicon" type="jack_vicon">
+  <node name="vicon" pkg="vicon" type="jack_vicon">
+  </node>
+
+  <!-- ROS bag - no vicon -->
+  <!--node pkg="rosbag" type="record" name="rosbag_record"
+    args="record -o /home/ros/workspace/results/bags/rosbag.bag /DT5/DT /odometry/filtered /imu/data /DT5/gradientOdom /HYB5/Odom /HYB5/IMU /HYB5/Bias"> 
   </node-->
 
-  <!-- ROS bag-->
+  <!-- ROS bag - yes vicon -->
   <node pkg="rosbag" type="record" name="rosbag_record"
-    args="record -o /home/ros/workspace/results/bags/rosbag.bag /DT5/DT /odometry/filtered /imu/data /DT5/gradientOdom /HYB5/Odom /HYB5/IMU /HYB5/Bias"> 
+    args="record -o /home/ros/workspace/results/bags/rosbag.bag /DT5/DT /ground_truth/state /odometry/filtered /imu/data /DT5/gradientOdom /HYB5/Odom /HYB5/IMU /HYB5/Bias"> 
   </node>
 
 
