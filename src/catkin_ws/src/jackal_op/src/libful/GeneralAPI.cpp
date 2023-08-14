@@ -309,7 +309,7 @@ _Float64 genAPI::J(double *p, double *grad_out, double *A, double D)
     // compute norm
     double norm = sqrt(pow((p[0] - A[0]), 2) + pow((p[1] - A[1]), 2) + pow((p[2] - A[2]), 2));
 
-    ROS_WARN("A: %g %g %g", A[0], A[1], A[2]);
+    // ROS_WARN("A: %g %g %g", A[0], A[1], A[2]);
 
     // compute J
     // J = norm - D;
