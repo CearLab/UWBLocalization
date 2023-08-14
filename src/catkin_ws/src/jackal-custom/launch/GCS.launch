@@ -4,8 +4,8 @@
   <arg name="joy_dev" default="/dev/input/js0" />
 
   <!-- Rviz -->
-  <!--include file="$(find jackal-custom)/launch/descriptions/view_robot_real.launch">
-  </include-->
+  <include file="$(find jackal-custom)/launch/descriptions/view_robot_real.launch">
+  </include>
 
   <!-- Run Websocket. -->
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
@@ -20,9 +20,14 @@
   <!--node name="vicon" pkg="vicon" type="jack_vicon">
   </node-->
 
-  <!-- ROS bag-->
-  <node pkg="rosbag" type="record" name="rosbag_record"
+  <!-- ROS bag - no vicon -->
+  <!--node pkg="rosbag" type="record" name="rosbag_record"
     args="record -o /home/ros/workspace/results/bags/rosbag.bag /DT5/DT /odometry/filtered /imu/data /DT5/gradientOdom /HYB5/Odom /HYB5/IMU /HYB5/Bias"> 
+  </node-->
+
+  <!-- ROS bag - yes vicon -->
+  <node pkg="rosbag" type="record" name="rosbag_record"
+    args="record -o /home/ros/workspace/results/bags/rosbag.bag /DT5/DT /ground_truth/state /odometry/filtered /imu/data /DT5/gradientOdom /HYB5/Odom /HYB5/IMU /HYB5/Bias"> 
   </node>
 
 
