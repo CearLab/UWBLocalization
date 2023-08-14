@@ -17,8 +17,8 @@
   </node>
 
   <!-- ###### GROUND TRUTH ######-->
-  <!--node name="vicon" pkg="vicon" type="jack_vicon">
-  </node-->
+  <node name="vicon" pkg="vicon" type="jack_vicon">
+  </node>
 
   <!-- ROS bag - no vicon -->
   <!--node pkg="rosbag" type="record" name="rosbag_record"
