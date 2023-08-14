@@ -202,8 +202,8 @@
 # remove the .zip and rename the folder in ViconAPI
 # rename the inner 20230413_145507h folder in F1
 # enter workspace/setup/lib/ViconAPI/F1/Release/Linux64
-# rename ViconDataStreamSDKSourceLinux64-source in Source
-# rename ViconDataStreamSDKSourceLinux64-thirdparty in ThirdParty
+# extract and rename ViconDataStreamSDKSourceLinux64-source in Source
+# extract and rename ViconDataStreamSDKSourceLinux64-thirdparty in ThirdParty
 # now, to be sure, we recompile viconAPI (sometimes it has been compiled with different glibC)
 # go to workspace/setup/lib/ViconAPI/F1/Release/Linux64/Source
 # edit the makefile as follows:
