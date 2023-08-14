@@ -26,8 +26,12 @@ function out = loadPointCloud(filename,plotFlag,roi)
     pcAlignSel = select(ptCloud, ID);
 
     tformArrInv = tformArr.invert;
-    out.ptMap = pcalign(pcAlignSel,tformArr);
-    
+    tmpMap = pcalign(pcAlignSel,tformArr);
+
+    point = [-5.10, + 6.98, - 1.31];
+    translatedLocations = tmpMap.Location - point;
+    translatedColors = tmpMap.Color;
+    out.ptMap = pointCloud(translatedLocations, 'Color', translatedColors);
     
     % Visualize the map
     if plotFlag
