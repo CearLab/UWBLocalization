@@ -51,7 +51,7 @@ namespace genAPI
     const std::vector<_Float64> gamma = {1.8112, 0.6373, 1.0015};
     const std::vector<_Float64> theta = {0.4221, 0.2888, -0.0281};
     // const std::vector<_Float64> theta = {1, 1.2662, -0.5457};
-    // const std::vector<_Float64> theta = {1.1371, 0.1862, -0.0250};
+    // const std::vector<_Float64> theta = {0.8, 0.1862, -0.0250};
 
     // env params
     const std::vector<_Float64> Anchors = {

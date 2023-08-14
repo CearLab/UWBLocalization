@@ -2,9 +2,9 @@
 #include "MelodicAPI.hpp"
 
 // dummy calback just for test
-void DummyCallback(const std_msgs::String::ConstPtr& msg)
+void DummyCallback(const std_msgs::String::ConstPtr &msg)
 {
-  ROS_INFO("ARARMAX");
+    ROS_INFO("ARARMAX");
 }
 
 /**
@@ -31,16 +31,18 @@ int main(int argc, char **argv)
     /**
      * define topic to subscribe to. Get the topics name from params server. Then create handle for subscribing.
      */
-    std::string subNameT, subNameA, pubNameT, pubNameTril, pubNameTrilodom, jackName;  
+    std::string subNameT, subNameA, pubNameT, pubNameTril, pubNameTrilodom, jackName;
     std::string child, base;
-    int Nanchors, Ntags, tagID;  
+    int Nanchors, Ntags, tagID;
 
     // get tagID - default 7
-    if (argc > 1){
+    if (argc > 1)
+    {
         std::string value_from_cl = argv[1];
         tagID = atoi(value_from_cl.c_str());
     }
-    else{
+    else
+    {
         tagID = 7;
     }
 
@@ -63,16 +65,19 @@ int main(int argc, char **argv)
     flags.push_back(np.hasParam(tmp));
     tmp = "/DT" + std::to_string(tagID) + "/Ntags";
     flags.push_back(np.hasParam(tmp));
-    
+
     // init rate for the node
     tmp = "/DT" + std::to_string(tagID) + "/UWBrate";
-    if (np.hasParam(tmp)){
+    if (np.hasParam(tmp))
+    {
         np.getParam(tmp, rate);
     }
     ros::Rate loop_rate(rate);
 
     // read distances from UWB and simplify them (publish on /disthandle_pub)
-    if (std::all_of(std::begin(flags), std::end(flags),[](bool b){return b;})) {
+    if (std::all_of(std::begin(flags), std::end(flags), [](bool b)
+                    { return b; }))
+    {
 
         // params found
         ROS_INFO("Params found");
@@ -81,15 +86,15 @@ int main(int argc, char **argv)
         std::string tmp;
         std::vector<bool> flags;
         tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_subT";
-        np.getParam(tmp, subNameT);  
+        np.getParam(tmp, subNameT);
         tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubDist";
-        np.getParam(tmp, pubNameT);  
+        np.getParam(tmp, pubNameT);
         tmp = "/DT" + std::to_string(tagID) + "/jackAPIName";
-        np.getParam(tmp, jackName);  
+        np.getParam(tmp, jackName);
         tmp = "/DT" + std::to_string(tagID) + "/NanchorMesh";
-        np.getParam(tmp, Nanchors);  
+        np.getParam(tmp, Nanchors);
         tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_subA";
-        np.getParam(tmp, subNameA);  
+        np.getParam(tmp, subNameA);
         tmp = "/DT" + std::to_string(tagID) + "/jack_disthandle_pubGrad";
         np.getParam(tmp, pubNameTril);
         tmp = "/DT" + std::to_string(tagID) + "/Ntags";
@@ -115,58 +120,62 @@ int main(int argc, char **argv)
         // publisher
         jackNode._jack_disthandle_P = np.advertise<jackal_op::MeshUWBCentral>(pubNameT, 1000);
         jackNode._jack_trilateration_P = np.advertise<jackal_op::GradientDescent>(pubNameTril, 1000);
-        jackNode._jack_odometry_P = np.advertise<nav_msgs::Odometry>(pubNameTrilodom, 1000);    
+        jackNode._jack_odometry_P = np.advertise<nav_msgs::Odometry>(pubNameTrilodom, 1000);
         ROS_INFO("Publishers initialized");
 
         // spin
         ROS_INFO("Spinning");
 
         // spin with loop rate
-        while (ros::ok()) {
-            
-            //spin
+        while (ros::ok())
+        {
+
+            // spin
             ros::spinOnce();
 
             // get transform
-            if (tagID >= 0){
-                try{
+            if (tagID >= 0)
+            {
+                try
+                {
 
                     // from child to odom
-                    for (i=0;i<jackNode._Ntags;i++){
+                    for (i = 0; i < jackNode._Ntags; i++)
+                    {
 
                         jackNode.GetFrames(child, base, i);
                         isFramePresent = (tfBuffer._frameExists(child) && tfBuffer._frameExists(base));
-                        if (isFramePresent){
-                            jackNode._transformStamped.transforms[i] = tfBuffer.lookupTransform(child,base,ros::Time(0));
+                        if (isFramePresent)
+                        {
+                            jackNode._transformStamped.transforms[i] = tfBuffer.lookupTransform(child, base, ros::Time(0));
                         }
-
                     }
                     // from odom to world
                     isFramePresent = (tfBuffer._frameExists("odom") && tfBuffer._frameExists("world"));
-                    if (isFramePresent){
-                        jackNode._transformStamped.transforms[jackNode._Ntags] = tfBuffer.lookupTransform("odom","world",ros::Time(0));
+                    if (isFramePresent)
+                    {
+                        jackNode._transformStamped.transforms[jackNode._Ntags] = tfBuffer.lookupTransform("odom", "world", ros::Time(0));
                     }
 
                     // wanna see the transformation?
-                    // ROS_WARN("Trasl: %g %g %g", 
+                    // ROS_WARN("Trasl: %g %g %g",
                     // jackNode._transformStamped.transforms[jackNode._Ntags].transform.translation.x,
                     // jackNode._transformStamped.transforms[jackNode._Ntags].transform.translation.y,
                     // jackNode._transformStamped.transforms[jackNode._Ntags].transform.translation.z);
-                    
                 }
-                catch (tf2::TransformException &ex) {
-                    ROS_WARN("ARARMAX DISTHANDLE: %s",ex.what());
+                catch (tf2::TransformException &ex)
+                {
+                    ROS_WARN("ARARMAX DISTHANDLE: %s", ex.what());
                 }
             }
 
             // sleep
             loop_rate.sleep();
             ++cnt;
-
         }
-
     }
-    else {
+    else
+    {
 
         // throw error
         ROS_ERROR("Params not found for jackal_op - jack_disthandle - get UWB");

@@ -35,7 +35,10 @@ int main(int argc, char** argv) {
   bool bReadCentroids = false;
 
   // connect to Vicon stream
+  ROS_WARN("START");
+  Output_GetVersion Output = MyClient.GetVersion();
   const Output_Connect ConnectResult = MyClient.Connect( "132.68.134.248" );
+  
   const bool ok = (ConnectResult.Result == Result::Success );
   Output_IsConnected Status;
 
@@ -171,7 +174,7 @@ int main(int argc, char** argv) {
       delta[1] = Transform.transform.translation.y;
       delta[2] = Transform.transform.translation.z;
       PosNew = RPos*PosOld + delta;
-      // PosNew = PosOld;
+      PosNew = PosOld;
 
       ViconMsg.pose.pose.position.x = PosNew[0];
       ViconMsg.pose.pose.position.y = PosNew[1];
