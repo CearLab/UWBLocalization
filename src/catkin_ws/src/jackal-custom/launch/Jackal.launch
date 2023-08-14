@@ -19,6 +19,12 @@
   <!--include file="$(find jackal-custom)/launch/descriptions/accessories.launch">
   </include-->
 
+  <!-- Teleop node  -->
+  <include file="$(find jackal-custom)/launch/control/teleop.launch">
+    <arg name="joystick" value="$(arg joystick)" />
+    <arg name="joy_dev" value="$(arg joy_dev)" />
+  </include>
+
   <!-- ###### TRILATERATION  - CENTRALIZED ######-->
   <node name="DT5" pkg="jackal_op" type="jack_disthandle_centralized" args="5">
     <rosparam command="load" file="$(find jackal_op)/config/jackal_op_disthandle_centralized.yaml"/>
